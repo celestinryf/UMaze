@@ -1,4 +1,4 @@
-package main
+package model
 
 // This will hold the current game state
 // Will hold the maze associated with this game.
@@ -13,7 +13,7 @@ type game struct {
 func initGame() *game {
 
 	newGame := &game{
-		gameMaze: initMaze(5, 5), // values can be changed later
+		gameMaze: initMaze(), // values can be changed later
 	}
 
 	return newGame
