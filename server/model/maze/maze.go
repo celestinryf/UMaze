@@ -9,6 +9,9 @@ type Maze struct {
 	currC int
 }
 
+// add getters and setters
+// add a toString method
+
 func InitMaze() *Maze {
 
 	newMaze := &Maze{
@@ -32,6 +35,10 @@ func InitMaze() *Maze {
 	}
 
 	newMaze.rooms[rand.Intn(len(newMaze.rooms)-1)].isExit = true
+
+	// make sure starting rooms / ending rooms have nothing else in them
+	// one item per room
+
 	var startingRoom *room
 	for {
 		startingRoom = newMaze.rooms[rand.Intn(len(newMaze.rooms)-1)]
