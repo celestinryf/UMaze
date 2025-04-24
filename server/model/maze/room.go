@@ -1,4 +1,4 @@
-package model
+package maze
 
 type area interface {
 	canPass() bool

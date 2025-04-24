@@ -1,17 +1,17 @@
-package model
+package maze
 
 import "math/rand"
 
-type maze struct {
+type Maze struct {
 	arr   [][]area
 	rooms []*room
 	currR int
 	currC int
 }
 
-func initMaze() *maze {
+func InitMaze() *Maze {
 
-	newMaze := &maze{
+	newMaze := &Maze{
 		arr:   make([][]area, mazeHeight),
 		rooms: make([]*room, 0),
 	}
