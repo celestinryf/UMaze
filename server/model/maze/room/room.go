@@ -26,6 +26,7 @@ func (r *room) canPass() bool {
 // make a set exit
 // makea a set explored
 
+// String method to display a room
 func (r room) String() string {
 	explored, exit, pit := 0, 0, 0
 	if r.isExplored {
