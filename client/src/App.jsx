@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Menu from './routes/menu/menu.jsx'
+import HeroSelect from './routes/HeroSelect/HeroSelect.jsx';
 
 function App() {
   return (
@@ -9,6 +10,7 @@ function App() {
       <div className="App">
         <Routes>
             <Route path="/menu" element={<Menu />} />
+            <Route path="/menu/select" element={<HeroSelect />} />
         </Routes>
       </div>
     </Router>
