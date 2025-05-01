@@ -1,25 +1,26 @@
 package model
 
-import "github.com/celestinryf/go-backend/model/maze"
+var currGame *Game
 
-type game struct {
-	gameMaze *maze.Maze
-	// has a hero guy
+type Game struct {
+	maze string
+	hero string
 }
 
-// should control the game
-// prints the current room over and over again (based on curr loaction)
-// give options, (move, use a potion, attack)
-// ends when the user wins
-// at the conclusion display entire dungeon
-// choose a hero method
-// save and load game (allow user to save by the name) (serialization)
-
-func initGame() *game {
-
-	newGame := &game{
-		gameMaze: maze.InitMaze(),
+func InitGame() {
+	currGame = &Game{
+		maze: "I am the Maze",
 	}
+}
 
-	return newGame
+func GetCurrGame() *Game {
+	return currGame
+}
+
+func (g *Game) SetHero(theHeroType int) {
+	if theHeroType == 1 {
+		g.hero = "One"
+	} else {
+		g.hero = "Default"
+	}
 }
