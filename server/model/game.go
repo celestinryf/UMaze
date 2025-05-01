@@ -1,26 +1,32 @@
 package model
 
-var currGame *Game
-
+// This represents the current game
 type Game struct {
-	maze string
-	hero string
+	theMaze *maze
+	theHero string
 }
 
+// This is the current game being played
+var myGame *Game
+
+// Gives an initialzed game. (no initing the hero)
 func InitGame() {
-	currGame = &Game{
-		maze: "I am the Maze",
+	myGame = &Game{
+		theMaze: initMaze(),
 	}
 }
 
+// Return the current gam ebeing played
 func GetCurrGame() *Game {
-	return currGame
+	return myGame
 }
 
+// Given a int, sets the hero type
 func (g *Game) SetHero(theHeroType int) {
-	if theHeroType == 1 {
-		g.hero = "One"
-	} else {
-		g.hero = "Default"
+	switch theHeroType {
+	case 1:
+		g.theHero = "One"
+	default:
+		g.theHero = "Default"
 	}
 }
