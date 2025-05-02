@@ -9,9 +9,6 @@ type Maze struct {
 	currC int
 }
 
-// add getters and setters
-// add a toString method
-
 func InitMaze() *Maze {
 
 	newMaze := &Maze{
