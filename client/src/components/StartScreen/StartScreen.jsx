@@ -12,7 +12,7 @@ function HomePage() {
         <div className="game-buttons">
           <Link to="/play" className="game-button">PLAY GAME</Link>
           <Link to="/menu" className="game-button">MENU</Link>
-          <button className="game-button">OPTIONS</button>
+          <Link to="/menu/options" className="game-button">OPTIONS</Link>
         </div>
         
         <div className="game-footer">
