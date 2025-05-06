@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Menu from './routes/menu/menu.jsx'
+import StartScreen from './routes/startscreen/StartScreen.jsx';
+import Menu from './routes/menu/menu.jsx';
 import HeroSelect from './routes/HeroSelect/HeroSelect.jsx';
 
 
