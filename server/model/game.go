@@ -3,7 +3,7 @@ package model
 // This represents the current game
 type Game struct {
 	theMaze *maze
-	theHero string
+	theHero *hero
 }
 
 // This is the current game being played
@@ -21,12 +21,7 @@ func GetCurrGame() *Game {
 	return myGame
 }
 
-// Given a int, sets the hero type
+// Given a int, sets the hero
 func (g *Game) SetHero(theHeroType int) {
-	switch theHeroType {
-	case 1:
-		g.theHero = "One"
-	default:
-		g.theHero = "Default"
-	}
+	g.theHero = initHero(theHeroType)
 }
