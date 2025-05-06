@@ -1,46 +1,65 @@
 package model
 
-import "math/rand/v2"
+import "math/rand"
 
+// maze has dimensions of mazeSize * mazeSize
 const mazeSize = 21
 
+// Holds the grid of the maze.
 type maze struct {
-	grid [mazeSize][mazeSize]bool
+	grid [mazeSize][mazeSize]*room
 }
 
+// inits the maze struct and returns a pointer to a maze
 func initMaze() *maze {
+
 	newMaze := maze{
 		grid: newGrid(),
 	}
-	// make the start and the end
+
+	// set up valid rooms
+	validRooms := make([]*room, 0)
+	for i := range newMaze.grid {
+		for j := range newMaze.grid[0] {
+			if newMaze.grid[i][j].roomType == path {
+				validRooms = append(validRooms, newMaze.grid[i][j])
+			}
+		}
+	}
+
+	// make a starting room
+	randInt := rand.Intn(len(validRooms) - 1)
+	validRooms[randInt].roomType = start
+	validRooms = removeElement(validRooms, randInt)
+	// make an ending room
+	randInt = rand.Intn(len(validRooms) - 1)
+	validRooms[randInt].roomType = end
+	validRooms = removeElement(validRooms, randInt)
+	// set pillar1
+	randInt = rand.Intn(len(validRooms) - 1)
+	validRooms[randInt].pillarType = pillar1
+	validRooms = removeElement(validRooms, randInt)
+	// set pillar2
+	randInt = rand.Intn(len(validRooms) - 1)
+	validRooms[randInt].pillarType = pillar2
+	validRooms = removeElement(validRooms, randInt)
+	// set pillar3
+	randInt = rand.Intn(len(validRooms) - 1)
+	validRooms[randInt].pillarType = pillar3
+	validRooms = removeElement(validRooms, randInt)
+	// set pillar4
+	randInt = rand.Intn(len(validRooms) - 1)
+	validRooms[randInt].pillarType = pillar4
+	validRooms = removeElement(validRooms, randInt)
+
+	// sets up potions, monsters, and pits
+	for _, val := range validRooms {
+		val.setUpRoom()
+	}
+
 	return &newMaze
 }
 
-func newGrid() [mazeSize][mazeSize]bool {
-	var grid [mazeSize][mazeSize]bool
-	setupNewGrid(1, 1, grid) // can be random
-
-	return grid
-}
-
-func setupNewGrid(x, y int, grid [mazeSize][mazeSize]bool) {
-	directions := [][2]int{
-		{0, 2},
-		{2, 0},
-		{0, -2},
-		{-2, 0},
-	}
-	rand.Shuffle(len(directions), func(i, j int) {
-		directions[i], directions[j] = directions[j], directions[i]
-	})
-	grid[y][x] = true
-	for _, dir := range directions {
-		newX := x + dir[0]
-		newY := y + dir[1]
-		if newX > 0 && newX < mazeSize-1 && newY > 0 && newY < mazeSize-1 && !grid[newY][newX] {
-			grid[newY][newX] = true
-			grid[y+dir[1]/2][x+dir[0]/2] = true
-			setupNewGrid(newX, newY, grid)
-		}
-	}
+func removeElement(slice []*room, index int) []*room {
+	return append(slice[:index], slice[index+1:]...)
 }
