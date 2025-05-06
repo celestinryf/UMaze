@@ -3,7 +3,6 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
 import Menu from './routes/menu/menu.jsx'
 import HeroSelect from './routes/HeroSelect/HeroSelect.jsx';
-import StartScreen from './StartScreen';
 
 
 function App() {
