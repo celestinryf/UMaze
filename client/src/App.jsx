@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import './App.css';
-import Menu from './routes/menu/menu.jsx'
-import StartScreen from './StartScreen';
+import StartScreen from './routes/startscreen/StartScreen.jsx';
 
 function App() {
   return (
@@ -10,8 +9,7 @@ function App() {
       <div className="App">
         <Routes>
             <Route path="/" element={<StartScreen />} />
-            <Route path="/menu" element={<Menu />} />
-            <Route path="/play" element={<div>This will take you to the gameplay.. eventually</div>} />
+            <Route path="/game" element={<div>This will take you to the gameplay.. eventually</div>} />
         </Routes>
       </div>
     </Router>
