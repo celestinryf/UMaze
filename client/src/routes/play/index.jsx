@@ -1,15 +1,16 @@
 import React, { useEffect, useState } from 'react';
 
 const Menu = () => {
-    const [message, setMessage] = useState('');
+    const [gameData, setGameData] = useState(null);
     const [error, setError] = useState(null);
 
     useEffect(() => {
         const testConnection = async () => {
             try {
                 const res = await fetch('/api/game', { method: 'POST' });
+                if (!res.ok) throw new Error('Network response was not ok');
                 const data = await res.json();
-                setMessage(data.message || 'Success');
+                setGameData(data);
             } catch (err) {
                 console.error('Connection error:', err);
                 setError('Failed to connect to backend');
@@ -23,8 +24,15 @@ const Menu = () => {
         <div style={{ padding: '2rem', textAlign: 'center' }}>
             {error ? (
                 <p style={{ color: 'red' }}>{error}</p>
+            ) : gameData ? (
+                <>
+                    <h2>Game Data</h2>
+                    <pre style={{ textAlign: 'left', background: '#f0f0f0', padding: '1rem', overflowX: 'auto' }}>
+                        {JSON.stringify(gameData, null, 2)}
+                    </pre>
+                </>
             ) : (
-                <h2>{message || 'Connecting to backend...'}</h2>
+                <p>Connecting to backend...</p>
             )}
         </div>
     );
