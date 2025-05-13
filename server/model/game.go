@@ -2,8 +2,8 @@ package model
 
 // This represents the current game
 type Game struct {
-	theMaze *maze
-	theHero *hero
+	TheMaze *Maze `json:"Maze"`
+	TheHero *Hero `json:"Hero"`
 }
 
 // This is the current game being played
@@ -12,7 +12,7 @@ var myGame *Game
 // Gives an initialzed game. (no initing the hero)
 func InitGame() {
 	myGame = &Game{
-		theMaze: initMaze(),
+		TheMaze: initMaze(),
 	}
 }
 
@@ -23,5 +23,5 @@ func GetCurrGame() *Game {
 
 // Given a int, sets the hero
 func (g *Game) SetHero(theHeroType int) {
-	g.theHero = initHero(theHeroType)
+	g.TheHero = initHero(theHeroType)
 }

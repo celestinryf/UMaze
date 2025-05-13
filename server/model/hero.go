@@ -1,34 +1,34 @@
 package model
 
 // Hero Type with name, totalHealth, currHealth, and attack.
-type hero struct {
-	name           string
-	totalHealth    int
-	currHealth     int
-	attack         int
-	aquiredPillars []pillar
-	aquiredPotions []potion
+type Hero struct {
+	Name           string   `json:"name"`
+	TotalHealth    int      `json:"totalHealth"`
+	CurrHealth     int      `json:"currHealth"`
+	Attack         int      `json:"attack"`
+	AquiredPillars []Pillar `json:"aquiredPillars"`
+	AquiredPotions []Potion `json:"aquiredPotions"`
 }
 
 // Inits hero with totalHealth,
 // currHealth, attack, and name.
-func initHero(heroType int) *hero {
+func initHero(heroType int) *Hero {
 	switch heroType {
 	case 0:
-		return &hero{
-			name:           "Hero0",
-			totalHealth:    100,
-			currHealth:     100,
-			attack:         20,
-			aquiredPillars: make([]pillar, 0),
-			aquiredPotions: make([]potion, 0),
+		return &Hero{
+			Name:           "Hero0",
+			TotalHealth:    100,
+			CurrHealth:     100,
+			Attack:         20,
+			AquiredPillars: make([]Pillar, 0),
+			AquiredPotions: make([]Potion, 0),
 		}
 	default:
-		return &hero{
-			name:        "Hero1",
-			totalHealth: 150,
-			currHealth:  150,
-			attack:      15,
+		return &Hero{
+			Name:        "Hero1",
+			TotalHealth: 150,
+			CurrHealth:  150,
+			Attack:      15,
 		}
 	}
 }

@@ -6,50 +6,50 @@ import "math/rand"
 const mazeSize = 21
 
 // Holds the grid of the maze.
-type maze struct {
-	grid [mazeSize][mazeSize]*room
+type Maze struct {
+	Grid [mazeSize][mazeSize]*Room `json:"grid"`
 }
 
 // inits the maze struct and returns a pointer to a maze
-func initMaze() *maze {
+func initMaze() *Maze {
 
-	newMaze := maze{
-		grid: newGrid(),
+	newMaze := Maze{
+		Grid: newGrid(),
 	}
 
 	// set up valid rooms
-	validRooms := make([]*room, 0)
-	for i := range newMaze.grid {
-		for j := range newMaze.grid[0] {
-			if newMaze.grid[i][j].roomType == path {
-				validRooms = append(validRooms, newMaze.grid[i][j])
+	validRooms := make([]*Room, 0)
+	for i := range newMaze.Grid {
+		for j := range newMaze.Grid[0] {
+			if newMaze.Grid[i][j].RoomType == path {
+				validRooms = append(validRooms, newMaze.Grid[i][j])
 			}
 		}
 	}
 
 	// make a starting room
 	randInt := rand.Intn(len(validRooms) - 1)
-	validRooms[randInt].roomType = start
+	validRooms[randInt].RoomType = start
 	validRooms = removeElement(validRooms, randInt)
 	// make an ending room
 	randInt = rand.Intn(len(validRooms) - 1)
-	validRooms[randInt].roomType = end
+	validRooms[randInt].RoomType = end
 	validRooms = removeElement(validRooms, randInt)
 	// set pillar1
 	randInt = rand.Intn(len(validRooms) - 1)
-	validRooms[randInt].pillarType = pillar1
+	validRooms[randInt].PillarType = pillar1
 	validRooms = removeElement(validRooms, randInt)
 	// set pillar2
 	randInt = rand.Intn(len(validRooms) - 1)
-	validRooms[randInt].pillarType = pillar2
+	validRooms[randInt].PillarType = pillar2
 	validRooms = removeElement(validRooms, randInt)
 	// set pillar3
 	randInt = rand.Intn(len(validRooms) - 1)
-	validRooms[randInt].pillarType = pillar3
+	validRooms[randInt].PillarType = pillar3
 	validRooms = removeElement(validRooms, randInt)
 	// set pillar4
 	randInt = rand.Intn(len(validRooms) - 1)
-	validRooms[randInt].pillarType = pillar4
+	validRooms[randInt].PillarType = pillar4
 	validRooms = removeElement(validRooms, randInt)
 
 	// sets up potions, monsters, and pits
@@ -60,6 +60,6 @@ func initMaze() *maze {
 	return &newMaze
 }
 
-func removeElement(slice []*room, index int) []*room {
+func removeElement(slice []*Room, index int) []*Room {
 	return append(slice[:index], slice[index+1:]...)
 }

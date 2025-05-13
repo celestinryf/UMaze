@@ -3,17 +3,17 @@ package model
 import "math/rand"
 
 // for room Type enums
-type roomTypes int
+type RoomTypes int
 
 // for pillar type enums
-type pillar int
+type Pillar int
 
 // potion types
-type potion int
+type Potion int
 
 // room enums
 const (
-	wall roomTypes = iota
+	wall RoomTypes = iota
 	start
 	end
 	path
@@ -22,7 +22,7 @@ const (
 
 // pillar enums
 const (
-	pillar1 pillar = iota
+	pillar1 Pillar = iota
 	pillar2
 	pillar3
 	pillar4
@@ -31,30 +31,30 @@ const (
 
 // potion enums
 const (
-	potion1 potion = iota
+	potion1 Potion = iota
 	potion2
 )
 
 // Rooms make up the maze
 // currently has canPass and roomMonster
-type room struct {
-	roomType    roomTypes
-	roomMonster *monster
-	pillarType  pillar
-	potionType  potion
+type Room struct {
+	RoomType    RoomTypes `json:"RoomType"`
+	RoomMonster *Monster  `json:"RoomMonster"`
+	PillarType  Pillar    `json:"PillarType"`
+	PotionType  Potion    `json:"PotionType"`
 }
 
 // Inits and returns a room based on
 // whether we canPass through or not.
-func initRoom(theRoomTypes roomTypes) *room {
-	return &room{
-		roomType:   theRoomTypes,
-		pillarType: noPillar,
+func initRoom(theRoomTypes RoomTypes) *Room {
+	return &Room{
+		RoomType:   theRoomTypes,
+		PillarType: noPillar,
 	}
 }
 
 // sets up rooms with pits, potions, and monsters
-func (r *room) setUpRoom() {
+func (r *Room) setUpRoom() {
 	// if val is 10 or less add a pit
 	pPit := 10
 	// if val is 10 < x <= 20 add a monster
@@ -65,10 +65,10 @@ func (r *room) setUpRoom() {
 	ranNum := rand.Intn(100)
 	switch {
 	case ranNum <= pPit:
-		r.roomType = pit
+		r.RoomType = pit
 	case ranNum <= pMon:
-		r.roomMonster = initMonster()
+		r.RoomMonster = initMonster()
 	case ranNum <= pPot:
-		r.potionType = potion1
+		r.PotionType = potion1
 	}
 }
