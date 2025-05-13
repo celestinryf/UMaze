@@ -12,7 +12,7 @@ func GameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
-	model.InitGame()
+	model.InitGame(4) // eventually get form the request based on the hero chosen
 	currGame := model.GetCurrGame()
 
 	switch r.Method {

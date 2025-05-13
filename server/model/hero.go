@@ -1,5 +1,11 @@
 package model
 
+import (
+	"database/sql"
+	"fmt"
+	"log"
+)
+
 // Hero Type with name, totalHealth, currHealth, and attack.
 type Hero struct {
 	Name           string   `json:"name"`
@@ -10,25 +16,44 @@ type Hero struct {
 	AquiredPotions []Potion `json:"aquiredPotions"`
 }
 
+// hero type can be 4, 5, or 6
+// 4 = healer
+// 5 = giant
+// 6 = barbarian
+
 // Inits hero with totalHealth,
 // currHealth, attack, and name.
-func initHero(heroType int) *Hero {
-	switch heroType {
-	case 0:
-		return &Hero{
-			Name:           "Hero0",
-			TotalHealth:    100,
-			CurrHealth:     100,
-			Attack:         20,
-			AquiredPillars: make([]Pillar, 0),
-			AquiredPotions: make([]Potion, 0),
-		}
-	default:
-		return &Hero{
-			Name:        "Hero1",
-			TotalHealth: 150,
-			CurrHealth:  150,
-			Attack:      15,
-		}
+func initHero(heroType int, db *sql.DB) *Hero {
+
+	if 4 > heroType || heroType > 6 {
+		fmt.Println("You did not enter hero 4, 5, or 6")
+	}
+
+	hero_stats, err := db.Query("SELECT name, health, attack_dmg FROM entities WHERE id = ?", heroType)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer hero_stats.Close()
+
+	var (
+		name               string
+		health, attack_dmg int
+	)
+
+	hero_stats.Next()
+	err = hero_stats.Scan(&name, &health, &attack_dmg)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(name, health, attack_dmg)
+
+	return &Hero{
+		Name:           name,
+		TotalHealth:    health,
+		CurrHealth:     health,
+		Attack:         attack_dmg,
+		AquiredPillars: make([]Pillar, 0),
+		AquiredPotions: make([]Potion, 0),
 	}
 }

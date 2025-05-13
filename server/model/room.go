@@ -1,6 +1,11 @@
 package model
 
-import "math/rand"
+import (
+	"database/sql"
+	"fmt"
+	"log"
+	"math/rand"
+)
 
 // for room Type enums
 type RoomTypes int
@@ -54,21 +59,41 @@ func initRoom(theRoomTypes RoomTypes) *Room {
 }
 
 // sets up rooms with pits, potions, and monsters
-func (r *Room) setUpRoom() {
-	// if val is 10 or less add a pit
-	pPit := 10
-	// if val is 10 < x <= 20 add a monster
-	pMon := 20
-	// if val is 20 < x <= 30 add a potion
-	pPot := 30
-	// else nothing
-	ranNum := rand.Intn(100)
-	switch {
-	case ranNum <= pPit:
+func (r *Room) setUpRoom(db *sql.DB) {
+
+	probs, err := db.Query("SELECT * FROM spawn_rates")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer probs.Close()
+
+	ranNum := rand.Intn(100) // random number generated
+
+	currProb := 0 // curr number from probabilities
+	id := 0       // curr id, at end of loop it will be 1->3
+
+	for probs.Next() {
+		var prob, currId int
+		err = probs.Scan(&currId, &prob)
+		if err != nil {
+			log.Fatal(err)
+		}
+		currProb += prob
+		if currProb >= ranNum {
+			id = currId
+			break
+		}
+	}
+
+	fmt.Println(id)
+
+	switch id {
+	case 1:
 		r.RoomType = pit
-	case ranNum <= pMon:
-		r.RoomMonster = initMonster()
-	case ranNum <= pPot:
+	case 2:
+		r.RoomMonster = initMonster(db)
+	case 3:
 		r.PotionType = potion1
 	}
+
 }
