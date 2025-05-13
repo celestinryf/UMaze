@@ -1,6 +1,9 @@
 package model
 
-import "math/rand"
+import (
+	"database/sql"
+	"math/rand"
+)
 
 // maze has dimensions of mazeSize * mazeSize
 const mazeSize = 21
@@ -11,7 +14,7 @@ type Maze struct {
 }
 
 // inits the maze struct and returns a pointer to a maze
-func initMaze() *Maze {
+func initMaze(db *sql.DB) *Maze {
 
 	newMaze := Maze{
 		Grid: newGrid(),
@@ -54,7 +57,7 @@ func initMaze() *Maze {
 
 	// sets up potions, monsters, and pits
 	for _, val := range validRooms {
-		val.setUpRoom()
+		val.setUpRoom(db)
 	}
 
 	return &newMaze
