@@ -9,17 +9,17 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
-// This represents the current game
-type Game struct {
-	TheMaze *Maze `json:"Maze"`
-	TheHero *Hero `json:"Hero"`
-}
-
 // savedGameQuery, err := db.Query("SELECT (id, name, date) FROM saved_games")
 type JsonGame struct {
 	Id   int    `json:"Id"`
 	Name string `json:"Name"`
 	Date string `json:"Date"`
+}
+
+// This represents the current game
+type Game struct {
+	TheMaze *Maze `json:"Maze"`
+	TheHero *Hero `json:"Hero"`
 }
 
 // This is the current game being played
