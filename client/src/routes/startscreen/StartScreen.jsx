@@ -12,7 +12,7 @@ function StartScreen() {
         <div className={styles.gameButtons}>
           <Link to="/play" className={styles.gameButton}>NEW GAME</Link>
           <Link to="/menu" className={styles.gameButton}>LOAD GAME</Link>
-          <button className={styles.gameButton}>OPTIONS</button>
+          <Link to="/options" className={styles.gameButton}>OPTIONS</Link>
         </div>
         
         <div className={styles.gameFooter}>
