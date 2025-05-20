@@ -2,7 +2,6 @@ package model
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
 	"math/rand"
 )
@@ -27,17 +26,19 @@ const (
 
 // pillar enums
 const (
-	pillar1 Pillar = iota
+	noPillar Pillar = iota
+	pillar1
 	pillar2
 	pillar3
 	pillar4
-	noPillar
 )
 
 // potion enums
 const (
-	potion1 Potion = iota
+	noPotion Potion = iota
+	potion1
 	potion2
+	potion3
 )
 
 // Rooms make up the maze
@@ -51,10 +52,12 @@ type Room struct {
 
 // Inits and returns a room based on
 // whether we canPass through or not.
-func initRoom(theRoomTypes RoomTypes) *Room {
+func initRoom(theRoomType RoomTypes) *Room {
 	return &Room{
-		RoomType:   theRoomTypes,
-		PillarType: noPillar,
+		RoomType:    theRoomType,
+		PillarType:  noPillar,
+		PotionType:  noPotion,
+		RoomMonster: nil,
 	}
 }
 
@@ -85,15 +88,20 @@ func (r *Room) setUpRoom(db *sql.DB) {
 		}
 	}
 
-	fmt.Println(id)
-
 	switch id {
 	case 1:
 		r.RoomType = pit
 	case 2:
 		r.RoomMonster = initMonster(db)
 	case 3:
-		r.PotionType = potion1
+		potion := rand.Intn(3) + 1
+		switch potion {
+		case 1:
+			r.PotionType = potion1
+		case 2:
+			r.PotionType = potion2
+		case 3:
+			r.PotionType = potion3
+		}
 	}
-
 }
