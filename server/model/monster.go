@@ -10,9 +10,9 @@ import (
 // currHealth, and attack
 type Monster struct {
 	Name        string `json:"Name"`
-	totalHealth int
-	CurrHealth  int `json:"CurrHealth"`
-	Attack      int `json:"Attack"`
+	TotalHealth int    `json:"TotalHealth`
+	CurrHealth  int    `json:"CurrHealth"`
+	Attack      int    `json:"Attack"`
 }
 
 // inits a random monster
@@ -40,7 +40,7 @@ func initMonster(db *sql.DB) *Monster {
 
 	newMonster := &Monster{
 		Name:        name,
-		totalHealth: health,
+		TotalHealth: health,
 		CurrHealth:  health,
 		Attack:      attack_dmg,
 	}

@@ -7,8 +7,8 @@ import (
 
 // Hero Type with name, totalHealth, currHealth, and attack.
 type Hero struct {
-	Name           string `json:"Name"`
-	totalHealth    int
+	Name           string   `json:"Name"`
+	TotalHealth    int      `json:"TotalHealh"`
 	CurrHealth     int      `json:"CurrHealth"`
 	Attack         int      `json:"Attack"`
 	AquiredPillars []Pillar `json:"AquiredPillars"`
@@ -38,7 +38,7 @@ func initHero(heroType int, db *sql.DB) *Hero {
 
 	return &Hero{
 		Name:           name,
-		totalHealth:    health,
+		TotalHealth:    health,
 		CurrHealth:     health,
 		Attack:         attack_dmg,
 		AquiredPillars: make([]Pillar, 0),
