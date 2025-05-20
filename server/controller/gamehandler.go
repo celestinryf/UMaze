@@ -8,6 +8,7 @@ import (
 	"github.com/celestinryf/go-backend/model"
 )
 
+// Hanldes requests for making games
 func GameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
