@@ -19,6 +19,10 @@ type Hero struct {
 // currHealth, attack, and name.
 func initHero(heroType int, db *sql.DB) *Hero {
 
+	if heroType < 4 || heroType > 6 {
+		return nil
+	}
+
 	hero_stats, err := db.Query("SELECT name, health, attack_dmg FROM entities WHERE id = ?", heroType)
 	if err != nil {
 		log.Fatal(err)
