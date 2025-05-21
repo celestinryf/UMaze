@@ -9,6 +9,13 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// savedGameQuery, err := db.Query("SELECT (id, name, date) FROM saved_games")
+type JsonGame struct {
+	Id   int    `json:"Id"`
+	Name string `json:"Name"`
+	Date string `json:"Date"`
+}
+
 // This represents the current game
 type Game struct {
 	TheMaze *Maze `json:"Maze"`
@@ -76,16 +83,8 @@ func RetrieveGame(game_id int) {
 	defer db.Close()
 
 	// Get the game by the id
-	game_query, err := db.Query("SELECT info FROM saved_games WHERE id = ?", game_id)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer game_query.Close()
-	game_query.Next()
-
-	// set MyGame to game_query result
 	var jsonData []byte
-	err = game_query.Scan(&jsonData)
+	err = db.QueryRow("SELECT info FROM saved_games WHERE id = ?", game_id).Scan(&jsonData)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -97,6 +96,29 @@ func RetrieveGame(game_id int) {
 }
 
 // Gets a list of all the name of the loaded games
-func GetStoredGames() {
+func GetStoredGames() []JsonGame {
 
+	db, err := sql.Open("sqlite3", "./db/360Game.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	savedGameQuery, err := db.Query("SELECT id, name, date FROM saved_games")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer savedGameQuery.Close()
+
+	savedGameArr := make([]JsonGame, 0)
+	for savedGameQuery.Next() {
+		saved_game := JsonGame{}
+		err = savedGameQuery.Scan(&saved_game.Id, &saved_game.Name, &saved_game.Date)
+		if err != nil {
+			log.Fatal(err)
+		}
+		savedGameArr = append(savedGameArr, saved_game)
+	}
+
+	return savedGameArr
 }

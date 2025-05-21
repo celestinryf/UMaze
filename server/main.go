@@ -15,6 +15,8 @@ func main() {
 
 	fmt.Println("Starting server on :8080")
 	http.HandleFunc("/api/game/", controller.GameHandler)
+	http.HandleFunc("/api/maze/", controller.MazeHandler)
+	http.HandleFunc("/api/load/", controller.LoadHandler)
 	err := http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)
