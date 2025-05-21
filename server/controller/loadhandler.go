@@ -36,13 +36,13 @@ func LoadHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "PUT": // Load a game
 		var data struct {
-			id int `json:"id"`
+			Id int `json:"id"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&data); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		model.RetrieveGame(data.id)
+		model.RetrieveGame(data.Id)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",

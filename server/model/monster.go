@@ -10,7 +10,7 @@ import (
 // currHealth, and attack
 type Monster struct {
 	Name        string `json:"Name"`
-	TotalHealth int    `json:"TotalHealth`
+	TotalHealth int    `json:"TotalHealth"`
 	CurrHealth  int    `json:"CurrHealth"`
 	Attack      int    `json:"Attack"`
 }
