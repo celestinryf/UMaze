@@ -10,7 +10,7 @@ function StartScreen() {
         <h1 className={styles.gameTitle}>Dungeon Maze</h1>
         
         <div className={styles.gameButtons}>
-          <Link to="/play" className={styles.gameButton}>NEW GAME</Link>
+          <Link to="/heroselect" className={styles.gameButton}>NEW GAME</Link>
           <Link to="/menu" className={styles.gameButton}>LOAD GAME</Link>
           <button className={styles.gameButton}>OPTIONS</button>
         </div>

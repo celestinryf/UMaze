@@ -1,0 +1,167 @@
+.heroCard {
+    position: relative;
+    width: 100%;
+    height: 320px;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    background-color: white;
+  }
+  
+  .heroCard:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.25);
+  }
+  
+  .cardInner {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .cardFront {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .imgContainer {
+    height: 60%;
+    overflow: hidden;
+    background-color: #2c3e50;
+    position: relative;
+  }
+  
+  .heroImg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  
+  .heroCard:hover .heroImg {
+    transform: scale(1.1);
+  }
+  
+  .placeholderImg {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 4rem;
+    font-weight: bold;
+    color: white;
+    background: linear-gradient(135deg, #3498db, #9b59b6);
+  }
+  
+  .cardContent {
+    padding: 15px;
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .heroName {
+    margin: 0 0 5px 0;
+    font-size: 1.5rem;
+    color: #333;
+    font-weight: bold;
+    letter-spacing: 0.5px;
+  }
+  
+  .heroShortDesc {
+    font-size: 0.9rem;
+    color: #666;
+    margin-bottom: 10px;
+    line-height: 1.4;
+    flex-grow: 1;
+  }
+  
+  .skillsContainer {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  
+  .skillTag {
+    display: inline-block;
+    padding: 3px 8px;
+    border-radius: 12px;
+    background-color: #f0f8ff;
+    color: #0066cc;
+    font-size: 0.8rem;
+    font-weight: 500;
+  }
+  
+  .skillsText {
+    font-size: 0.9rem;
+    color: #555;
+    font-style: italic;
+  }
+  
+  .moreSkills {
+    font-size: 0.8rem;
+    color: #777;
+    padding: 3px 5px;
+  }
+  
+  .selectIndicator {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    padding: 8px 0;
+    background-color: rgba(76, 175, 80, 0.9);
+    color: white;
+    text-align: center;
+    font-weight: bold;
+    transform: translateY(100%);
+    transition: transform 0.3s ease;
+  }
+  
+  .heroCard:hover .selectIndicator {
+    transform: translateY(0);
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .heroCard {
+      height: 280px;
+    }
+    
+    .heroName {
+      font-size: 1.3rem;
+    }
+    
+    .heroShortDesc {
+      font-size: 0.85rem;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .heroCard {
+      height: 250px;
+      max-width: 280px;
+      margin: 0 auto;
+    }
+    
+    .imgContainer {
+      height: 50%;
+    }
+    
+    .cardContent {
+      padding: 10px;
+    }
+    
+    .heroShortDesc {
+      display: none;
+    }
+    
+    .skillsContainer {
+      margin-top: 5px;
+    }
+  }
