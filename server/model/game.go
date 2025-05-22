@@ -27,19 +27,12 @@ type Game struct {
 var MyGame *Game
 
 // Gives an initialzed game. (no initing the hero)
-func InitGame(theHeroType int, dbPath string) {
+func InitGame(theHeroType int, db *sql.DB) {
 
 	if theHeroType < 3 || theHeroType > 6 {
 		fmt.Println("Hero must be 4, 5, or 6")
 		return
 	}
-
-	db, err := sql.Open("sqlite3", dbPath)
-	//db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
 
 	MyGame = &Game{
 		TheMaze: initMaze(db),
@@ -48,22 +41,21 @@ func InitGame(theHeroType int, dbPath string) {
 }
 
 // Stores current game in the database
-func StoreGame(gameName string) {
+func StoreGame(gameName string, db *sql.DB) {
 
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec(`CREATE TABLE saved_games (
-    	id INTEGER PRIMARY KEY AUTOINCREMENT,
-    	name TEXT,
-    	info TEXT,
-    	date TEXT
+	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS saved_games (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,
+		info TEXT,
+		date TEXT
 	)`)
 	if err != nil {
 		log.Fatal(err)
+	}
+
+	if MyGame == nil {
+		fmt.Println("Can't store nil game")
+		return
 	}
 
 	gameBytes, err := json.Marshal(MyGame)
@@ -80,7 +72,7 @@ func StoreGame(gameName string) {
 }
 
 // Get a game from the db, then set it to the curr game
-func RetrieveGame(game_id int) {
+func RetrieveGame(game_id int, dbPath string) {
 
 	// Open the database
 	db, err := sql.Open("sqlite3", "./db/360Game.db")
