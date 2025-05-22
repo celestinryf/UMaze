@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -28,12 +29,16 @@ func LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		model.StoreGame(data.Name)
+		db, err := sql.Open("sqlite3", "./db/360Game.db")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+		model.StoreGame(data.Name, db)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
 		})
-
 	case "PUT": // Load a game
 		var data struct {
 			Id int `json:"id"`
@@ -42,7 +47,7 @@ func LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		model.RetrieveGame(data.Id)
+		model.RetrieveGame(data.Id, "./db/360Game.db")
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
