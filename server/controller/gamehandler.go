@@ -13,7 +13,7 @@ func GameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
-	model.InitGame(4) // eventually get form the request based on the hero chosen
+	model.InitGame(4, "./db/360Game.db") // eventually get form the request based on the hero chosen
 
 	switch r.Method {
 	case "POST", "GET", "PUT":

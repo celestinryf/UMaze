@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
@@ -26,9 +27,15 @@ type Game struct {
 var MyGame *Game
 
 // Gives an initialzed game. (no initing the hero)
-func InitGame(theHeroType int) {
+func InitGame(theHeroType int, dbPath string) {
 
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
+	if theHeroType < 3 || theHeroType > 6 {
+		fmt.Println("Hero must be 4, 5, or 6")
+		return
+	}
+
+	db, err := sql.Open("sqlite3", dbPath)
+	//db, err := sql.Open("sqlite3", "./db/360Game.db")
 	if err != nil {
 		log.Fatal(err)
 	}
