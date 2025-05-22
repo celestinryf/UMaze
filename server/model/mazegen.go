@@ -17,9 +17,9 @@ func newGrid() [mazeSize][mazeSize]*Room {
 	for i := range modelGrid {
 		for j := range modelGrid[i] {
 			if modelGrid[i][j] {
-				grid[i][j] = initRoom(path)
+				grid[i][j] = InitRoom(true)
 			} else {
-				grid[i][j] = initRoom(wall)
+				grid[i][j] = InitRoom(false)
 			}
 		}
 	}
