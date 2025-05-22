@@ -44,7 +44,7 @@ func initMaze(db *sql.DB) *Maze {
 	}
 
 	for _, room := range validRooms {
-		room.setUpRoom(db)
+		room.SetUpRoom(db)
 	}
 
 	return &newMaze

@@ -17,9 +17,9 @@ func newGrid() [mazeSize][mazeSize]*Room {
 	for i := range modelGrid {
 		for j := range modelGrid[i] {
 			if modelGrid[i][j] {
-				grid[i][j] = initRoom(path)
+				grid[i][j] = InitRoom(true)
 			} else {
-				grid[i][j] = initRoom(wall)
+				grid[i][j] = InitRoom(false)
 			}
 		}
 	}
@@ -37,7 +37,6 @@ func setupNewGrid(x, y int, grid *[mazeSize][mazeSize]bool) {
 	rand.Shuffle(len(directions), func(i, j int) {
 		directions[i], directions[j] = directions[j], directions[i]
 	})
-
 	grid[y][x] = true
 	for _, dir := range directions {
 		newX := x + dir[0]

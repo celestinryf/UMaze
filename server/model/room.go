@@ -52,9 +52,16 @@ type Room struct {
 
 // Inits and returns a room based on
 // whether we canPass through or not.
-func initRoom(theRoomType RoomTypes) *Room {
+func InitRoom(isPath bool) *Room {
+	var roomType RoomTypes
+	if isPath {
+		roomType = path
+	} else {
+		roomType = wall
+	}
+
 	return &Room{
-		RoomType:    theRoomType,
+		RoomType:    roomType,
 		PillarType:  noPillar,
 		PotionType:  noPotion,
 		RoomMonster: nil,
@@ -62,7 +69,7 @@ func initRoom(theRoomType RoomTypes) *Room {
 }
 
 // sets up rooms with pits, potions, and monsters
-func (r *Room) setUpRoom(db *sql.DB) {
+func (r *Room) SetUpRoom(db *sql.DB) {
 
 	probs, err := db.Query("SELECT * FROM spawn_rates")
 	if err != nil {

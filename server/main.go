@@ -8,6 +8,8 @@ import (
 	"github.com/celestinryf/go-backend/model"
 )
 
+//var Random *rand.Rand
+
 // Starting point of the server side of the program
 func main() {
 
