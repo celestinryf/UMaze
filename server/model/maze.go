@@ -20,6 +20,16 @@ type Maze struct {
 	CurrCoords *Coords                   `json:"coords"`
 }
 
+// Gives the status of the game
+type GameStatus int
+
+// Game Status enums
+const (
+	Won GameStatus = iota
+	Lost
+	InProgress
+)
+
 // inits the maze struct and returns a pointer to a maze
 func initMaze(db *sql.DB) *Maze {
 
@@ -70,8 +80,33 @@ func initMaze(db *sql.DB) *Maze {
 }
 
 // Sets curr location to x and y
-func (m *Maze) Move(newCoords *Coords) {
+func (m *Maze) Move(newCoords *Coords) GameStatus {
 	m.CurrCoords = newCoords
+
+	currRoom := m.Grid[newCoords.X][newCoords.Y]
+
+	if currRoom.PotionType != noPotion {
+		MyGame.TheHero.AquiredPotions = append(MyGame.TheHero.AquiredPotions, currRoom.PotionType)
+		currRoom.PotionType = noPotion
+	}
+
+	if currRoom.PillarType != noPillar {
+		MyGame.TheHero.AquiredPillars = append(MyGame.TheHero.AquiredPillars, currRoom.PillarType)
+		currRoom.PillarType = noPillar
+	}
+
+	if currRoom.RoomType == pit {
+		MyGame.TheHero.CurrHealth -= 20 // can change the pit damage
+		if MyGame.TheHero.CurrHealth <= 0 {
+			return Lost
+		}
+	}
+
+	if currRoom.RoomType == end && len(MyGame.TheHero.AquiredPillars) == 4 {
+		return Won
+	}
+
+	return InProgress
 }
 
 // Helper method to remove element from a slice
