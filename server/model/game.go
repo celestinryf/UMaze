@@ -28,12 +28,10 @@ var MyGame *Game
 
 // Gives an initialzed game. (no initing the hero)
 func InitGame(theHeroType int, db *sql.DB) {
-
 	if theHeroType < 3 || theHeroType > 6 {
 		fmt.Println("Hero must be 4, 5, or 6")
 		return
 	}
-
 	MyGame = &Game{
 		TheMaze: initMaze(db),
 		TheHero: initHero(theHeroType, db),

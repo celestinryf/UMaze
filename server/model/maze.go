@@ -8,16 +8,24 @@ import (
 // maze has dimensions of mazeSize * mazeSize
 const mazeSize = 7
 
+// Coordinates of the player
+type Coords struct {
+	X int `json:"x"`
+	Y int `json:"y"`
+}
+
 // Holds the grid of the maze.
 type Maze struct {
-	Grid [mazeSize][mazeSize]*Room `json:"Grid"`
+	Grid       [mazeSize][mazeSize]*Room `json:"Grid"`
+	CurrCoords *Coords                   `json:"coords"`
 }
 
 // inits the maze struct and returns a pointer to a maze
 func initMaze(db *sql.DB) *Maze {
 
 	newMaze := Maze{
-		Grid: newGrid(),
+		Grid:       newGrid(),
+		CurrCoords: nil,
 	}
 
 	validRooms := make([]*Room, 0)
@@ -47,7 +55,23 @@ func initMaze(db *sql.DB) *Maze {
 		room.SetUpRoom(db)
 	}
 
+	for i := range newMaze.Grid {
+		for j := range newMaze.Grid[0] {
+			if newMaze.Grid[i][j].RoomType == start {
+				newMaze.CurrCoords = &Coords{
+					X: i,
+					Y: j,
+				}
+			}
+		}
+	}
+
 	return &newMaze
+}
+
+// Sets curr location to x and y
+func (m *Maze) Move(newCoords *Coords) {
+	m.CurrCoords = newCoords
 }
 
 // Helper method to remove element from a slice
