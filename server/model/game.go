@@ -121,3 +121,17 @@ func GetStoredGames() []JsonGame {
 
 	return savedGameArr
 }
+
+// Remove Game from db, by the id
+func RemoveGame(idToRemove int) {
+	db, err := sql.Open("sqlite3", "./db/360Game.db")
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+	_, err = db.Exec(`DELETE FROM saved_games
+		WHERE id = ?`, idToRemove)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
