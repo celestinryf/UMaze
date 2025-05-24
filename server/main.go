@@ -26,6 +26,7 @@ func main() {
 	http.HandleFunc("/api/game/", controller.GameHandler)
 	http.HandleFunc("/api/maze/", controller.MazeHandler)
 	http.HandleFunc("/api/load/", controller.LoadHandler)
+	http.HandleFunc("/api/battle/", controller.BattleHandler)
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)
