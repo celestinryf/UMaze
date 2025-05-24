@@ -28,17 +28,21 @@ const LoadGames = () => {
 
     // Removea game function to be added
 
+    const removeGame = () => {
+
+    }
+
     return (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h1>Load Saved Games</h1>
         {loading ? (
             <p>Loading...</p>
         ) : (
-            games.map((game) => (
-            <>
-                <GameCard key={game.Id} name={game.Name} date={game.Date} />
+            games.map((game, index) => (
+            <div key={index}>
+                <GameCard name={game.Name} date={game.Date} />
                 <button onClick={removeGame()}>Remove Game</button>
-            </>
+            </div>
             ))
         )}
         <p>{error}</p>
