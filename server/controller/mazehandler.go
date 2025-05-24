@@ -20,10 +20,9 @@ func MazeHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		model.MyGame.TheMaze.Move(&updatedCoord)
-		json.NewEncoder(w).Encode(map[string]string{
-			"status":  "success",
-			"message": "Game saved successfully",
+		gameDone := model.MyGame.TheMaze.Move(&updatedCoord)
+		json.NewEncoder(w).Encode(map[string]model.GameStatus{
+			"gameStatus": gameDone,
 		})
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
