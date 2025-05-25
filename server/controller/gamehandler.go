@@ -9,17 +9,18 @@ import (
 	"github.com/celestinryf/go-backend/model"
 )
 
+type HeroIdJson struct {
+	HeroId int `json:"hero_id"`
+}
+
 // Hanldes requests for making games
-func GameHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
 	switch r.Method {
 	case "POST": // makes a new game given the hero id
-		type HeroIdJson struct {
-			HeroId int `json:"hero_id"`
-		}
 		var inputHero HeroIdJson
 		if err := json.NewDecoder(r.Body).Decode(&inputHero); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
@@ -30,13 +31,12 @@ func GameHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		defer db.Close()
-
 		model.InitGame(inputHero.HeroId, db)
-		if err := json.NewEncoder(w).Encode(model.MyGame); err != nil {
+		if err := json.NewEncoder(w).Encode(s.game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	case "GET": // gets curr game json
-		if err := json.NewEncoder(w).Encode(model.MyGame); err != nil {
+		if err := json.NewEncoder(w).Encode(s.game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	default:

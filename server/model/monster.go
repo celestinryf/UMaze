@@ -38,11 +38,10 @@ func initMonster(db *sql.DB) *Monster {
 		log.Fatal(err)
 	}
 
-	newMonster := &Monster{
+	return &Monster{
 		Name:        name,
 		TotalHealth: health,
 		CurrHealth:  health,
 		Attack:      attack_dmg,
 	}
-	return newMonster
 }

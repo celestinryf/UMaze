@@ -9,7 +9,7 @@ import (
 )
 
 // Handle functions in the game, like attacking a monster
-func MazeHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) MazeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
@@ -20,7 +20,7 @@ func MazeHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		gameDone := model.MyGame.TheMaze.Move(&updatedCoord)
+		gameDone := s.game.Move(&updatedCoord)
 		json.NewEncoder(w).Encode(map[string]model.GameStatus{
 			"gameStatus": gameDone,
 		})
