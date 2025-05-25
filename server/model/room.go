@@ -9,12 +9,6 @@ import (
 // for room Type enums
 type RoomTypes int
 
-// for pillar type enums
-type Pillar int
-
-// potion types
-type Potion int
-
 // room enums
 const (
 	wall RoomTypes = iota
@@ -23,6 +17,9 @@ const (
 	path
 	pit
 )
+
+// for pillar type enums
+type Pillar int
 
 // pillar enums
 const (
@@ -33,6 +30,9 @@ const (
 	pillar4
 )
 
+// potion types
+type Potion int
+
 // potion enums
 const (
 	noPotion Potion = iota
@@ -42,7 +42,6 @@ const (
 )
 
 // Rooms make up the maze
-// currently has canPass and roomMonster
 type Room struct {
 	RoomType    RoomTypes `json:"RoomType"`
 	RoomMonster *Monster  `json:"RoomMonster"`
@@ -59,7 +58,6 @@ func InitRoom(isPath bool) *Room {
 	} else {
 		roomType = wall
 	}
-
 	return &Room{
 		RoomType:    roomType,
 		PillarType:  noPillar,

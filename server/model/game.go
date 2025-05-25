@@ -2,20 +2,9 @@ package model
 
 import (
 	"database/sql"
-	"encoding/json"
-	"fmt"
-	"log"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-// savedGameQuery, err := db.Query("SELECT (id, name, date) FROM saved_games")
-type JsonGame struct {
-	Id   int    `json:"Id"`
-	Name string `json:"Name"`
-	Date string `json:"Date"`
-}
 
 // This represents the current game
 type Game struct {
@@ -23,113 +12,40 @@ type Game struct {
 	TheHero *Hero `json:"Hero"`
 }
 
-// This is the current game being played
-var MyGame *Game
-
-// Gives an initialzed game. (no initing the hero)
-func InitGame(theHeroType int, db *sql.DB) {
-	if theHeroType < 3 || theHeroType > 6 {
-		fmt.Println("Hero must be 4, 5, or 6")
-		return
-	}
-	MyGame = &Game{
+// Gives an initialzed game.
+func InitGame(theHeroType int, db *sql.DB) *Game {
+	return &Game{
 		TheMaze: initMaze(db),
 		TheHero: initHero(theHeroType, db),
 	}
 }
 
-// Stores current game in the database
-func StoreGame(gameName string, db *sql.DB) {
+// Sets curr location to x and y
+func (g *Game) Move(newCoords *Coords) GameStatus {
 
-	_, err := db.Exec(`CREATE TABLE IF NOT EXISTS saved_games (
-		id INTEGER PRIMARY KEY AUTOINCREMENT,
-		name TEXT,
-		info TEXT,
-		date TEXT
-	)`)
-	if err != nil {
-		log.Fatal(err)
+	g.TheMaze.CurrCoords = newCoords
+	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
+
+	if currRoom.PotionType != noPotion {
+		g.TheHero.AquiredPotions = append(g.TheHero.AquiredPotions, currRoom.PotionType)
+		currRoom.PotionType = noPotion
 	}
 
-	if MyGame == nil {
-		fmt.Println("Can't store nil game")
-		return
+	if currRoom.PillarType != noPillar {
+		g.TheHero.AquiredPillars = append(g.TheHero.AquiredPillars, currRoom.PillarType)
+		currRoom.PillarType = noPillar
 	}
 
-	gameBytes, err := json.Marshal(MyGame)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	_, err = db.Exec(`INSERT INTO saved_games
-		(name, info, date) VALUES (?, ?, ?)`,
-		gameName, string(gameBytes), time.Now().Format("5/5/06"))
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Get a game from the db, then set it to the curr game
-func RetrieveGame(game_id int, dbPath string) {
-
-	// Open the database
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Get the game by the id
-	var jsonData []byte
-	err = db.QueryRow("SELECT info FROM saved_games WHERE id = ?", game_id).Scan(&jsonData)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	err = json.Unmarshal(jsonData, &MyGame)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Gets a list of all the name of the loaded games
-func GetStoredGames() []JsonGame {
-
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	savedGameQuery, err := db.Query("SELECT id, name, date FROM saved_games")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer savedGameQuery.Close()
-
-	savedGameArr := make([]JsonGame, 0)
-	for savedGameQuery.Next() {
-		saved_game := JsonGame{}
-		err = savedGameQuery.Scan(&saved_game.Id, &saved_game.Name, &saved_game.Date)
-		if err != nil {
-			log.Fatal(err)
+	if currRoom.RoomType == pit {
+		g.TheHero.CurrHealth -= 20 // can change the pit damage
+		if g.TheHero.CurrHealth <= 0 {
+			return Lost
 		}
-		savedGameArr = append(savedGameArr, saved_game)
 	}
 
-	return savedGameArr
-}
+	if currRoom.RoomType == end && len(g.TheHero.AquiredPillars) == 4 {
+		return Won
+	}
 
-// Remove Game from db, by the id
-func RemoveGame(idToRemove int) {
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-	_, err = db.Exec(`DELETE FROM saved_games
-		WHERE id = ?`, idToRemove)
-	if err != nil {
-		log.Fatal(err)
-	}
+	return InProgress
 }
