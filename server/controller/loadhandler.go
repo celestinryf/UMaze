@@ -7,18 +7,10 @@ import (
 	"net/http"
 )
 
-var dataId struct {
-	Id int `json:"id"`
-}
-
 type JsonGame struct {
 	Id   int    `json:"Id"`
 	Name string `json:"Name"`
 	Date string `json:"Date"`
-}
-
-var dataName struct {
-	Name string `json:"name"`
 }
 
 // LoadHandler handles GET (list saved games), POST (save current game), and PUT (load a game)
@@ -42,11 +34,14 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "POST": // Save current game
 
+		var dataName struct {
+			Name string `json:"name"`
+		}
 		if err := json.NewDecoder(r.Body).Decode(&dataName); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.saveGame(db)
+		s.saveGame(dataName.Name, db)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
@@ -54,6 +49,9 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "PUT": // Load a game
 
+		var dataId struct {
+			Id int `json:"id"`
+		}
 		if err := json.NewDecoder(r.Body).Decode(&dataId); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
@@ -66,6 +64,9 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 
 	case "DELETE": // delete game by id
 
+		var dataId struct {
+			Id int `json:"id"`
+		}
 		if err := json.NewDecoder(r.Body).Decode(&dataId); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
