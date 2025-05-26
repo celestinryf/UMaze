@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"fmt"
 	"log"
 )
 
@@ -20,6 +21,7 @@ type Hero struct {
 func initHero(heroType int, db *sql.DB) *Hero {
 
 	if heroType < 4 || heroType > 6 {
+		fmt.Println("Not sending in a hero 4-6")
 		return nil
 	}
 

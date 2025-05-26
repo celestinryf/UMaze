@@ -17,14 +17,14 @@ func InitServer() *Server {
 	return &Server{}
 }
 
-func (s *Server) saveGame(db *sql.DB) {
+func (s *Server) saveGame(name string, db *sql.DB) {
 	gameBytes, err := json.Marshal(s.game)
 	if err != nil {
 		log.Fatal(err)
 	}
 	_, err = db.Exec(`INSERT INTO saved_games
 		(name, info, date) VALUES (?, ?, ?)`,
-		dataName.Name, string(gameBytes), time.Now().Format("5/5/06"))
+		name, string(gameBytes), time.Now().Format("5/5/06"))
 	if err != nil {
 		log.Fatal(err)
 	}

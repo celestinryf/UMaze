@@ -12,7 +12,6 @@ import (
 func (s *Server) MazeHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
-
 	switch r.Method {
 	case "PUT": // gives an x and a y and change to that location
 		var updatedCoord model.Coords

@@ -9,10 +9,6 @@ import (
 	"github.com/celestinryf/go-backend/model"
 )
 
-type HeroIdJson struct {
-	HeroId int `json:"hero_id"`
-}
-
 // Hanldes requests for making games
 func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 
@@ -21,8 +17,10 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "POST": // makes a new game given the hero id
-		var inputHero HeroIdJson
-		if err := json.NewDecoder(r.Body).Decode(&inputHero); err != nil {
+		var HeroIdJson struct {
+			HeroId int `json:"hero_id"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&HeroIdJson); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
@@ -31,7 +29,7 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 			log.Fatal(err)
 		}
 		defer db.Close()
-		model.InitGame(inputHero.HeroId, db)
+		model.InitGame(HeroIdJson.HeroId, db)
 		if err := json.NewEncoder(w).Encode(s.game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
