@@ -20,7 +20,7 @@
   
   .subtitle {
     font-size: 1.2rem;
-    color: #666;
+    color: #ffffff;
   }
 
   .gameTitle {
@@ -242,6 +242,44 @@
     margin-top: 30px;
   }
   
+  /* Back to Main Menu Button Styles */
+  .backButtonContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 40px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.2);
+  }
+  
+  .backButton {
+    padding: 12px 24px;
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  
+  .backButton:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+  }
+  
+  .backButton:active {
+    transform: translateY(0);
+  }
+  
   /* Responsive adjustments */
   @media (max-width: 768px) {
     .cardContainer {
@@ -256,5 +294,14 @@
     
     .statsGrid {
       grid-template-columns: 1fr;
+    }
+    
+    .backButtonContainer {
+      margin-top: 30px;
+    }
+    
+    .backButton {
+      padding: 10px 20px;
+      font-size: 0.9rem;
     }
   }

@@ -2,14 +2,19 @@ import React, { useState } from 'react';
 import HeroCard from '../../components/HeroCard';
 import styles from './HeroSelect.module.css';
 import { useNavigate } from 'react-router-dom';
+import nickImg from '../../assets/nick.png';
+import matthewImg from '../../assets/matthew.png';
+import celestinImg from '../../assets/celestin.png';
+import primoImg from '../../assets/primo.png';
+
 
 // Hero data with expanded information
 const heroes = [
   {
     id: 1,
     name: "Nick",
-    img: "/heroes/warrior.png", // Replace with actual image path
-    desc: "A powerful warrior with high attack damage and strong defense capabilities. Perfect for players who prefer direct combat.",
+    img: nickImg, // Replace with actual image path
+    desc: "A powerful warrior with high attack damage and strong defense capabilities.",
     skills: ["Heavy Strike", "Shield Bash", "Battle Cry"],
     stats: {
       attack: 8,
@@ -21,8 +26,8 @@ const heroes = [
   {
     id: 2,
     name: "Matthew",
-    img: "/heroes/mage.png", // Replace with actual image path
-    desc: "A brilliant mage who masters arcane spells and tactical positioning. Ideal for players who enjoy strategic gameplay.",
+    img: matthewImg,
+    desc: "A brilliant mage who masters arcane spells and tactical positioning.",
     skills: ["Fireball", "Ice Shield", "Teleport"],
     stats: {
       attack: 3,
@@ -34,8 +39,8 @@ const heroes = [
   {
     id: 3,
     name: "Celestin",
-    img: "/heroes/rogue.png", // Replace with actual image path
-    desc: "A nimble rogue with exceptional speed and evasion abilities. Best for players who prefer stealth and critical strikes.",
+    img: celestinImg,
+    desc: "A nimble rogue with exceptional speed and evasion abilities.",
     skills: ["Shadow Step", "Backstab", "Smoke Bomb"],
     stats: {
       attack: 7,
@@ -47,8 +52,8 @@ const heroes = [
   {
     id: 4,
     name: "Primo",
-    img: "/heroes/healer.png", // Replace with actual image path
-    desc: "A dedicated healer with support abilities and protective enchantments. Perfect for players who enjoy helping their team.",
+    img: primoImg,
+    desc: "A dedicated healer with support abilities and protective enchantments.",
     skills: ["Healing Touch", "Protection Aura", "Divine Blessing"],
     stats: {
       attack: 2,
@@ -73,6 +78,11 @@ const HeroSelect = () => {
     console.log(`Starting game with hero: ${selectedHero.name}`);
     navigate('/play', { state: { hero: selectedHero } });
     // Navigation logic here, e.g., redirect to "/play" with the selected hero
+  };
+
+  const handleBackToMainMenu = () => {
+    // Navigate back to the main menu/start screen
+    navigate('/');
   };
 
   return (
@@ -186,6 +196,16 @@ const HeroSelect = () => {
           <p>Select a hero to view details and begin your adventure</p>
         </div>
       )}
+
+      {/* Back to Main Menu Button */}
+      <div className={styles.backButtonContainer}>
+        <button 
+          className={styles.backButton}
+          onClick={handleBackToMainMenu}
+        >
+          ← Back to Main Menu
+        </button>
+      </div>
     </div>
   );
 };
