@@ -14,7 +14,7 @@ func TestInitRoomPath(t *testing.T) {
 	if room.PillarType != noPillar {
 		t.Error("Should be no pillar")
 	}
-	if room.PotionType != noPotion {
+	if room.PotionType != NoPotion {
 		t.Error("Should be no potion")
 	}
 	if room.RoomMonster != nil {
@@ -31,7 +31,7 @@ func TestInitRoomWall(t *testing.T) {
 	if room.PillarType != noPillar {
 		t.Error("Should be no pillar")
 	}
-	if room.PotionType != noPotion {
+	if room.PotionType != NoPotion {
 		t.Error("Should be no potion")
 	}
 	if room.RoomMonster != nil {
@@ -68,7 +68,7 @@ func TestSetUpRoom(t *testing.T) {
 			features++
 			counts["monster"]++
 		}
-		if room.PotionType != noPotion {
+		if room.PotionType != NoPotion {
 			features++
 			counts["potion"]++
 		}

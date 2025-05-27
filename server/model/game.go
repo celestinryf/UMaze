@@ -26,9 +26,9 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 	g.TheMaze.CurrCoords = newCoords
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
 
-	if currRoom.PotionType != noPotion {
+	if currRoom.PotionType != NoPotion {
 		g.TheHero.AquiredPotions = append(g.TheHero.AquiredPotions, currRoom.PotionType)
-		currRoom.PotionType = noPotion
+		currRoom.PotionType = NoPotion
 	}
 
 	if currRoom.PillarType != noPillar {

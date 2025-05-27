@@ -80,6 +80,6 @@ func initMaze(db *sql.DB) *Maze {
 }
 
 // Helper method to remove element from a slice
-func RemoveElement(slice []*Room, index int) []*Room {
+func removeElement(slice []*Room, index int) []*Room {
 	return append(slice[:index], slice[index+1:]...)
 }
