@@ -2,11 +2,12 @@ import { useEffect, useState } from 'react';
 import GameCard from '../../components/GameCard/GameCard';
 
 const LoadGames = () => {
-  const [games, setGames] = useState([]);
-  const [error, setError] = useState();
-  const [loading, setLoading] = useState(true);
+    const [games, setGames] = useState([]);
+    const [error, setError] = useState();
+    const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+        // Load games from db
+    useEffect(() => {
         const fetchLoadGame = async () => {
             try {
                 setLoading(true);
@@ -26,11 +27,22 @@ const LoadGames = () => {
         fetchLoadGame();
     }, []);
 
-    // Removea game function to be added
+    // Removes game from db and client
+    const removeGame = async (id) => {
+        try {
+            const res = await fetch('/api/load', { method: 'DELETE' ,  headers: {
+    'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({Id: id})
+    });
 
-    const removeGame = () => {
+            if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
 
-    }
+            setGames((prevGames) => prevGames.filter((game) => game.Id !== id));
+        } catch (err) {
+            console.log(err);
+        }
+    };
 
     return (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
@@ -38,10 +50,10 @@ const LoadGames = () => {
         {loading ? (
             <p>Loading...</p>
         ) : (
-            games.map((game, index) => (
+            games && games.map((game, index) => (
             <div key={index}>
                 <GameCard name={game.Name} date={game.Date} />
-                <button onClick={removeGame()}>Remove Game</button>
+                <button onClick={() => removeGame(game.Id)}>Remove Game</button>
             </div>
             ))
         )}

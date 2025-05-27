@@ -16,7 +16,7 @@ function App() {
             <Route path="/play" element={<Play />} />
             <Route path="/heroselect" element={<HeroSelect />} />
             <Route path="/play" element={<div>This will take you to the gameplay.. eventually</div>} />
-            <Route path="/play/games" element={<LoadGames />} />
+            <Route path="/menu" element={<LoadGames />} />
         </Routes>
       </div>
     </Router>

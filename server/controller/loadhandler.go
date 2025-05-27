@@ -67,6 +67,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 		var dataId struct {
 			Id int `json:"id"`
 		}
+
 		if err := json.NewDecoder(r.Body).Decode(&dataId); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
