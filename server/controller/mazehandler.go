@@ -19,7 +19,7 @@ func (s *Server) MazeHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		gameDone := s.game.Move(&updatedCoord)
+		gameDone := s.Game.Move(&updatedCoord)
 		json.NewEncoder(w).Encode(map[string]model.GameStatus{
 			"gameStatus": gameDone,
 		})

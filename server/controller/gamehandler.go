@@ -20,21 +20,33 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 		var HeroIdJson struct {
 			HeroId int `json:"hero_id"`
 		}
+
 		if err := json.NewDecoder(r.Body).Decode(&HeroIdJson); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
+
 		db, err := sql.Open("sqlite3", "./db/360Game.db")
 		if err != nil {
 			log.Fatal(err)
 		}
 		defer db.Close()
-		model.InitGame(HeroIdJson.HeroId, db)
-		if err := json.NewEncoder(w).Encode(s.game); err != nil {
+
+		s.Game = model.InitGame(HeroIdJson.HeroId, db)
+		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	case "GET": // gets curr game json
-		if err := json.NewEncoder(w).Encode(s.game); err != nil {
+
+		db, err := sql.Open("sqlite3", "./db/360Game.db")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+
+		s.Game = model.InitGame(4, db)
+
+		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	default:
