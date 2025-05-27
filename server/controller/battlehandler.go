@@ -27,8 +27,8 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		RoomMonster := s.game.TheMaze.Grid[s.game.TheMaze.CurrCoords.X][s.game.TheMaze.CurrCoords.X].RoomMonster
-		CurrHero := s.game.TheHero
+		RoomMonster := s.Game.TheMaze.Grid[s.Game.TheMaze.CurrCoords.X][s.Game.TheMaze.CurrCoords.X].RoomMonster
+		CurrHero := s.Game.TheHero
 
 		if CurrAttack.Potion != model.NoPotion {
 			CurrHero.CurrHealth += 100                            // health from potion
