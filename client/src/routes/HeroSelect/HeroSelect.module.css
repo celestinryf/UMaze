@@ -37,7 +37,7 @@
 }
 
 .titleUnderline {
-  width: 100px;
+  width: 940px;
   height: 4px;
   background: linear-gradient(90deg, transparent, #00d4ff, transparent);
   margin: 1rem auto;
@@ -149,7 +149,7 @@
 .selectionGlow {
   position: absolute;
   inset: 0;
-  background: linear-gradient(45deg, #00d4ff, #ff0080);
+  background: linear-gradient(45deg, #00d4ff, #ff008000);
   border-radius: 16px;
   opacity: 0.6;
   animation: selectionPulse 1.5s ease-in-out infinite alternate;
@@ -164,8 +164,8 @@
 }
 
 @keyframes selectionPulse {
-  0% { opacity: 0.4; transform: scale(1); }
-  100% { opacity: 0.8; transform: scale(1.02); }
+  0% { opacity: 0.2; transform: scale(1); }
+  100% { opacity: 0.4; transform: scale(1.02); }
 }
 
 .detailsPanel {
@@ -306,7 +306,7 @@
   position: relative;
   width: 100%;
   padding: 1rem;
-  background: linear-gradient(45deg, #ff0080, #00d4ff);
+  background: linear-gradient(45deg, #48e5f0, #ff00bf);
   border: none;
   border-radius: 8px;
   color: white;
@@ -387,7 +387,7 @@
 }
 
 .backButton:hover {
-  background: rgba(0, 0, 0, 0.8);
+  background: rgba(255, 0, 212, 0.1);
   border-color: rgba(255, 255, 255, 0.4);
   transform: translateY(-2px);
 }

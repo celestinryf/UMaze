@@ -69,7 +69,7 @@ const myHeroes = [
   }
 ];
 
-const HeroSelectRedesign = () => {
+const HeroSelect = () => {
   const [mySelectedHero, setMySelectedHero] = useState(null);
   const [myHoveredHero, setMyHoveredHero] = useState(null);
   const { playSFX } = useContext(AudioContext);
@@ -212,4 +212,4 @@ const HeroSelectRedesign = () => {
   );
 };
 
-export default HeroSelectRedesign;
+export default HeroSelect;
