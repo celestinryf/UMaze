@@ -3,10 +3,22 @@ import { useNavigate } from 'react-router-dom';
 import styles from './Options.module.css';
 import backgroundImg from '../../assets/background.jpg';
 import { AudioContext } from '../../context/AudioContext';
+import clickSFX from '../../assets/click.mp3';
 
 function Options() {
   const navigate = useNavigate();
-  const { volume, setVolume } = useContext(AudioContext);
+  const {
+    musicVolume,
+    setMusicVolume,
+    sfxVolume,
+    setSfxVolume,
+    playSFX
+  } = useContext(AudioContext);
+
+  const handleBackClick = () => {
+    playSFX(clickSFX);
+    navigate('/');
+  };
 
   return (
     <div
@@ -23,14 +35,27 @@ function Options() {
 
       <div className={styles.settingsCard}>
         <div className={styles.settingGroup}>
-          <label htmlFor="volume">Volume: {volume}</label>
+          <label htmlFor="musicVolume">Music Volume: {musicVolume}</label>
           <input
-            id="volume"
+            id="musicVolume"
             type="range"
             min="0"
             max="100"
-            value={volume}
-            onChange={(e) => setVolume(Number(e.target.value))}
+            value={musicVolume}
+            onChange={(e) => setMusicVolume(Number(e.target.value))}
+            className={styles.slider}
+          />
+        </div>
+
+        <div className={styles.settingGroup}>
+          <label htmlFor="sfxVolume">SFX Volume: {sfxVolume}</label>
+          <input
+            id="sfxVolume"
+            type="range"
+            min="0"
+            max="100"
+            value={sfxVolume}
+            onChange={(e) => setSfxVolume(Number(e.target.value))}
             className={styles.slider}
           />
         </div>
@@ -47,7 +72,7 @@ function Options() {
 
       <button
         className={styles.backButton}
-        onClick={() => navigate('/')}
+        onClick={handleBackClick}
       >
         ← Back to Main Menu
       </button>

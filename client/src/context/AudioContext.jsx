@@ -1,41 +1,51 @@
-// src/context/AudioContext.jsx
 import React, { createContext, useEffect, useRef, useState } from 'react';
 import musicFile from '../assets/music.mp3';
 
 export const AudioContext = createContext();
 
 export const AudioProvider = ({ children }) => {
-  const [volume, setVolume] = useState(50);
+  const [musicVolume, setMusicVolume] = useState(50);
+  const [sfxVolume, setSfxVolume] = useState(50);
   const [hasInteracted, setHasInteracted] = useState(false);
-  const audioRef = useRef(new Audio(musicFile));
 
-  // Start audio after first user interaction (e.g. click).. couldn't find a way to make it start automatically :(
+  const musicRef = useRef(new Audio(musicFile));
+
+  // Start music only after user interaction
   useEffect(() => {
-    const startAudio = () => {
+    const handleInteraction = () => {
       if (!hasInteracted) {
-        const audio = audioRef.current;
-        audio.loop = true;
-        audio.volume = volume / 100;
-        audio.play().catch((e) => {
-          console.warn("Playback blocked by browser:", e.message);
-        });
+        const music = musicRef.current;
+        music.loop = true;
+        music.volume = musicVolume / 100;
+        music.play().catch((e) => console.warn("Music blocked:", e.message));
         setHasInteracted(true);
       }
     };
 
-    window.addEventListener('click', startAudio);
-    return () => window.removeEventListener('click', startAudio);
-  }, [hasInteracted, volume]);
+    window.addEventListener('click', handleInteraction);
+    return () => window.removeEventListener('click', handleInteraction);
+  }, [hasInteracted]);
 
-  // Sync volume when changed
+  // Update music volume
   useEffect(() => {
-    if (audioRef.current) {
-      audioRef.current.volume = volume / 100;
+    if (musicRef.current) {
+      musicRef.current.volume = musicVolume / 100;
     }
-  }, [volume]);
+  }, [musicVolume]);
+
+  // Function to play UI sound effect
+  const playSFX = (file) => {
+    const sfx = new Audio(file);
+    sfx.volume = sfxVolume / 100;
+    sfx.play().catch((e) => console.warn("SFX blocked:", e.message));
+  };
 
   return (
-    <AudioContext.Provider value={{ volume, setVolume }}>
+    <AudioContext.Provider value={{
+      musicVolume, setMusicVolume,
+      sfxVolume, setSfxVolume,
+      playSFX
+    }}>
       {children}
     </AudioContext.Provider>
   );
