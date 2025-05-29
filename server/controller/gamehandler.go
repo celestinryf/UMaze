@@ -16,7 +16,7 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
 	switch r.Method {
-	case "POST": // makes a new game given the hero id
+	case http.MethodPost: // makes a new game given the hero id
 		var HeroIdJson struct {
 			HeroId int `json:"hero_id"`
 		}
@@ -32,11 +32,11 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer db.Close()
 
-		s.Game = model.InitGame(HeroIdJson.HeroId, db)
+		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), db)
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
-	case "GET": // gets curr game json
+	case http.MethodGet: // gets curr game json
 
 		db, err := sql.Open("sqlite3", "./db/360Game.db")
 		if err != nil {

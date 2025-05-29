@@ -18,8 +18,8 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 
 		var CurrAttack struct {
-			Attack int          `json:"Attack"`
-			Potion model.Potion `json:"Potion"`
+			SpecialAttack bool         `json:"SpecialAttack"`
+			Potion        model.Potion `json:"Potion"`
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&CurrAttack); err != nil {
@@ -27,22 +27,14 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		RoomMonster := s.Game.TheMaze.Grid[s.Game.TheMaze.CurrCoords.X][s.Game.TheMaze.CurrCoords.X].RoomMonster
-		CurrHero := s.Game.TheHero
+		s.Game.Attack(CurrAttack.SpecialAttack, CurrAttack.Potion)
 
-		if CurrAttack.Potion != model.NoPotion {
-			CurrHero.CurrHealth += 100                            // health from potion
-			CurrHero.AquiredPotions = CurrHero.AquiredPotions[1:] // take off first element
-		}
-
-		RoomMonster.CurrHealth -= CurrHero.Attack
-		if RoomMonster.CurrHealth > 0 {
-			CurrHero.CurrHealth -= RoomMonster.Attack
-		}
-
-		var AttackResult struct {
-			RoomMonster model.Monster `json:"Monster"`
-			CurrHero    model.Hero    `json:"Hero"`
+		AttackResult := struct {
+			Mon  model.Monster `json:"Monster"`
+			Hero model.Hero    `json:"Hero"`
+		}{
+			Mon:  *s.Game.TheMaze.Grid[s.Game.TheMaze.CurrCoords.X][s.Game.TheMaze.CurrCoords.X].RoomMonster,
+			Hero: *s.Game.TheHero,
 		}
 
 		if err := json.NewEncoder(w).Encode(AttackResult); err != nil {

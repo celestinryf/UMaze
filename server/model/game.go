@@ -13,7 +13,7 @@ type Game struct {
 }
 
 // Gives an initialzed game.
-func InitGame(theHeroType int, db *sql.DB) *Game {
+func InitGame(theHeroType HeroType, db *sql.DB) *Game {
 	return &Game{
 		TheMaze: initMaze(db),
 		TheHero: initHero(theHeroType, db),
@@ -48,4 +48,28 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 	}
 
 	return InProgress
+}
+
+// attack
+func (g *Game) Attack(specialAttack bool, potionType Potion) {
+
+	roomMonster := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.X].RoomMonster
+	hero := g.TheHero
+
+	if potionType != NoPotion {
+		// implement later (potion)
+		hero.CurrHealth += 100
+		hero.AquiredPotions = hero.AquiredPotions[1:]
+	}
+
+	if !specialAttack {
+		roomMonster.CurrHealth -= hero.Attack
+	} else {
+		// implement later (special attack)
+		roomMonster.CurrHealth -= hero.Attack
+	}
+
+	if roomMonster.CurrHealth > 0 {
+		hero.CurrHealth -= roomMonster.Attack
+	}
 }

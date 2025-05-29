@@ -7,8 +7,6 @@ import (
 	"github.com/celestinryf/go-backend/controller"
 )
 
-//var Random *rand.Rand
-
 // Starting point of the server side of the program
 func main() {
 
