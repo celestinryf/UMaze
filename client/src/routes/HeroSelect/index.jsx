@@ -1,191 +1,213 @@
-import React, { useState } from 'react';
-import HeroCard from '../../components/HeroCard';
+import React, { useState, useContext } from 'react';
 import styles from './HeroSelect.module.css';
 import { useNavigate } from 'react-router-dom';
+import { AudioContext } from '../../context/AudioContext';
+import clickSFX from '../../assets/click.mp3';
+import startSFX from '../../assets/startGame.mp3';
+import nickImg from '../../assets/nick.png';
+import matthewImg from '../../assets/matthew.png';
+import celestinImg from '../../assets/celestin.png';
+import primoImg from '../../assets/primo.png';
+import bgImage from '../../assets/background.jpg';
 
-// Hero data with expanded information
-const heroes = [
+const myHeroes = [
   {
     id: 1,
     name: "Nick",
-    img: "/heroes/warrior.png", // Replace with actual image path
-    desc: "A powerful warrior with high attack damage and strong defense capabilities. Perfect for players who prefer direct combat.",
+    img: nickImg,
+    desc: "A powerful warrior with high attack damage and strong defense capabilities.",
     skills: ["Heavy Strike", "Shield Bash", "Battle Cry"],
     stats: {
       attack: 8,
       defense: 7,
       health: 9,
       magic: 2
-    }
+    },
+    class: "Warrior"
   },
   {
     id: 2,
     name: "Matthew",
-    img: "/heroes/mage.png", // Replace with actual image path
-    desc: "A brilliant mage who masters arcane spells and tactical positioning. Ideal for players who enjoy strategic gameplay.",
+    img: matthewImg,
+    desc: "A brilliant mage who masters arcane spells and tactical positioning.",
     skills: ["Fireball", "Ice Shield", "Teleport"],
     stats: {
       attack: 3,
       defense: 4,
       health: 5,
       magic: 10
-    }
+    },
+    class: "Mage"
   },
   {
     id: 3,
     name: "Celestin",
-    img: "/heroes/rogue.png", // Replace with actual image path
-    desc: "A nimble rogue with exceptional speed and evasion abilities. Best for players who prefer stealth and critical strikes.",
+    img: celestinImg,
+    desc: "A nimble rogue with exceptional speed and evasion abilities.",
     skills: ["Shadow Step", "Backstab", "Smoke Bomb"],
     stats: {
       attack: 7,
       defense: 5,
       health: 6,
       magic: 4
-    }
+    },
+    class: "Rogue"
   },
   {
     id: 4,
     name: "Primo",
-    img: "/heroes/healer.png", // Replace with actual image path
-    desc: "A dedicated healer with support abilities and protective enchantments. Perfect for players who enjoy helping their team.",
+    img: primoImg,
+    desc: "A dedicated healer with support abilities and protective enchantments.",
     skills: ["Healing Touch", "Protection Aura", "Divine Blessing"],
     stats: {
       attack: 2,
       defense: 6,
       health: 7,
       magic: 9
-    }
+    },
+    class: "Healer"
   }
 ];
 
 const HeroSelect = () => {
-  const navigate = useNavigate();
-  const [selectedHero, setSelectedHero] = useState(null);
-  const [hoveredHero, setHoveredHero] = useState(null);
+  const [mySelectedHero, setMySelectedHero] = useState(null);
+  const [myHoveredHero, setMyHoveredHero] = useState(null);
+  const { playSFX } = useContext(AudioContext);
+  const myNavigate = useNavigate();
 
-  const handleSelectHero = (hero) => {
-    setSelectedHero(hero);
+  const handleSelectHero = (finalTheHero) => {
+    playSFX(clickSFX);
+    setMySelectedHero(finalTheHero);
   };
 
   const handleStartGame = () => {
-    // Implement navigation to game screen with selected hero
-    console.log(`Starting game with hero: ${selectedHero.name}`);
-    navigate('/play', { state: { hero: selectedHero } });
-    // Navigation logic here, e.g., redirect to "/play" with the selected hero
+    playSFX(startSFX);
+    console.log(`Starting game with hero: ${mySelectedHero.name}`);
+    myNavigate('/play', { state: { hero: mySelectedHero } });
   };
 
+  const StatBar = ({ label, value, color }) => (
+    <div className={styles.statItem}>
+      <div className={styles.statHeader}>
+        <span className={styles.statLabel}>{label}</span>
+        <span className={styles.statValue}>{value}/10</span>
+      </div>
+      <div className={styles.statBarBg}>
+        <div 
+          className={styles.statBarFill} 
+          style={{ 
+            width: `${value * 10}%`,
+            backgroundColor: color
+          }}
+        />
+      </div>
+    </div>
+  );
+
   return (
-    <div className={styles.heroSelectContainer}>
+    <div 
+      className={styles.heroSelectContainer} 
+      style={{ 
+        backgroundImage: `url(${bgImage})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat'
+      }}
+    >
+      <div className={styles.bgOverlay} />
       <div className={styles.header}>
-        <h1 className={styles.gameTitle}>Choose Your Hero</h1>
-        <p className={styles.subtitle}>Select a character to begin your adventure</p>
+        <h1 className={styles.mainTitle}>CHOOSE YOUR HERO</h1>
+        <div className={styles.titleUnderline} />
       </div>
 
-      <div className={styles.cardContainer}>
-        {heroes.map((hero) => (
-          <div 
-            key={hero.id}
-            className={`
-              ${styles.cardWrapper} 
-              ${selectedHero && selectedHero.id === hero.id ? styles.selected : ''}
-              ${hoveredHero && hoveredHero.id === hero.id ? styles.hovered : ''}
-            `}
-            onClick={() => handleSelectHero(hero)}
-            onMouseEnter={() => setHoveredHero(hero)}
-            onMouseLeave={() => setHoveredHero(null)}
-          >
-            <HeroCard 
-              props={{
-                name: hero.name,
-                img: hero.img, 
-                desc: hero.desc, 
-                skills: hero.skills
-              }}
-            />
+      <div className={styles.mainContent}>
+        <div className={styles.charactersSection} style={{ display: 'flex', flexDirection: 'column' }}>
+          <div className={styles.charactersGrid}>
+            {myHeroes.map((theHero) => (
+              <div
+                key={theHero.id}
+                className={`${styles.characterCard} ${mySelectedHero?.id === theHero.id ? styles.selected : ''} ${myHoveredHero?.id === theHero.id ? styles.hovered : ''}`}
+                onClick={() => handleSelectHero(theHero)}
+                onMouseEnter={() => setMyHoveredHero(theHero)}
+                onMouseLeave={() => setMyHoveredHero(null)}
+              >
+                <div className={styles.characterImageContainer}>
+                  <img src={theHero.img} alt={theHero.name} className={styles.characterImage} />
+                  <div className={styles.characterOverlay}>
+                    <div className={styles.characterName}>{theHero.name}</div>
+                    <div className={styles.characterClass}>{theHero.class}</div>
+                  </div>
+                </div>
+                {mySelectedHero?.id === theHero.id && (
+                  <div className={styles.selectionIndicator}>
+                    <div className={styles.selectionGlow} />
+                    <div className={styles.selectionBorder} />
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
 
-      {selectedHero && (
-        <div className={styles.heroDetails}>
-          <div className={styles.detailsHeader}>
-            <h2>{selectedHero.name}</h2>
-            <p className={styles.heroDesc}>{selectedHero.desc}</p>
-          </div>
-          
-          <div className={styles.statsContainer}>
-            <h3>Hero Stats</h3>
-            <div className={styles.statsGrid}>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Attack</span>
-                <div className={styles.statBarContainer}>
-                  <div 
-                    className={styles.statBar} 
-                    style={{ width: `${selectedHero.stats.attack * 10}%` }}
-                  />
-                </div>
-                <span className={styles.statValue}>{selectedHero.stats.attack}/10</span>
+          {/* Button wrapper with spacing */}
+          {mySelectedHero && (
+            <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'center' }}>
+              <button className={styles.startButton} onClick={handleStartGame}>
+                <span className={styles.buttonText}>BEGIN ADVENTURE</span>
+                <div className={styles.buttonGlow} />
+              </button>
+            </div>
+          )}
+        </div>
+
+        {mySelectedHero && (
+          <div className={styles.detailsPanel}>
+            <div className={styles.detailsHeader}>
+              <h2 className={styles.heroName}>{mySelectedHero.name}</h2>
+              <span className={styles.heroClass}>{mySelectedHero.class}</span>
+            </div>
+            <p className={styles.heroDescription}>{mySelectedHero.desc}</p>
+
+            <div className={styles.statsSection}>
+              <h3 className={styles.sectionTitle}>COMBAT STATS</h3>
+              <div className={styles.statsGrid}>
+                <StatBar label="ATK" value={mySelectedHero.stats.attack} color="#ff4757" />
+                <StatBar label="DEF" value={mySelectedHero.stats.defense} color="#3742fa" />
+                <StatBar label="HP" value={mySelectedHero.stats.health} color="#2ed573" />
+                <StatBar label="MAG" value={mySelectedHero.stats.magic} color="#a55eea" />
               </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Defense</span>
-                <div className={styles.statBarContainer}>
-                  <div 
-                    className={styles.statBar} 
-                    style={{ width: `${selectedHero.stats.defense * 10}%` }}
-                  />
-                </div>
-                <span className={styles.statValue}>{selectedHero.stats.defense}/10</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Health</span>
-                <div className={styles.statBarContainer}>
-                  <div 
-                    className={styles.statBar} 
-                    style={{ width: `${selectedHero.stats.health * 10}%` }}
-                  />
-                </div>
-                <span className={styles.statValue}>{selectedHero.stats.health}/10</span>
-              </div>
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Magic</span>
-                <div className={styles.statBarContainer}>
-                  <div 
-                    className={styles.statBar} 
-                    style={{ width: `${selectedHero.stats.magic * 10}%` }}
-                  />
-                </div>
-                <span className={styles.statValue}>{selectedHero.stats.magic}/10</span>
+            </div>
+
+            <div className={styles.skillsSection}>
+              <h3 className={styles.sectionTitle}>SPECIAL ABILITIES</h3>
+              <div className={styles.skillsList}>
+                {mySelectedHero.skills.map((theSkill, theIndex) => (
+                  <div key={theIndex} className={styles.skillItem}>
+                    <div className={styles.skillIcon}>⚡</div>
+                    <span className={styles.skillName}>{theSkill}</span>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
+        )}
 
-          <div className={styles.skillsSection}>
-            <h3>Special Skills</h3>
-            <ul className={styles.skillsList}>
-              {selectedHero.skills.map((skill, index) => (
-                <li key={index} className={styles.skillItem}>
-                  <span className={styles.skillIcon}>✦</span>
-                  {skill}
-                </li>
-              ))}
-            </ul>
+        {!mySelectedHero && (
+          <div className={styles.placeholderPanel}>
+            <div className={styles.placeholderContent}>
+              <div className={styles.placeholderIcon}>⚔️</div>
+              <h3>Select a Hero</h3>
+              <p>Choose your champion to view their abilities and begin your quest</p>
+            </div>
           </div>
+        )}
+      </div>
 
-          <button 
-            className={styles.startButton}
-            onClick={handleStartGame}
-          >
-            Begin Adventure with {selectedHero.name}
-          </button>
-        </div>
-      )}
-
-      {!selectedHero && (
-        <div className={styles.promptMessage}>
-          <p>Select a hero to view details and begin your adventure</p>
-        </div>
-      )}
+      <button className={styles.backButton} onClick={() => {
+        playSFX(clickSFX);
+        myNavigate('/');
+      }}>
+        <span>← BACK TO MENU</span>
+      </button>
     </div>
   );
 };

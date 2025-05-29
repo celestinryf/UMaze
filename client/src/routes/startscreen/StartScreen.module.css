@@ -57,7 +57,7 @@
 }
 
 .gameButton:hover {
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(255, 0, 212, 0.1);
   transform: scale(1.05);
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
 }
