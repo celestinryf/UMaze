@@ -2,99 +2,104 @@ import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './Play.module.css';
 import Maze from './Maze'; // Import the Maze component
+import Fight from './Fight'; // Import the Fight component
 
 const Play = () => {
-  const location = useLocation();
-  const selectedHero = location.state?.hero;
+  const myLocation = useLocation();
+  const mySelectedHero = myLocation.state?.hero;
   
   // State to hold game data and debug information
-  const [gameData, setGameData] = useState(null);
-  const [error, setError] = useState(null);
-  const [debugInfo, setDebugInfo] = useState({
+  const [myGameData, mySetGameData] = useState(null);
+  const [myError, mySetError] = useState(null);
+  const [myDebugInfo, mySetDebugInfo] = useState({
     apiCallAttempted: false,
     apiResponse: null,
     responseStatus: null,
     parsedData: null,
     error: null
   });
-  const [playerPosition, setPlayerPosition] = useState(null);
-  const [gameStatus, setGameStatus] = useState('playing');
-  const [message, setMessage] = useState('Navigate through the maze to find all 4 pillars before reaching the exit!');
-  const [collectedPillars, setCollectedPillars] = useState([]);
-  const [collectedPotions, setCollectedPotions] = useState({
+  const [myPlayerPosition, mySetPlayerPosition] = useState(null);
+  const [myGameStatus, mySetGameStatus] = useState('playing');
+  const [myMessage, mySetMessage] = useState('Navigate through the maze to find all 4 pillars before reaching the exit!');
+  const [myCollectedPillars, mySetCollectedPillars] = useState([]);
+  const [myCollectedPotions, mySetCollectedPotions] = useState({
     1: 0, // Health potions
     2: 0, // Vision potions
     3: 0  // Strength potions
   });
-  const [skipMonsters, setSkipMonsters] = useState(false);
-  const [showDebug, setShowDebug] = useState(false);
+  const [mySkipMonsters, mySetSkipMonsters] = useState(false);
+  const [myShowDebug, mySetShowDebug] = useState(false);
+  
+  // Fight state
+  const [myInFight, mySetInFight] = useState(false);
+  const [myCurrentMonster, mySetCurrentMonster] = useState(null);
 
   // Use the exact fetch approach from the working solution with more debug info
   useEffect(() => {
-    const fetchGameData = async () => {
+    const myFetchGameData = async () => {
       try {
-        setDebugInfo(prev => ({ ...prev, apiCallAttempted: true }));
+        mySetDebugInfo(thePrev => ({ ...thePrev, apiCallAttempted: true }));
         console.log("Attempting API call to /api/game");
         
-        const res = await fetch('/api/game', { method: 'POST' });
-        console.log("API response received:", res);
+        const myRes = await fetch('/api/game', { method: 'POST' });
+        console.log("API response received:", myRes);
         
-        setDebugInfo(prev => ({ 
-          ...prev, 
-          responseStatus: res.status,
+        mySetDebugInfo(thePrev => ({ 
+          ...thePrev, 
+          responseStatus: myRes.status,
           apiResponse: {
-            ok: res.ok,
-            status: res.status,
-            statusText: res.statusText,
-            headers: Object.fromEntries([...res.headers.entries()])
+            ok: myRes.ok,
+            status: myRes.status,
+            statusText: myRes.statusText,
+            headers: Object.fromEntries([...myRes.headers.entries()])
           }
         }));
         
-        if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+        if (!myRes.ok) throw new Error(`Network response was not ok: ${myRes.status} ${myRes.statusText}`);
         
-        const rawText = await res.text();
-        console.log("Raw response text:", rawText);
+        const myRawText = await myRes.text();
+        console.log("Raw response text:", myRawText);
         
-        let data;
+        let myData;
         try {
           // Try to parse the JSON
-          data = JSON.parse(rawText);
-          console.log("Parsed JSON data:", data);
-          setDebugInfo(prev => ({ ...prev, parsedData: data }));
-        } catch (parseError) {
-          console.error("JSON parsing error:", parseError);
-          throw new Error(`Failed to parse JSON: ${parseError.message}\nRaw text: ${rawText.slice(0, 200)}...`);
+          myData = JSON.parse(myRawText);
+          console.log("Parsed JSON data:", myData);
+          mySetDebugInfo(thePrev => ({ ...thePrev, parsedData: myData }));
+        } catch (theParseError) {
+          console.error("JSON parsing error:", theParseError);
+          throw new Error(`Failed to parse JSON: ${theParseError.message}\nRaw text: ${myRawText.slice(0, 200)}...`);
         }
         
-        setGameData(data);
+        mySetGameData(myData);
         
         // Try to find starting position if we have valid data
-        if (data && data.Maze && data.Maze.Grid) {
+        if (myData && myData.Maze && myData.Maze.Grid) {
           try {
-            const startPos = findStartPosition(data.Maze.Grid);
-            setPlayerPosition(startPos);
-          } catch (posError) {
-            console.error("Error finding start position:", posError);
+            const myStartPos = myFindStartPosition(myData.Maze.Grid);
+            mySetPlayerPosition(myStartPos);
+          } catch (thePosError) {
+            console.error("Error finding start position:", thePosError);
           }
         } else {
-          console.warn("Game data structure is not as expected:", data);
+          console.warn("Game data structure is not as expected:", myData);
         }
-      } catch (err) {
-        console.error('Connection error:', err);
-        setError(`Failed to connect to backend: ${err.message}`);
-        setDebugInfo(prev => ({ ...prev, error: err.toString() }));
+      } catch (theErr) {
+        console.error('Connection error:', theErr);
+        mySetError(`Failed to connect to backend: ${theErr.message}`);
+        mySetDebugInfo(thePrev => ({ ...thePrev, error: theErr.toString() }));
       }
     };
 
-    fetchGameData();
+    myFetchGameData();
   }, []);
 
   // Find the start position in the maze
-  const findStartPosition = (grid) => {
-    for (let i = 0; i < grid.length; i++) {
-      for (let j = 0; j < grid[i].length; j++) {
-        if (grid[i][j].RoomType === 1) {
-          return { row: i, col: j };
+  const myFindStartPosition = (theGrid) => {
+    for (let myI = 0; myI < theGrid.length; myI++) {
+      for (let myJ = 0; myJ < theGrid[myI].length; myJ++) {
+        if (theGrid[myI][myJ].RoomType === 1) {
+          return { row: myI, col: myJ };
         }
       }
     }
@@ -103,185 +108,205 @@ const Play = () => {
   };
 
   // Check if all four pillars have been collected
-  const hasAllPillars = () => {
-    return collectedPillars.length === 4 && 
-           collectedPillars.includes(1) && 
-           collectedPillars.includes(2) && 
-           collectedPillars.includes(3) && 
-           collectedPillars.includes(4);
+  const myHasAllPillars = () => {
+    return myCollectedPillars.length === 4 && 
+           myCollectedPillars.includes(1) && 
+           myCollectedPillars.includes(2) && 
+           myCollectedPillars.includes(3) && 
+           myCollectedPillars.includes(4);
   };
 
   // Handle player movement
-  const movePlayer = (direction) => {
-    if (gameStatus !== 'playing' || !playerPosition || !gameData) return;
+  const myMovePlayer = (theDirection) => {
+    if (myGameStatus !== 'playing' || !myPlayerPosition || !myGameData) return;
 
-    const newPosition = { ...playerPosition };
+    const myNewPosition = { ...myPlayerPosition };
     
-    switch (direction) {
+    switch (theDirection) {
       case 'up':
-        newPosition.row = Math.max(0, playerPosition.row - 1);
+        myNewPosition.row = Math.max(0, myPlayerPosition.row - 1);
         break;
       case 'down':
-        newPosition.row = Math.min(gameData.Maze.Grid.length - 1, playerPosition.row + 1);
+        myNewPosition.row = Math.min(myGameData.Maze.Grid.length - 1, myPlayerPosition.row + 1);
         break;
       case 'left':
-        newPosition.col = Math.max(0, playerPosition.col - 1);
+        myNewPosition.col = Math.max(0, myPlayerPosition.col - 1);
         break;
       case 'right':
-        newPosition.col = Math.min(gameData.Maze.Grid[0].length - 1, playerPosition.col + 1);
+        myNewPosition.col = Math.min(myGameData.Maze.Grid[0].length - 1, myPlayerPosition.col + 1);
         break;
       default:
         break;
     }
 
     // Check if the move is valid (not a wall)
-    const targetRoom = gameData.Maze.Grid[newPosition.row][newPosition.col];
-    if (targetRoom.RoomType === 0) {
-      setMessage("You can't move through walls!");
+    const myTargetRoom = myGameData.Maze.Grid[myNewPosition.row][myNewPosition.col];
+    if (myTargetRoom.RoomType === 0) {
+      mySetMessage("You can't move through walls!");
       return;
     }
 
     // Check for monsters - but skip if debug mode is enabled
-    if (targetRoom.RoomMonster) {
-      if (skipMonsters) {
+    if (myTargetRoom.RoomMonster) {
+      if (mySkipMonsters) {
         // When skipMonsters is enabled, just notify but allow movement
-        setMessage(`[DEBUG] Skipped combat with ${targetRoom.RoomMonster.Name}`);
+        mySetMessage(`[DEBUG] Skipped combat with ${myTargetRoom.RoomMonster.Name}`);
       } else {
-        setMessage(`You encountered a ${targetRoom.RoomMonster.Name}! Defeat it to proceed.`);
-        // In a real implementation, this would handle combat with the backend
-        return; // Stop movement only if not skipping monsters
+        mySetInFight(true);
+        mySetCurrentMonster(myTargetRoom.RoomMonster);
+        return;
       }
     }
 
     // Check for pillars
-    if (targetRoom.PillarType > 0 && !collectedPillars.includes(targetRoom.PillarType)) {
-      const newPillars = [...collectedPillars, targetRoom.PillarType];
-      setCollectedPillars(newPillars);
-      setMessage(`You found Pillar ${targetRoom.PillarType}! ${4 - newPillars.length} pillars remaining.`);
+    if (myTargetRoom.PillarType > 0 && !myCollectedPillars.includes(myTargetRoom.PillarType)) {
+      const myNewPillars = [...myCollectedPillars, myTargetRoom.PillarType];
+      mySetCollectedPillars(myNewPillars);
+      mySetMessage(`You found Pillar ${myTargetRoom.PillarType}! ${4 - myNewPillars.length} pillars remaining.`);
       
-      if (newPillars.length === 4) {
-        setMessage("You've collected all pillars! Find the exit to win.");
+      if (myNewPillars.length === 4) {
+        mySetMessage("You've collected all pillars! Find the exit to win.");
       }
     }
     
     // Check for potions
-    if (targetRoom.PotionType > 0) {
-      const potionTypes = {
+    if (myTargetRoom.PotionType > 0) {
+      const myPotionTypes = {
         1: "Health Potion",
         2: "Vision Potion",
         3: "Strength Potion"
       };
-      const potionName = potionTypes[targetRoom.PotionType] || `Potion type ${targetRoom.PotionType}`;
+      const myPotionName = myPotionTypes[myTargetRoom.PotionType] || `Potion type ${myTargetRoom.PotionType}`;
       
       // Update potion count
-      const newPotions = { ...collectedPotions };
-      newPotions[targetRoom.PotionType] = (newPotions[targetRoom.PotionType] || 0) + 1;
-      setCollectedPotions(newPotions);
+      const myNewPotions = { ...myCollectedPotions };
+      myNewPotions[myTargetRoom.PotionType] = (myNewPotions[myTargetRoom.PotionType] || 0) + 1;
+      mySetCollectedPotions(myNewPotions);
       
-      setMessage(`You found a ${potionName}! (${newPotions[targetRoom.PotionType]} total)`);
+      mySetMessage(`You found a ${myPotionName}! (${myNewPotions[myTargetRoom.PotionType]} total)`);
       
       // Clear the potion from the room to prevent multiple collection
-      const updatedGameData = { ...gameData };
-      updatedGameData.Maze.Grid[newPosition.row][newPosition.col].PotionType = 0;
-      setGameData(updatedGameData);
+      const myUpdatedGameData = { ...myGameData };
+      myUpdatedGameData.Maze.Grid[myNewPosition.row][myNewPosition.col].PotionType = 0;
+      mySetGameData(myUpdatedGameData);
     }
 
     // Check for exit
-    if (targetRoom.RoomType === 2) {
-      if (hasAllPillars()) {
-        setGameStatus('won');
-        setMessage("Congratulations! You've collected all pillars and found the exit!");
+    if (myTargetRoom.RoomType === 2) {
+      if (myHasAllPillars()) {
+        mySetGameStatus('won');
+        mySetMessage("Congratulations! You've collected all pillars and found the exit!");
       } else {
-        setMessage(`You found the exit, but you need to collect all 4 pillars first! (${collectedPillars.length}/4 collected)`);
+        mySetMessage(`You found the exit, but you need to collect all 4 pillars first! (${myCollectedPillars.length}/4 collected)`);
         // Allow player to stand on exit tile, but don't trigger win condition
       }
     }
 
     // Move player to new position
-    setPlayerPosition(newPosition);
+    mySetPlayerPosition(myNewPosition);
   };
 
   // Handle key presses for movement
   useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!gameData) return;
+    const myHandleKeyDown = (theE) => {
+      if (!myGameData || myInFight) return;
       
-      switch (e.key) {
+      switch (theE.key) {
         case 'ArrowUp':
-          movePlayer('up');
+          myMovePlayer('up');
           break;
         case 'ArrowDown':
-          movePlayer('down');
+          myMovePlayer('down');
           break;
         case 'ArrowLeft':
-          movePlayer('left');
+          myMovePlayer('left');
           break;
         case 'ArrowRight':
-          movePlayer('right');
+          myMovePlayer('right');
           break;
         default:
           break;
       }
     };
 
-    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keydown', myHandleKeyDown);
     return () => {
-      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keydown', myHandleKeyDown);
     };
-  }, [playerPosition, gameStatus, gameData, collectedPillars, collectedPotions, skipMonsters]);
+  }, [myPlayerPosition, myGameStatus, myGameData, myCollectedPillars, myCollectedPotions, mySkipMonsters, myInFight]);
+
+  // Handle fight victory
+  const myHandleFightVictory = () => {
+    mySetInFight(false);
+    mySetMessage(`You defeated the ${myCurrentMonster.Name}!`);
+    
+    // Remove monster from the room
+    const myUpdatedGameData = { ...myGameData };
+    myUpdatedGameData.Maze.Grid[myPlayerPosition.row][myPlayerPosition.col].RoomMonster = null;
+    mySetGameData(myUpdatedGameData);
+    
+    mySetCurrentMonster(null);
+  };
+
+  // Handle fight escape
+  const myHandleFightEscape = () => {
+    mySetInFight(false);
+    mySetCurrentMonster(null);
+    mySetMessage("You escaped from battle!");
+  };
 
   // Reset the game
-  const resetGame = () => {
+  const myResetGame = () => {
     window.location.reload();
   };
 
   // Toggle debug section visibility
-  const toggleDebugSection = () => {
-    setShowDebug(!showDebug);
+  const myToggleDebugSection = () => {
+    mySetShowDebug(!myShowDebug);
   };
 
   // Toggle monster skipping
-  const toggleSkipMonsters = () => {
-    setSkipMonsters(!skipMonsters);
-    setMessage(skipMonsters ? "Monster skipping disabled." : "Monster skipping enabled! You can now pass through monsters.");
+  const myToggleSkipMonsters = () => {
+    mySetSkipMonsters(!mySkipMonsters);
+    mySetMessage(mySkipMonsters ? "Monster skipping disabled." : "Monster skipping enabled! You can now pass through monsters.");
   };
 
   // Display game data as JSON for debugging
-  const renderDebugInfo = () => {
+  const myRenderDebugInfo = () => {
     return (
       <div className={styles.debugSection}>
         <h3>Debug Controls</h3>
         <div className={styles.debugControls}>
           <button 
-            onClick={toggleSkipMonsters}
-            className={`${styles.debugButton} ${skipMonsters ? styles.debugButtonActive : ''}`}
+            onClick={myToggleSkipMonsters}
+            className={`${styles.debugButton} ${mySkipMonsters ? styles.debugButtonActive : ''}`}
           >
-            {skipMonsters ? "Disable Monster Skipping" : "Enable Monster Skipping"}
+            {mySkipMonsters ? "Disable Monster Skipping" : "Enable Monster Skipping"}
           </button>
         </div>
         
         <h3>Debug Information</h3>
         <div className={styles.debugItem}>
-          <strong>API Call Attempted:</strong> {debugInfo.apiCallAttempted ? 'Yes' : 'No'}
+          <strong>API Call Attempted:</strong> {myDebugInfo.apiCallAttempted ? 'Yes' : 'No'}
         </div>
-        {debugInfo.responseStatus && (
+        {myDebugInfo.responseStatus && (
           <div className={styles.debugItem}>
-            <strong>Response Status:</strong> {debugInfo.responseStatus}
+            <strong>Response Status:</strong> {myDebugInfo.responseStatus}
           </div>
         )}
-        {debugInfo.error && (
+        {myDebugInfo.error && (
           <div className={styles.debugItem}>
-            <strong>Error:</strong> {debugInfo.error}
+            <strong>Error:</strong> {myDebugInfo.error}
           </div>
         )}
         <div className={styles.debugItem}>
           <strong>API Response:</strong>
-          <pre>{JSON.stringify(debugInfo.apiResponse, null, 2)}</pre>
+          <pre>{JSON.stringify(myDebugInfo.apiResponse, null, 2)}</pre>
         </div>
-        {gameData && (
+        {myGameData && (
           <div className={styles.debugItem}>
             <strong>Game Data:</strong>
-            <pre>{JSON.stringify(gameData, null, 2)}</pre>
+            <pre>{JSON.stringify(myGameData, null, 2)}</pre>
           </div>
         )}
       </div>
@@ -289,17 +314,17 @@ const Play = () => {
   };
 
   // Render pillar collection status
-  const renderPillarStatus = () => {
+  const myRenderPillarStatus = () => {
     return (
       <div className={styles.pillarStatus}>
         <h3>Collected Pillars:</h3>
         <div className={styles.pillarsContainer}>
-          {[1, 2, 3, 4].map(pillarNumber => (
+          {[1, 2, 3, 4].map(thePillarNumber => (
             <div 
-              key={pillarNumber} 
-              className={`${styles.pillarIndicator} ${collectedPillars.includes(pillarNumber) ? styles.collected : styles.missing}`}
+              key={thePillarNumber} 
+              className={`${styles.pillarIndicator} ${myCollectedPillars.includes(thePillarNumber) ? styles.collected : styles.missing}`}
             >
-              {pillarNumber}
+              {thePillarNumber}
             </div>
           ))}
         </div>
@@ -308,29 +333,29 @@ const Play = () => {
   };
   
   // Render potion collection status
-  const renderPotionStatus = () => {
+  const myRenderPotionStatus = () => {
     // Define potion types and their names
-    const potionTypes = {
+    const myPotionTypes = {
       1: "Health",
       2: "Vision",
       3: "Strength"
     };
     
-    const hasPotions = Object.values(collectedPotions).some(count => count > 0);
+    const myHasPotions = Object.values(myCollectedPotions).some(theCount => theCount > 0);
     
     return (
       <div className={styles.potionStatus}>
         <h3>Collected Potions:</h3>
         <div className={styles.potionsContainer}>
-          {hasPotions ? (
-            Object.entries(collectedPotions).map(([potionType, count]) => {
-              if (count > 0) {
+          {myHasPotions ? (
+            Object.entries(myCollectedPotions).map(([thePotionType, theCount]) => {
+              if (theCount > 0) {
                 return (
                   <div 
-                    key={potionType} 
-                    className={`${styles.potionIndicator} ${styles['potion' + potionType]}`}
+                    key={thePotionType} 
+                    className={`${styles.potionIndicator} ${styles['potion' + thePotionType]}`}
                   >
-                    {potionTypes[potionType] || `Type ${potionType}`}: {count}
+                    {myPotionTypes[thePotionType] || `Type ${thePotionType}`}: {theCount}
                   </div>
                 );
               }
@@ -345,31 +370,31 @@ const Play = () => {
   };
 
   // If there's an error, show error with debug info
-  if (error) {
+  if (myError) {
     return (
       <div className={styles.errorContainer}>
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Error</h2>
-        <p className={styles.errorMessage}>{error}</p>
+        <p className={styles.errorMessage}>{myError}</p>
         <button 
           onClick={() => window.location.reload()} 
           className={styles.retryButton}
         >
           Retry
         </button>
-        {renderDebugInfo()}
+        {myRenderDebugInfo()}
       </div>
     );
   }
 
   // If still loading, show loading with debug info
-  if (!gameData) {
+  if (!myGameData) {
     return (
       <div className={styles.loadingContainer}>
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Loading Maze...</h2>
         <div className={styles.loadingSpinner}></div>
-        {renderDebugInfo()}
+        {myRenderDebugInfo()}
       </div>
     );
   }
@@ -380,7 +405,7 @@ const Play = () => {
       <h1 className={styles.gameTitle}>Maze Adventure</h1>
       
       {/* Debug mode indicator */}
-      {skipMonsters && (
+      {mySkipMonsters && (
         <div className={styles.debugModeIndicator}>
           DEBUG MODE: Monster Skipping Enabled
         </div>
@@ -388,56 +413,65 @@ const Play = () => {
       
       {/* Hero info */}
       <div className={styles.heroInfo}>
-        <h3>{gameData.Hero.Name}</h3>
+        <h3>{myGameData.Hero.Name}</h3>
         <div className={styles.heroStats}>
           <div className={styles.healthBar}>
             <div 
               className={styles.healthFill} 
-              style={{ width: `${(gameData.Hero.CurrHealth / gameData.Hero.TotalHealh) * 100}%` }}
+              style={{ width: `${(myGameData.Hero.CurrHealth / myGameData.Hero.TotalHealh) * 100}%` }}
             ></div>
           </div>
           <div className={styles.healthText}>
-            {gameData.Hero.CurrHealth} / {gameData.Hero.TotalHealh}
+            {myGameData.Hero.CurrHealth} / {myGameData.Hero.TotalHealh}
           </div>
         </div>
       </div>
       
       {/* Pillar collection status */}
-      {renderPillarStatus()}
+      {myRenderPillarStatus()}
       
       {/* Potion collection status */}
-      {renderPotionStatus()}
+      {myRenderPotionStatus()}
       
       <div className={styles.gameStatus}>
-        <p>{message}</p>
-        {gameStatus !== 'playing' && (
-          <button onClick={resetGame} className={styles.resetButton}>Play Again</button>
+        <p>{myMessage}</p>
+        {myGameStatus !== 'playing' && (
+          <button onClick={myResetGame} className={styles.resetButton}>Play Again</button>
         )}
       </div>
       
-      {/* Use the Maze component */}
-      <Maze 
-        gameData={gameData}
-        playerPosition={playerPosition}
-        movePlayer={movePlayer}
-        skipMonsters={skipMonsters}
-        collectedPillars={collectedPillars}
-        setCollectedPillars={setCollectedPillars}
-        collectedPotions={collectedPotions}
-        setCollectedPotions={setCollectedPotions}
-        setMessage={setMessage}
-        hasAllPillars={hasAllPillars}
-      />
+      {/* Conditionally render either Maze or Fight */}
+      {myInFight && myCurrentMonster ? (
+        <Fight
+          monster={myCurrentMonster}
+          hero={myGameData.Hero}
+          onVictory={myHandleFightVictory}
+          onEscape={myHandleFightEscape}
+        />
+      ) : (
+        <Maze 
+          gameData={myGameData}
+          playerPosition={myPlayerPosition}
+          movePlayer={myMovePlayer}
+          skipMonsters={mySkipMonsters}
+          collectedPillars={myCollectedPillars}
+          setCollectedPillars={mySetCollectedPillars}
+          collectedPotions={myCollectedPotions}
+          setCollectedPotions={mySetCollectedPotions}
+          setMessage={mySetMessage}
+          hasAllPillars={myHasAllPillars}
+        />
+      )}
       
       {/* Debug toggle */}
       <div className={styles.debugToggle}>
-        <button onClick={toggleDebugSection}>
-          {showDebug ? "Hide Debug Info" : "Show Debug Info"}
+        <button onClick={myToggleDebugSection}>
+          {myShowDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
       </div>
       
       {/* Debug section that's shown/hidden based on state */}
-      {showDebug && renderDebugInfo()}
+      {myShowDebug && myRenderDebugInfo()}
     </div>
   );
 };
