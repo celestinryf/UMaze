@@ -13,35 +13,35 @@ func TestInitGame(t *testing.T) {
 		t.Fatal(err)
 	}
 
-	game0 := InitGame(0, db)
-	if game0.TheHero != nil {
-		t.Error("Hero should be nil")
-	}
-	if game0.TheMaze == nil {
-		t.Error("Maze shouldn't be nil")
-	}
-
-	game4 := InitGame(4, db)
-	if game4.TheHero.Name != "HEALER" {
-		t.Error("Hero should be nil")
+	game4 := InitGame(Matt, db)
+	if game4.TheHero.Name != "MATT" {
+		t.Error("Hero shouldn't be nil")
 	}
 	if game4.TheMaze == nil {
 		t.Error("Maze shouldn't be nil")
 	}
 
-	game5 := InitGame(5, db)
-	if game5.TheHero.Name != "GIANT" {
-		t.Error("Hero should be nil")
+	game5 := InitGame(Primo, db)
+	if game5.TheHero.Name != "PRIMO" {
+		t.Error("Hero should't be nil")
 	}
 	if game5.TheMaze == nil {
 		t.Error("Maze shouldn't be nil")
 	}
 
-	game6 := InitGame(6, db)
-	if game6.TheHero.Name != "BARBARIAN" {
+	game6 := InitGame(Nick, db)
+	if game6.TheHero.Name != "NICK" {
 		t.Error("Hero should be nil")
 	}
 	if game6.TheMaze == nil {
+		t.Error("Maze shouldn't be nil")
+	}
+
+	game7 := InitGame(Celestin, db)
+	if game7.TheHero.Name != "CELESTIN" {
+		t.Error("Hero should be nil")
+	}
+	if game7.TheMaze == nil {
 		t.Error("Maze shouldn't be nil")
 	}
 

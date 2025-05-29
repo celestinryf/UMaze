@@ -25,14 +25,14 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 	defer db.Close()
 
 	switch r.Method {
-	case "GET": // Get list of all saved games
+	case http.MethodGet: // Get list of all saved games
 
 		if err := json.NewEncoder(w).Encode(s.getSavedGames(db)); err != nil {
 			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
 			return
 		}
 
-	case "POST": // Save current game
+	case http.MethodPost: // Save current game
 
 		var dataName struct {
 			Name string `json:"name"`
@@ -47,7 +47,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			"message": "Game saved successfully",
 		})
 
-	case "PUT": // Load a game
+	case http.MethodPut: // Load a game
 
 		var dataId struct {
 			Id int `json:"id"`
@@ -62,7 +62,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			"message": "Game saved successfully",
 		})
 
-	case "DELETE": // delete game by id
+	case http.MethodDelete: // delete game by id
 
 		var dataId struct {
 			Id int `json:"id"`

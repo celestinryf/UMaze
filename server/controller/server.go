@@ -14,7 +14,7 @@ type Server struct {
 }
 
 func InitServer() *Server {
-	return &Server{}
+	return &Server{Game: nil}
 }
 
 func (s *Server) saveGame(name string, db *sql.DB) {
@@ -61,8 +61,7 @@ func (s *Server) loadGame(id int, db *sql.DB) {
 }
 
 func (s *Server) deleteGame(id int, db *sql.DB) {
-	_, err := db.Exec(`DELETE FROM saved_games
-		WHERE id = ?`, id)
+	_, err := db.Exec(`DELETE FROM saved_games WHERE id = ?`, id)
 	if err != nil {
 		log.Fatal(err)
 	}
