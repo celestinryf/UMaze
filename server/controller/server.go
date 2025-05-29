@@ -10,15 +10,15 @@ import (
 )
 
 type Server struct {
-	game *model.Game
+	Game *model.Game `json:"Game"`
 }
 
 func InitServer() *Server {
-	return &Server{}
+	return &Server{Game: nil}
 }
 
 func (s *Server) saveGame(name string, db *sql.DB) {
-	gameBytes, err := json.Marshal(s.game)
+	gameBytes, err := json.Marshal(s.Game)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -54,15 +54,14 @@ func (s *Server) loadGame(id int, db *sql.DB) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	err = json.Unmarshal(jsonData, &s.game)
+	err = json.Unmarshal(jsonData, &s.Game)
 	if err != nil {
 		log.Fatal(err)
 	}
 }
 
 func (s *Server) deleteGame(id int, db *sql.DB) {
-	_, err := db.Exec(`DELETE FROM saved_games
-		WHERE id = ?`, id)
+	_, err := db.Exec(`DELETE FROM saved_games WHERE id = ?`, id)
 	if err != nil {
 		log.Fatal(err)
 	}

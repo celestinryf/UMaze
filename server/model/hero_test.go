@@ -5,64 +5,31 @@ import (
 	"testing"
 )
 
-// Test initing a new healer
-func TestInitHeroHealer(t *testing.T) {
+// Test initing a new Matthew
+func TestInitMatt(t *testing.T) {
 
 	db, err := sql.Open("sqlite3", "../db/360Game.db")
 	if err != nil {
-		t.Fatalf("failed to open database: %v", err)
+		t.Fatal("failed to open db")
 	}
 	defer db.Close()
 
-	hero := initHero(4, db)
+	hero := initHero(Matt, db)
 
 	if hero == nil {
 		t.Fatal("hero is nil")
 	}
 
-	if hero.Name != "HEALER" {
-		t.Error("Name is not healer")
-	}
-
-	if hero.TotalHealth != 175 || hero.CurrHealth != 175 {
-		t.Error("Health not valid")
-	}
-
-	if hero.Attack != 15 {
-		t.Error("Attack is not valid")
-	}
-
-	if len(hero.AquiredPillars) != 0 || len(hero.AquiredPotions) != 0 {
-		t.Error("Aquired items not empty")
-	}
-
-}
-
-// Test initing a new giant
-func TestInitHeroGiant(t *testing.T) {
-
-	db, err := sql.Open("sqlite3", "../db/360Game.db")
-	if err != nil {
-		t.Fatalf("failed to open database: %v", err)
-	}
-	defer db.Close()
-
-	hero := initHero(5, db)
-
-	if hero == nil {
-		t.Fatal("hero is nil")
-	}
-
-	if hero.Name != "GIANT" {
-		t.Error("Name is not giant")
+	if hero.Name != "MATT" {
+		t.Error("Name not Matt")
 	}
 
 	if hero.TotalHealth != 250 || hero.CurrHealth != 250 {
-		t.Error("Health not valid")
+		t.Error("Matt health not valid")
 	}
 
-	if hero.Attack != 20 {
-		t.Error("Attack is not valid")
+	if hero.Attack != 25 {
+		t.Error("Matt attack not valid")
 	}
 
 	if len(hero.AquiredPillars) != 0 || len(hero.AquiredPotions) != 0 {
@@ -71,31 +38,31 @@ func TestInitHeroGiant(t *testing.T) {
 
 }
 
-// Test initing a new barb
-func TestInitHeroBarb(t *testing.T) {
+// Test initing a new Primo
+func TestInitPrimo(t *testing.T) {
 
 	db, err := sql.Open("sqlite3", "../db/360Game.db")
 	if err != nil {
-		t.Fatalf("failed to open database: %v", err)
+		t.Fatal("failed to open db")
 	}
 	defer db.Close()
 
-	hero := initHero(6, db)
+	hero := initHero(Primo, db)
 
 	if hero == nil {
 		t.Fatal("hero is nil")
 	}
 
-	if hero.Name != "BARBARIAN" {
-		t.Error("Name is not barb")
+	if hero.Name != "PRIMO" {
+		t.Error("Name not Matt")
 	}
 
-	if hero.TotalHealth != 200 || hero.CurrHealth != 200 {
-		t.Error("Health not valid")
+	if hero.TotalHealth != 220 || hero.CurrHealth != 220 {
+		t.Error("Matt health not valid")
 	}
 
-	if hero.Attack != 25 {
-		t.Error("Attack is not valid")
+	if hero.Attack != 15 {
+		t.Error("Matt attack not valid")
 	}
 
 	if len(hero.AquiredPillars) != 0 || len(hero.AquiredPotions) != 0 {
@@ -104,37 +71,67 @@ func TestInitHeroBarb(t *testing.T) {
 
 }
 
-// Test initing a new hero w/ invalid vals
-func TestInitHeroInvalid(t *testing.T) {
+// Test initing a new Nick
+func TestInitNick(t *testing.T) {
 
 	db, err := sql.Open("sqlite3", "../db/360Game.db")
 	if err != nil {
-		t.Fatalf("failed to open database: %v", err)
+		t.Fatal("failed to open db")
 	}
 	defer db.Close()
 
-	hero := initHero(0, db)
-	if hero != nil {
-		t.Error("Should not allow this val")
+	hero := initHero(Nick, db)
+
+	if hero == nil {
+		t.Fatal("hero is nil")
 	}
 
-	hero = initHero(100, db)
-	if hero != nil {
-		t.Error("Should not allow this val")
+	if hero.Name != "NICK" {
+		t.Error("Name not Matt")
 	}
 
-	hero = initHero(3, db)
-	if hero != nil {
-		t.Error("Should not allow this val")
+	if hero.TotalHealth != 200 || hero.CurrHealth != 200 {
+		t.Error("Matt health not valid")
 	}
 
-	hero = initHero(10, db)
-	if hero != nil {
-		t.Error("Should not allow this val")
+	if hero.Attack != 30 {
+		t.Error("Matt attack not valid")
 	}
 
-	hero = initHero(-1, db)
-	if hero != nil {
-		t.Error("Should not allow this val")
+	if len(hero.AquiredPillars) != 0 || len(hero.AquiredPotions) != 0 {
+		t.Error("Aquired items not empty")
 	}
+}
+
+// Init Celestin
+func TestInitCelestin(t *testing.T) {
+
+	db, err := sql.Open("sqlite3", "../db/360Game.db")
+	if err != nil {
+		t.Fatal("failed to open db")
+	}
+	defer db.Close()
+
+	hero := initHero(Celestin, db)
+
+	if hero == nil {
+		t.Fatal("hero is nil")
+	}
+
+	if hero.Name != "CELESTIN" {
+		t.Error("Name not Matt")
+	}
+
+	if hero.TotalHealth != 150 || hero.CurrHealth != 150 {
+		t.Error("Matt health not valid")
+	}
+
+	if hero.Attack != 20 {
+		t.Error("Matt attack not valid")
+	}
+
+	if len(hero.AquiredPillars) != 0 || len(hero.AquiredPotions) != 0 {
+		t.Error("Aquired items not empty")
+	}
+
 }

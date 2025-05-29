@@ -13,7 +13,7 @@ type Game struct {
 }
 
 // Gives an initialzed game.
-func InitGame(theHeroType int, db *sql.DB) *Game {
+func InitGame(theHeroType HeroType, db *sql.DB) *Game {
 	return &Game{
 		TheMaze: initMaze(db),
 		TheHero: initHero(theHeroType, db),
@@ -22,6 +22,10 @@ func InitGame(theHeroType int, db *sql.DB) *Game {
 
 // Sets curr location to x and y
 func (g *Game) Move(newCoords *Coords) GameStatus {
+
+	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomMonster != nil {
+		return InProgress
+	}
 
 	g.TheMaze.CurrCoords = newCoords
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
@@ -48,4 +52,31 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 	}
 
 	return InProgress
+}
+
+// attack
+func (g *Game) Attack(specialAttack bool, potionType Potion) {
+
+	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.X]
+	roomMonster := room.RoomMonster
+	hero := g.TheHero
+
+	if potionType != NoPotion {
+		// implement later (potion)
+		hero.CurrHealth += 100
+		hero.AquiredPotions = hero.AquiredPotions[1:]
+	}
+
+	if !specialAttack {
+		roomMonster.CurrHealth -= hero.Attack
+	} else {
+		// implement later (special attack)
+		roomMonster.CurrHealth -= hero.Attack
+	}
+
+	if roomMonster.CurrHealth > 0 {
+		hero.CurrHealth -= roomMonster.Attack
+	} else {
+		room.RoomMonster = nil
+	}
 }

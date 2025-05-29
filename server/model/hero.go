@@ -2,8 +2,16 @@ package model
 
 import (
 	"database/sql"
-	"fmt"
 	"log"
+)
+
+type HeroType int
+
+const (
+	Matt HeroType = iota + 4
+	Primo
+	Nick
+	Celestin
 )
 
 // Hero Type with name, totalHealth, currHealth, and attack.
@@ -18,26 +26,13 @@ type Hero struct {
 
 // Inits hero with totalHealth,
 // currHealth, attack, and name.
-func initHero(heroType int, db *sql.DB) *Hero {
-
-	if heroType < 4 || heroType > 6 {
-		fmt.Println("Not sending in a hero 4-6")
-		return nil
-	}
-
-	hero_stats, err := db.Query("SELECT name, health, attack_dmg FROM entities WHERE id = ?", heroType)
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer hero_stats.Close()
-
+func initHero(heroType HeroType, db *sql.DB) *Hero {
 	var (
 		name               string
 		health, attack_dmg int
 	)
 
-	hero_stats.Next()
-	err = hero_stats.Scan(&name, &health, &attack_dmg)
+	err := db.QueryRow("SELECT name, health, attack_dmg FROM entities WHERE id = ?", heroType).Scan(&name, &health, &attack_dmg)
 	if err != nil {
 		log.Fatal(err)
 	}
