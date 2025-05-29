@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -9,15 +10,43 @@ import (
 )
 
 // Hanldes requests for making games
-func GameHandler(w http.ResponseWriter, r *http.Request) {
+func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
+
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
-	model.InitGame(4) // eventually get form the request based on the hero chosen
-
 	switch r.Method {
-	case "POST", "GET", "PUT":
-		if err := json.NewEncoder(w).Encode(model.MyGame); err != nil {
+	case http.MethodPost: // makes a new game given the hero id
+		var HeroIdJson struct {
+			HeroId int `json:"hero_id"`
+		}
+
+		if err := json.NewDecoder(r.Body).Decode(&HeroIdJson); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+
+		db, err := sql.Open("sqlite3", "./db/360Game.db")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+
+		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), db)
+		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
+			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
+		}
+	case http.MethodGet: // gets curr game json
+
+		db, err := sql.Open("sqlite3", "./db/360Game.db")
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer db.Close()
+
+		s.Game = model.InitGame(4, db)
+
+		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	default:

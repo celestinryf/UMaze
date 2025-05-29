@@ -2,19 +2,9 @@ package model
 
 import (
 	"database/sql"
-	"encoding/json"
-	"log"
-	"time"
 
 	_ "github.com/mattn/go-sqlite3"
 )
-
-// savedGameQuery, err := db.Query("SELECT (id, name, date) FROM saved_games")
-type JsonGame struct {
-	Id   int    `json:"Id"`
-	Name string `json:"Name"`
-	Date string `json:"Date"`
-}
 
 // This represents the current game
 type Game struct {
@@ -22,103 +12,71 @@ type Game struct {
 	TheHero *Hero `json:"Hero"`
 }
 
-// This is the current game being played
-var MyGame *Game
-
-// Gives an initialzed game. (no initing the hero)
-func InitGame(theHeroType int) {
-
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	MyGame = &Game{
+// Gives an initialzed game.
+func InitGame(theHeroType HeroType, db *sql.DB) *Game {
+	return &Game{
 		TheMaze: initMaze(db),
 		TheHero: initHero(theHeroType, db),
 	}
 }
 
-// Stores current game in the database
-func StoreGame(gameName string) {
+// Sets curr location to x and y
+func (g *Game) Move(newCoords *Coords) GameStatus {
 
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	_, err = db.Exec(`CREATE TABLE saved_games (
-    	id INTEGER PRIMARY KEY AUTOINCREMENT,
-    	name TEXT,
-    	info TEXT,
-    	date TEXT
-	)`)
-	if err != nil {
-		log.Fatal(err)
+	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomMonster != nil {
+		return InProgress
 	}
 
-	gameBytes, err := json.Marshal(MyGame)
-	if err != nil {
-		log.Fatal(err)
+	g.TheMaze.CurrCoords = newCoords
+	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
+
+	if currRoom.PotionType != NoPotion {
+		g.TheHero.AquiredPotions = append(g.TheHero.AquiredPotions, currRoom.PotionType)
+		currRoom.PotionType = NoPotion
 	}
 
-	_, err = db.Exec(`INSERT INTO saved_games
-		(name, info, date) VALUES (?, ?, ?)`,
-		gameName, string(gameBytes), time.Now().Format("5/5/06"))
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Get a game from the db, then set it to the curr game
-func RetrieveGame(game_id int) {
-
-	// Open the database
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	// Get the game by the id
-	var jsonData []byte
-	err = db.QueryRow("SELECT info FROM saved_games WHERE id = ?", game_id).Scan(&jsonData)
-	if err != nil {
-		log.Fatal(err)
+	if currRoom.PillarType != noPillar {
+		g.TheHero.AquiredPillars = append(g.TheHero.AquiredPillars, currRoom.PillarType)
+		currRoom.PillarType = noPillar
 	}
 
-	err = json.Unmarshal(jsonData, &MyGame)
-	if err != nil {
-		log.Fatal(err)
-	}
-}
-
-// Gets a list of all the name of the loaded games
-func GetStoredGames() []JsonGame {
-
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
-	savedGameQuery, err := db.Query("SELECT id, name, date FROM saved_games")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer savedGameQuery.Close()
-
-	savedGameArr := make([]JsonGame, 0)
-	for savedGameQuery.Next() {
-		saved_game := JsonGame{}
-		err = savedGameQuery.Scan(&saved_game.Id, &saved_game.Name, &saved_game.Date)
-		if err != nil {
-			log.Fatal(err)
+	if currRoom.RoomType == pit {
+		g.TheHero.CurrHealth -= 20 // can change the pit damage
+		if g.TheHero.CurrHealth <= 0 {
+			return Lost
 		}
-		savedGameArr = append(savedGameArr, saved_game)
 	}
 
-	return savedGameArr
+	if currRoom.RoomType == end && len(g.TheHero.AquiredPillars) == 4 {
+		return Won
+	}
+
+	return InProgress
+}
+
+// attack
+func (g *Game) Attack(specialAttack bool, potionType Potion) {
+
+	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.X]
+	roomMonster := room.RoomMonster
+	hero := g.TheHero
+
+	if potionType != NoPotion {
+		// implement later (potion)
+		hero.CurrHealth += 100
+		hero.AquiredPotions = hero.AquiredPotions[1:]
+	}
+
+	if !specialAttack {
+		roomMonster.CurrHealth -= hero.Attack
+	} else {
+		// implement later (special attack)
+		roomMonster.CurrHealth -= hero.Attack
+	}
+
+	if roomMonster.CurrHealth > 0 {
+		hero.CurrHealth -= roomMonster.Attack
+	} else {
+		room.RoomMonster = nil
+	}
 }

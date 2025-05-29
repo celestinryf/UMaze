@@ -9,12 +9,6 @@ import (
 // for room Type enums
 type RoomTypes int
 
-// for pillar type enums
-type Pillar int
-
-// potion types
-type Potion int
-
 // room enums
 const (
 	wall RoomTypes = iota
@@ -23,6 +17,9 @@ const (
 	path
 	pit
 )
+
+// for pillar type enums
+type Pillar int
 
 // pillar enums
 const (
@@ -33,16 +30,18 @@ const (
 	pillar4
 )
 
+// potion types
+type Potion int
+
 // potion enums
 const (
-	noPotion Potion = iota
-	potion1
-	potion2
-	potion3
+	NoPotion Potion = iota
+	Potion1
+	Potion2
+	Potion3
 )
 
 // Rooms make up the maze
-// currently has canPass and roomMonster
 type Room struct {
 	RoomType    RoomTypes `json:"RoomType"`
 	RoomMonster *Monster  `json:"RoomMonster"`
@@ -52,17 +51,23 @@ type Room struct {
 
 // Inits and returns a room based on
 // whether we canPass through or not.
-func initRoom(theRoomType RoomTypes) *Room {
+func InitRoom(isPath bool) *Room {
+	var roomType RoomTypes
+	if isPath {
+		roomType = path
+	} else {
+		roomType = wall
+	}
 	return &Room{
-		RoomType:    theRoomType,
+		RoomType:    roomType,
 		PillarType:  noPillar,
-		PotionType:  noPotion,
+		PotionType:  NoPotion,
 		RoomMonster: nil,
 	}
 }
 
 // sets up rooms with pits, potions, and monsters
-func (r *Room) setUpRoom(db *sql.DB) {
+func (r *Room) SetUpRoom(db *sql.DB) {
 
 	probs, err := db.Query("SELECT * FROM spawn_rates")
 	if err != nil {
@@ -97,11 +102,11 @@ func (r *Room) setUpRoom(db *sql.DB) {
 		potion := rand.Intn(3) + 1
 		switch potion {
 		case 1:
-			r.PotionType = potion1
+			r.PotionType = Potion1
 		case 2:
-			r.PotionType = potion2
+			r.PotionType = Potion2
 		case 3:
-			r.PotionType = potion3
+			r.PotionType = Potion3
 		}
 	}
 }
