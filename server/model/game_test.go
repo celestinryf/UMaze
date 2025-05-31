@@ -12,6 +12,7 @@ func TestInitGame(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	defer db.Close()
 
 	game4 := InitGame(Matt, db)
 	if game4.TheHero.Name != "MATT" {
@@ -50,4 +51,32 @@ func TestInitGame(t *testing.T) {
 // Test the Move method
 func TestMove(t *testing.T) {
 
+}
+
+func TestAttack(t *testing.T) {
+	// func (g *Game) Attack(specialAttack bool, potionType Potion) {
+
+	// 	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.X]
+	// 	roomMonster := room.RoomMonster
+	// 	hero := g.TheHero
+
+	// 	if potionType != NoPotion {
+	// 		// implement later (potion)
+	// 		hero.CurrHealth += 100
+	// 		hero.AquiredPotions = hero.AquiredPotions[1:]
+	// 	}
+
+	// 	if !specialAttack {
+	// 		roomMonster.CurrHealth -= hero.Attack
+	// 	} else {
+	// 		// implement later (special attack)
+	// 		roomMonster.CurrHealth -= hero.Attack
+	// 	}
+
+	//	if roomMonster.CurrHealth > 0 {
+	//		hero.CurrHealth -= roomMonster.Attack
+	//	} else {
+	//
+	//		room.RoomMonster = nil
+	//	}
 }

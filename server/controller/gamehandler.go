@@ -44,7 +44,7 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer db.Close()
 
-		s.Game = model.InitGame(4, db)
+		s.Game = model.InitGame(model.Matt, db)
 
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
