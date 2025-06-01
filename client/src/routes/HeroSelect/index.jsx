@@ -12,7 +12,7 @@ import bgImage from '../../assets/background.jpg';
 
 const myHeroes = [
   {
-    id: 1,
+    id: 6,
     name: "Nick",
     img: nickImg,
     desc: "A powerful warrior with high attack damage and strong defense capabilities.",
@@ -26,7 +26,7 @@ const myHeroes = [
     class: "Warrior"
   },
   {
-    id: 2,
+    id: 4,
     name: "Matthew",
     img: matthewImg,
     desc: "A brilliant mage who masters arcane spells and tactical positioning.",
@@ -40,7 +40,7 @@ const myHeroes = [
     class: "Mage"
   },
   {
-    id: 3,
+    id: 7,
     name: "Celestin",
     img: celestinImg,
     desc: "A nimble rogue with exceptional speed and evasion abilities.",
@@ -54,7 +54,7 @@ const myHeroes = [
     class: "Rogue"
   },
   {
-    id: 4,
+    id: 5,
     name: "Primo",
     img: primoImg,
     desc: "A dedicated healer with support abilities and protective enchantments.",
@@ -80,10 +80,27 @@ const HeroSelect = () => {
     setMySelectedHero(finalTheHero);
   };
 
-  const handleStartGame = () => {
+  const handleStartGame = async () => {
     playSFX(startSFX);
     console.log(`Starting game with hero: ${mySelectedHero.name}`);
-    myNavigate('/play', { state: { hero: mySelectedHero } });
+    try {
+      const res = await fetch('api/game/', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ hero_id: mySelectedHero.id }),
+      });
+      if (!res.ok) {
+        throw new Error('http err')
+      }
+      const result = await res.json();
+      console.log(result)
+
+      myNavigate('/play', { state: { hero: mySelectedHero } });
+    } catch (error) {
+      console.log("Coulndt set the game")
+    }
   };
 
   const StatBar = ({ label, value, color }) => (
