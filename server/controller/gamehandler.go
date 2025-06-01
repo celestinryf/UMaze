@@ -37,15 +37,6 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	case http.MethodGet: // gets curr game json
-
-		db, err := sql.Open("sqlite3", "./db/360Game.db")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer db.Close()
-
-		s.Game = model.InitGame(model.Matt, db)
-
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
