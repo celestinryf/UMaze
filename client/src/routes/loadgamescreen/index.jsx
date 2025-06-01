@@ -31,10 +31,10 @@ const LoadGames = () => {
     const removeGame = async (id) => {
         try {
             const res = await fetch('/api/load', { method: 'DELETE' ,  headers: {
-    'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({Id: id})
-    });
+            'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({Id: id})
+            });
 
             if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
 
