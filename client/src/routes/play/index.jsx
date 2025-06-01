@@ -312,7 +312,7 @@ const Play = () => {
   // Saves Game
   const saveGame = async () => {
     try {
-      const res = await fetch('/api/load', { method: 'POST' ,  headers: {
+      const res = await fetch('/api/load/', { method: 'POST' ,  headers: {
       'Content-Type': 'application/json'
       },
       body: JSON.stringify({Name: gName})
