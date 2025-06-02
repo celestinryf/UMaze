@@ -104,8 +104,8 @@ const Play = () => {
       // Assuming the backend expects coordinates in the request
       // You might need to adjust this based on your actual backend API
       const requestBody = {
-        positionx: col,
-        positiony: row
+        row: row,
+        col: col
       };
       console.log(requestBody);
       const res = await fetch('/api/move', {
