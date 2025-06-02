@@ -1,21 +1,21 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './Play.module.css';
-import Maze from './Maze'; // Import the Maze component
+import Maze from './Maze';
 
 const Play = () => {
   const location = useLocation();
   const selectedHero = location.state?.hero;
+  const difficulty = location.state?.difficulty;
   
   // State to hold game data and debug information
   const [gameData, setGameData] = useState(null);
+  const [currentRoom, setCurrentRoom] = useState(null);
   const [error, setError] = useState(null);
   const [debugInfo, setDebugInfo] = useState({
-    apiCallAttempted: false,
-    apiResponse: null,
-    responseStatus: null,
-    parsedData: null,
-    error: null
+    lastApiCall: null,
+    lastApiResponse: null,
+    allApiCalls: []
   });
   const [playerPosition, setPlayerPosition] = useState(null);
   const [gameStatus, setGameStatus] = useState('playing');
@@ -26,65 +26,58 @@ const Play = () => {
     2: 0, // Vision potions
     3: 0  // Strength potions
   });
+  const [inEncounter, setInEncounter] = useState(false);
   const [skipMonsters, setSkipMonsters] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
-  const [gName, setgName] = useState("")
+  const [gName, setgName] = useState("");
   const [gMessage, setGMessage] = useState("");
 
-  // Use the exact fetch approach from the working solution with more debug info
+  // Helper function to add debug info
+  const addDebugInfo = (callType, request, response) => {
+    const debugEntry = {
+      timestamp: new Date().toISOString(),
+      type: callType,
+      request: request,
+      response: response
+    };
+    
+    setDebugInfo(prev => ({
+      lastApiCall: callType,
+      lastApiResponse: response,
+      allApiCalls: [...prev.allApiCalls, debugEntry]
+    }));
+  };
+
+  // Get initial game state
   useEffect(() => {
     const fetchGameData = async () => {
       try {
-        setDebugInfo(prev => ({ ...prev, apiCallAttempted: true }));
-        console.log("Attempting API call to /api/game");
+        console.log("Fetching current game state...");
         
-        const res = await fetch('/api/game', { method: 'POST' });
-        console.log("API response received:", res);
-        
-        setDebugInfo(prev => ({ 
-          ...prev, 
-          responseStatus: res.status,
-          apiResponse: {
-            ok: res.ok,
-            status: res.status,
-            statusText: res.statusText,
-            headers: Object.fromEntries([...res.headers.entries()])
-          }
-        }));
+        // Get the current game state (should already be initialized from hero select)
+        const res = await fetch('/api/game', { method: 'GET' });
         
         if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
         
-        const rawText = await res.text();
-        console.log("Raw response text:", rawText);
+        const data = await res.json();
+        console.log("Game state received:", data);
         
-        let data;
-        try {
-          // Try to parse the JSON
-          data = JSON.parse(rawText);
-          console.log("Parsed JSON data:", data);
-          setDebugInfo(prev => ({ ...prev, parsedData: data }));
-        } catch (parseError) {
-          console.error("JSON parsing error:", parseError);
-          throw new Error(`Failed to parse JSON: ${parseError.message}\nRaw text: ${rawText.slice(0, 200)}...`);
-        }
+        addDebugInfo('GET /api/game', { method: 'GET' }, data);
         
         setGameData(data);
         
-        // Try to find starting position if we have valid data
+        // Find starting position
         if (data && data.Maze && data.Maze.Grid) {
-          try {
-            const startPos = findStartPosition(data.Maze.Grid);
-            setPlayerPosition(startPos);
-          } catch (posError) {
-            console.error("Error finding start position:", posError);
-          }
-        } else {
-          console.warn("Game data structure is not as expected:", data);
+          const startPos = findStartPosition(data.Maze.Grid);
+          setPlayerPosition(startPos);
+          
+          // Get initial room state
+          await getRoomState(startPos.row, startPos.col);
         }
       } catch (err) {
-        console.error('Connection error:', err);
-        setError(`Failed to connect to backend: ${err.message}`);
-        setDebugInfo(prev => ({ ...prev, error: err.toString() }));
+        console.error('Error fetching game data:', err);
+        setError(`Failed to fetch game state: ${err.message}`);
+        addDebugInfo('GET /api/game ERROR', { method: 'GET' }, { error: err.message });
       }
     };
 
@@ -100,8 +93,98 @@ const Play = () => {
         }
       }
     }
-    // Default if no start found
-    return { row: 2, col: 1 };
+    return { row: 0, col: 0 };
+  };
+
+  // Get room state from backend
+  const getRoomState = async (row, col) => {
+    try {
+      console.log(`Getting room state for position (${row}, ${col})`);
+      
+      // Assuming the backend expects coordinates in the request
+      // You might need to adjust this based on your actual backend API
+      const requestBody = {
+        positionx: col,
+        positiony: row
+      };
+      
+      const res = await fetch('/api/maze', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(requestBody)
+      });
+      
+      if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+      
+      const roomData = await res.json();
+      console.log("Room state received:", roomData);
+      
+      addDebugInfo('POST /api/maze', requestBody, roomData);
+      
+      setCurrentRoom(roomData);
+      
+      // Handle room contents based on backend response
+      handleRoomContents(roomData);
+      
+      return roomData;
+    } catch (err) {
+      console.error('Error getting room state:', err);
+      setError(`Failed to get room state: ${err.message}`);
+      addDebugInfo('POST /api/maze ERROR', { row, col }, { error: err.message });
+      return null;
+    }
+  };
+
+  // Handle room contents based on backend response
+  const handleRoomContents = (roomData) => {
+    // Handle encounter
+    if (roomData.encounter) {
+      setInEncounter(true);
+      if (roomData.Monster) {
+        setMessage(`You encountered a ${roomData.Monster.Name || 'Monster'}! Defeat it to proceed.`);
+      }
+    } else {
+      setInEncounter(false);
+    }
+    
+    // Handle pillars
+    if (roomData.pillar && roomData.pillar > 0 && !collectedPillars.includes(roomData.pillar)) {
+      const newPillars = [...collectedPillars, roomData.pillar];
+      setCollectedPillars(newPillars);
+      setMessage(`You found Pillar ${roomData.pillar}! ${4 - newPillars.length} pillars remaining.`);
+      
+      if (newPillars.length === 4) {
+        setMessage("You've collected all pillars! Find the exit to win.");
+      }
+    }
+    
+    // Handle potions
+    if (roomData.potion && roomData.potion > 0) {
+      const potionTypes = {
+        1: "Health Potion",
+        2: "Vision Potion",
+        3: "Strength Potion"
+      };
+      const potionName = potionTypes[roomData.potion] || `Potion type ${roomData.potion}`;
+      
+      const newPotions = { ...collectedPotions };
+      newPotions[roomData.potion] = (newPotions[roomData.potion] || 0) + 1;
+      setCollectedPotions(newPotions);
+      
+      setMessage(`You found a ${potionName}! (${newPotions[roomData.potion]} total)`);
+    }
+    
+    // Handle exit
+    if (roomData.roomtype === 2) {
+      if (hasAllPillars()) {
+        setGameStatus('won');
+        setMessage("Congratulations! You've collected all pillars and found the exit!");
+      } else {
+        setMessage(`You found the exit, but you need to collect all 4 pillars first! (${collectedPillars.length}/4 collected)`);
+      }
+    }
   };
 
   // Check if all four pillars have been collected
@@ -114,8 +197,14 @@ const Play = () => {
   };
 
   // Handle player movement
-  const movePlayer = (direction) => {
+  const movePlayer = async (direction) => {
     if (gameStatus !== 'playing' || !playerPosition || !gameData) return;
+    
+    // Prevent movement during encounters (unless skipping monsters)
+    if (inEncounter && !skipMonsters) {
+      setMessage("You must defeat the monster before moving!");
+      return;
+    }
 
     const newPosition = { ...playerPosition };
     
@@ -143,64 +232,16 @@ const Play = () => {
       return;
     }
 
-    // Check for monsters - but skip if debug mode is enabled
-    if (targetRoom.RoomMonster) {
-      if (skipMonsters) {
-        // When skipMonsters is enabled, just notify but allow movement
-        setMessage(`[DEBUG] Skipped combat with ${targetRoom.RoomMonster.Name}`);
-      } else {
-        setMessage(`You encountered a ${targetRoom.RoomMonster.Name}! Defeat it to proceed.`);
-        // In a real implementation, this would handle combat with the backend
-        return; // Stop movement only if not skipping monsters
-      }
-    }
-
-    // Check for pillars
-    if (targetRoom.PillarType > 0 && !collectedPillars.includes(targetRoom.PillarType)) {
-      const newPillars = [...collectedPillars, targetRoom.PillarType];
-      setCollectedPillars(newPillars);
-      setMessage(`You found Pillar ${targetRoom.PillarType}! ${4 - newPillars.length} pillars remaining.`);
-      
-      if (newPillars.length === 4) {
-        setMessage("You've collected all pillars! Find the exit to win.");
-      }
-    }
-    
-    // Check for potions
-    if (targetRoom.PotionType > 0) {
-      const potionTypes = {
-        1: "Health Potion",
-        2: "Vision Potion",
-        3: "Strength Potion"
-      };
-      const potionName = potionTypes[targetRoom.PotionType] || `Potion type ${targetRoom.PotionType}`;
-      
-      // Update potion count
-      const newPotions = { ...collectedPotions };
-      newPotions[targetRoom.PotionType] = (newPotions[targetRoom.PotionType] || 0) + 1;
-      setCollectedPotions(newPotions);
-      
-      setMessage(`You found a ${potionName}! (${newPotions[targetRoom.PotionType]} total)`);
-      
-      // Clear the potion from the room to prevent multiple collection
-      const updatedGameData = { ...gameData };
-      updatedGameData.Maze.Grid[newPosition.row][newPosition.col].PotionType = 0;
-      setGameData(updatedGameData);
-    }
-
-    // Check for exit
-    if (targetRoom.RoomType === 2) {
-      if (hasAllPillars()) {
-        setGameStatus('won');
-        setMessage("Congratulations! You've collected all pillars and found the exit!");
-      } else {
-        setMessage(`You found the exit, but you need to collect all 4 pillars first! (${collectedPillars.length}/4 collected)`);
-        // Allow player to stand on exit tile, but don't trigger win condition
-      }
-    }
-
     // Move player to new position
     setPlayerPosition(newPosition);
+    
+    // Get room state from backend
+    const roomState = await getRoomState(newPosition.row, newPosition.col);
+    
+    if (skipMonsters && roomState?.encounter) {
+      setMessage(`[DEBUG] Skipped combat with ${roomState.Monster?.Name || 'Monster'}`);
+      setInEncounter(false);
+    }
   };
 
   // Handle key presses for movement
@@ -230,7 +271,7 @@ const Play = () => {
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
     };
-  }, [playerPosition, gameStatus, gameData, collectedPillars, collectedPotions, skipMonsters]);
+  }, [playerPosition, gameStatus, gameData, collectedPillars, collectedPotions, skipMonsters, inEncounter]);
 
   // Reset the game
   const resetGame = () => {
@@ -248,7 +289,29 @@ const Play = () => {
     setMessage(skipMonsters ? "Monster skipping disabled." : "Monster skipping enabled! You can now pass through monsters.");
   };
 
-  // Display game data as JSON for debugging
+  // Save game
+  const saveGame = async () => {
+    try {
+      const res = await fetch('/api/load/', { 
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ Name: gName })
+      });
+
+      if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+
+      setgName("");
+      setGMessage(`Game saved successfully! (${res.status})`);
+      console.log(res);
+    } catch (err) {
+      console.log(err);
+      setGMessage(`Error saving game: ${err.message}`);
+    }
+  };
+
+  // Display debug info
   const renderDebugInfo = () => {
     return (
       <div className={styles.debugSection}>
@@ -264,28 +327,34 @@ const Play = () => {
         
         <h3>Debug Information</h3>
         <div className={styles.debugItem}>
-          <strong>API Call Attempted:</strong> {debugInfo.apiCallAttempted ? 'Yes' : 'No'}
+          <strong>Last API Call:</strong> {debugInfo.lastApiCall || 'None'}
         </div>
-        {debugInfo.responseStatus && (
-          <div className={styles.debugItem}>
-            <strong>Response Status:</strong> {debugInfo.responseStatus}
-          </div>
-        )}
-        {debugInfo.error && (
-          <div className={styles.debugItem}>
-            <strong>Error:</strong> {debugInfo.error}
-          </div>
-        )}
         <div className={styles.debugItem}>
-          <strong>API Response:</strong>
-          <pre>{JSON.stringify(debugInfo.apiResponse, null, 2)}</pre>
+          <strong>Last API Response:</strong>
+          <pre>{JSON.stringify(debugInfo.lastApiResponse, null, 2)}</pre>
         </div>
-        {gameData && (
-          <div className={styles.debugItem}>
-            <strong>Game Data:</strong>
-            <pre>{JSON.stringify(gameData, null, 2)}</pre>
+        <div className={styles.debugItem}>
+          <strong>Current Room State:</strong>
+          <pre>{JSON.stringify(currentRoom, null, 2)}</pre>
+        </div>
+        <div className={styles.debugItem}>
+          <strong>Player Position:</strong> Row: {playerPosition?.row}, Col: {playerPosition?.col}
+        </div>
+        <div className={styles.debugItem}>
+          <strong>In Encounter:</strong> {inEncounter ? 'Yes' : 'No'}
+        </div>
+        <div className={styles.debugItem}>
+          <strong>All API Calls:</strong>
+          <div style={{ maxHeight: '300px', overflow: 'auto' }}>
+            {debugInfo.allApiCalls.map((call, index) => (
+              <div key={index} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
+                <strong>{call.timestamp} - {call.type}</strong>
+                <pre>Request: {JSON.stringify(call.request, null, 2)}</pre>
+                <pre>Response: {JSON.stringify(call.response, null, 2)}</pre>
+              </div>
+            ))}
           </div>
-        )}
+        </div>
       </div>
     );
   };
@@ -308,31 +377,9 @@ const Play = () => {
       </div>
     );
   };
-
-  // Saves Game
-  const saveGame = async () => {
-    try {
-      const res = await fetch('/api/load/', { method: 'POST' ,  headers: {
-      'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({Name: gName})
-      });
-
-
-      if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
-
-      setgName("");
-      setGMessage(res.status);
-      console.log(res)
-    } catch (err) {
-      console.log(err);
-      setGMessage(err);
-    }
-  };
   
   // Render potion collection status
   const renderPotionStatus = () => {
-    // Define potion types and their names
     const potionTypes = {
       1: "Health",
       2: "Vision",
@@ -392,18 +439,18 @@ const Play = () => {
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Loading Maze...</h2>
         <div className={styles.loadingSpinner}></div>
-        {renderDebugInfo()}
+        {showDebug && renderDebugInfo()}
       </div>
     );
   }
 
-  // Display the maze game with pillar status and debug info
+  // Display the maze game
   return (
     <div className={styles.mazeGame}>
       <h1 className={styles.gameTitle}>Maze Adventure</h1>
   
       <div>
-        <label for="gameName">Game Name: </label><br/>
+        <label htmlFor="gameName">Game Name: </label><br/>
         <input type="text" id="gameName" name="gameName" value={gName} onChange={e => setgName(e.target.value)}/><br/>
         <button onClick={saveGame}>Save Game</button>
         <p>{gMessage}</p>
@@ -413,6 +460,13 @@ const Play = () => {
       {skipMonsters && (
         <div className={styles.debugModeIndicator}>
           DEBUG MODE: Monster Skipping Enabled
+        </div>
+      )}
+      
+      {/* Encounter indicator */}
+      {inEncounter && !skipMonsters && (
+        <div className={styles.encounterIndicator}>
+          ⚔️ IN COMBAT - Defeat the monster to continue!
         </div>
       )}
       
@@ -457,6 +511,7 @@ const Play = () => {
         setCollectedPotions={setCollectedPotions}
         setMessage={setMessage}
         hasAllPillars={hasAllPillars}
+        inEncounter={inEncounter}
       />
       
       {/* Debug toggle */}
@@ -466,7 +521,7 @@ const Play = () => {
         </button>
       </div>
       
-      {/* Debug section that's shown/hidden based on state */}
+      {/* Debug section */}
       {showDebug && renderDebugInfo()}
     </div>
   );

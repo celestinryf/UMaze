@@ -11,7 +11,8 @@ const Maze = ({
   collectedPotions, 
   setCollectedPotions, 
   setMessage, 
-  hasAllPillars 
+  hasAllPillars,
+  inEncounter 
 }) => {
   // Get the character for a room
   const getRoomChar = (room, i, j) => {
@@ -83,12 +84,36 @@ const Maze = ({
       </div>
       
       <div className={styles.controls}>
-        <button onClick={() => handleMove('up')}>Up</button>
+        <button 
+          onClick={() => handleMove('up')}
+          disabled={inEncounter && !skipMonsters}
+          className={inEncounter && !skipMonsters ? styles.disabledButton : ''}
+        >
+          Up
+        </button>
         <div className={styles.horizontalControls}>
-          <button onClick={() => handleMove('left')}>Left</button>
-          <button onClick={() => handleMove('right')}>Right</button>
+          <button 
+            onClick={() => handleMove('left')}
+            disabled={inEncounter && !skipMonsters}
+            className={inEncounter && !skipMonsters ? styles.disabledButton : ''}
+          >
+            Left
+          </button>
+          <button 
+            onClick={() => handleMove('right')}
+            disabled={inEncounter && !skipMonsters}
+            className={inEncounter && !skipMonsters ? styles.disabledButton : ''}
+          >
+            Right
+          </button>
         </div>
-        <button onClick={() => handleMove('down')}>Down</button>
+        <button 
+          onClick={() => handleMove('down')}
+          disabled={inEncounter && !skipMonsters}
+          className={inEncounter && !skipMonsters ? styles.disabledButton : ''}
+        >
+          Down
+        </button>
       </div>
       
       <div className={styles.legend}>

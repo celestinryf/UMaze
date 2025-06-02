@@ -297,3 +297,20 @@
   .mazeGame button:active {
     transform: translateY(0);
   }
+
+  .encounterIndicator {
+    background: rgba(255, 0, 0, 0.2);
+    border: 2px solid #ff0000;
+    padding: 10px;
+    margin: 10px 0;
+    text-align: center;
+    font-weight: bold;
+    color: #ff0000;
+    animation: pulse 1s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+  }
