@@ -121,7 +121,7 @@ const Play = () => {
       const roomData = await res.json();
       console.log("Room state received:", roomData);
       
-      addDebugInfo('POST /api/move', requestBody, roomData);
+      addDebugInfo('PUT /api/move', requestBody, roomData);
       
       setCurrentRoom(roomData);
       
@@ -132,7 +132,7 @@ const Play = () => {
     } catch (err) {
       console.error('Error getting room state:', err);
       setError(`Failed to get room state: ${err.message}`);
-      addDebugInfo('POST /api/move ERROR', { row, col }, { error: err.message });
+      addDebugInfo('PUT /api/move ERROR', { row, col }, { error: err.message });
       return null;
     }
   };
