@@ -89,14 +89,15 @@ const HeroSelect = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ hero_id: mySelectedHero.id }),
+        // can have variable maze_size, however must be odd
+        // maybe 7, 9, 11, or 13
+        body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: 7 }),
       });
       if (!res.ok) {
         throw new Error('http err')
       }
       const result = await res.json();
       console.log(result)
-
       myNavigate('/play', { state: { hero: mySelectedHero } });
     } catch (error) {
       console.log("Coulndt set the game")
