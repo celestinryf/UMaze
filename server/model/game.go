@@ -59,7 +59,7 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 }
 
 // attack
-func (g *Game) Attack(specialAttack bool, potionType Potion) {
+func (g *Game) Attack(specialAttack bool) {
 
 	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y]
 	roomMonster := room.RoomMonster
@@ -67,12 +67,6 @@ func (g *Game) Attack(specialAttack bool, potionType Potion) {
 
 	if roomMonster == nil {
 		return
-	}
-
-	if potionType != NoPotion {
-		// implement later (potion)
-		hero.CurrHealth += 100
-		hero.AquiredPotions = hero.AquiredPotions[1:]
 	}
 
 	if !specialAttack {
