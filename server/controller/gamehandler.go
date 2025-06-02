@@ -18,7 +18,8 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodPost: // makes a new game given the hero id
 		var HeroIdJson struct {
-			HeroId int `json:"hero_id"`
+			HeroId   int `json:"hero_id"`
+			MazeSize int `json:"maze_size"`
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&HeroIdJson); err != nil {
@@ -32,7 +33,7 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 		}
 		defer db.Close()
 
-		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), db)
+		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), db, HeroIdJson.MazeSize)
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}

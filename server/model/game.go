@@ -13,9 +13,9 @@ type Game struct {
 }
 
 // Gives an initialzed game.
-func InitGame(theHeroType HeroType, db *sql.DB) *Game {
+func InitGame(theHeroType HeroType, db *sql.DB, mazeSize int) *Game {
 	return &Game{
-		TheMaze: initMaze(db),
+		TheMaze: initMaze(db, mazeSize),
 		TheHero: initHero(theHeroType, db),
 	}
 }
