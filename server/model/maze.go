@@ -6,7 +6,7 @@ import (
 )
 
 // maze has dimensions of mazeSize * mazeSize
-const mazeSize = 7
+//const mazeSize = 7
 
 // Coordinates of the player
 type Coords struct {
@@ -16,8 +16,8 @@ type Coords struct {
 
 // Holds the grid of the maze.
 type Maze struct {
-	Grid       [mazeSize][mazeSize]*Room `json:"Grid"`
-	CurrCoords *Coords                   `json:"coords"`
+	Grid       [][]*Room `json:"Grid"`
+	CurrCoords *Coords   `json:"coords"`
 }
 
 // Gives the status of the game
@@ -31,10 +31,10 @@ const (
 )
 
 // inits the maze struct and returns a pointer to a maze
-func initMaze(db *sql.DB) *Maze {
+func initMaze(db *sql.DB, mazeSize int) *Maze {
 
 	newMaze := Maze{
-		Grid:       newGrid(),
+		Grid:       newGrid(mazeSize),
 		CurrCoords: nil,
 	}
 

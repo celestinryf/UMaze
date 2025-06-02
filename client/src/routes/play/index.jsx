@@ -331,6 +331,27 @@ const Play = () => {
       </div>
     );
   };
+
+  // Saves Game
+  const saveGame = async () => {
+    try {
+      const res = await fetch('/api/load/', { method: 'POST' ,  headers: {
+      'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({Name: gName})
+      });
+
+
+      if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+
+      setgName("");
+      setGMessage(res.status);
+      console.log(res)
+    } catch (err) {
+      console.log(err);
+      setGMessage(err);
+    }
+  };
   
   // Render potion collection status
   const myRenderPotionStatus = () => {
@@ -403,7 +424,14 @@ const Play = () => {
   return (
     <div className={styles.mazeGame}>
       <h1 className={styles.gameTitle}>Maze Adventure</h1>
-      
+  
+      <div>
+        <label for="gameName">Game Name: </label><br/>
+        <input type="text" id="gameName" name="gameName" value={gName} onChange={e => setgName(e.target.value)}/><br/>
+        <button onClick={saveGame}>Save Game</button>
+        <p>{gMessage}</p>
+      </div>
+
       {/* Debug mode indicator */}
       {mySkipMonsters && (
         <div className={styles.debugModeIndicator}>
