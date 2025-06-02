@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import GameCard from '../../components/GameCard/GameCard';
 
 const LoadGames = () => {
     const [games, setGames] = useState([]);
     const [error, setError] = useState();
     const [loading, setLoading] = useState(true);
+    const myNavigate = useNavigate();
 
         // Load games from db
     useEffect(() => {
@@ -44,6 +46,20 @@ const LoadGames = () => {
         }
     };
 
+    const loadGame = async (theId) => {
+        try {
+            const res = await fetch('api/load/', { 
+                method: 'PUT' , 
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ id: theId })
+            });
+            if (!res.ok) throw new Error(`Network respsonse was not ok`);
+            myNavigate('/play'); 
+        } catch (err) {
+            console.log(err);
+        }
+    };
+
     return (
         <div style={{ padding: '2rem', textAlign: 'center' }}>
         <h1>Load Saved Games</h1>
@@ -53,6 +69,7 @@ const LoadGames = () => {
             games && games.map((game, index) => (
             <div key={index}>
                 <GameCard name={game.Name} date={game.Date} />
+                <button onClick={() => loadGame(game.Id)}>Load Game</button>
                 <button onClick={() => removeGame(game.Id)}>Remove Game</button>
             </div>
             ))
