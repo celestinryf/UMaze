@@ -26,8 +26,10 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		log.Println(CurrPotion.PotionType)
+
 		if len(s.Game.TheHero.AquiredPotions) != 0 && CurrPotion.PotionType != model.NoPotion {
-			s.Game.TheHero.TotalHealth += 100 // every potion is a healing potion rn
+			s.Game.TheHero.CurrHealth += 100 // every potion is a healing potion rn
 			s.Game.TheHero.AquiredPotions = s.Game.TheHero.AquiredPotions[1:]
 		}
 

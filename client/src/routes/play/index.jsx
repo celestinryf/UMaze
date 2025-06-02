@@ -93,7 +93,7 @@ const Play = () => {
       const res = await fetch('/api/potion', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ PotionType: potionType })
+        body: JSON.stringify({ potion_type: potionType })
       });
       if (!res.ok) throw new Error(`Failed to use potion: ${res.status}`);
       const result = await res.json();
