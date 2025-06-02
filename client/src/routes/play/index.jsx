@@ -57,9 +57,9 @@ const Play = () => {
 
   const saveGame = async () => {
     try {
-      const res = await fetch('/api/load/', { 
+      const res = await fetch('/api/load/', {
         method: 'POST',
-        headers: {'Content-Type': 'application/json'},
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ Name: gName })
       });
       if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
@@ -79,7 +79,7 @@ const Play = () => {
       });
       if (!res.ok) throw new Error(`Failed to attack: ${res.status}`);
       const result = await res.json();
-  
+
       setGameData(result);
       const monster = result?.Maze?.Grid?.[result.Maze.coords.row]?.[result.Maze.coords.col]?.RoomMonster;
       setGMessage(`Attacked monster! Hero HP: ${result.Hero.CurrHealth}, Monster HP: ${monster?.CurrHealth ?? 'Defeated'}`);
@@ -87,7 +87,23 @@ const Play = () => {
       setGMessage(`Attack failed: ${err.message}`);
     }
   };
-  
+
+  const usePotion = async (potionType) => {
+    try {
+      const res = await fetch('/api/potion', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ PotionType: potionType })
+      });
+      if (!res.ok) throw new Error(`Failed to use potion: ${res.status}`);
+      const result = await res.json();
+      console.log(result);
+      setGameData(result);
+      setGMessage(`Used ${getPotionName(potionType)} Potion!`);
+    } catch (err) {
+      setGMessage(`Potion use failed: ${err.message}`);
+    }
+  };
 
   const movePlayer = async (newRow, newCol) => {
     const { Maze } = gameData;
@@ -177,10 +193,10 @@ const Play = () => {
 
       <div className={styles.saveSection}>
         <label htmlFor="gameName">Game Name: </label>
-        <input 
-          type="text" 
-          id="gameName" 
-          value={gName} 
+        <input
+          type="text"
+          id="gameName"
+          value={gName}
           onChange={e => setgName(e.target.value)}
         />
         <button onClick={saveGame}>Save Game</button>
@@ -192,6 +208,17 @@ const Play = () => {
           <p>⚔️ A wild {currentRoom.RoomMonster.Name} blocks your path! HP: {currentRoom.RoomMonster.CurrHealth}</p>
           <button onClick={() => attackMonster(false)}>Attack</button>
           <button onClick={() => attackMonster(true)}>Special Attack</button>
+
+          {/* Allow potion usage during encounter */}
+          {collectedPotions.includes(1) && (
+            <button onClick={() => usePotion(1)}>Use Health Potion</button>
+          )}
+          {collectedPotions.includes(2) && (
+            <button onClick={() => usePotion(2)}>Use Vision Potion</button>
+          )}
+          {collectedPotions.includes(3) && (
+            <button onClick={() => usePotion(3)}>Use Strength Potion</button>
+          )}
         </div>
       )}
 
