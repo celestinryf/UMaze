@@ -65,6 +65,10 @@ func (g *Game) Attack(specialAttack bool, potionType Potion) {
 	roomMonster := room.RoomMonster
 	hero := g.TheHero
 
+	if roomMonster == nil {
+		return
+	}
+
 	if potionType != NoPotion {
 		// implement later (potion)
 		hero.CurrHealth += 100

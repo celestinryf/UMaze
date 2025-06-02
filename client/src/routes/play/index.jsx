@@ -1,528 +1,381 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './Play.module.css';
-import Maze from './Maze';
 
 const Play = () => {
   const location = useLocation();
-  const selectedHero = location.state?.hero;
-  const difficulty = location.state?.difficulty;
-  
-  // State to hold game data and debug information
   const [gameData, setGameData] = useState(null);
-  const [currentRoom, setCurrentRoom] = useState(null);
   const [error, setError] = useState(null);
-  const [debugInfo, setDebugInfo] = useState({
-    lastApiCall: null,
-    lastApiResponse: null,
-    allApiCalls: []
-  });
-  const [playerPosition, setPlayerPosition] = useState(null);
-  const [gameStatus, setGameStatus] = useState('playing');
-  const [message, setMessage] = useState('Navigate through the maze to find all 4 pillars before reaching the exit!');
-  const [collectedPillars, setCollectedPillars] = useState([]);
-  const [collectedPotions, setCollectedPotions] = useState({
-    1: 0, // Health potions
-    2: 0, // Vision potions
-    3: 0  // Strength potions
-  });
-  const [inEncounter, setInEncounter] = useState(false);
-  const [skipMonsters, setSkipMonsters] = useState(false);
   const [showDebug, setShowDebug] = useState(false);
   const [gName, setgName] = useState("");
   const [gMessage, setGMessage] = useState("");
 
-  // Helper function to add debug info
-  const addDebugInfo = (callType, request, response) => {
-    const debugEntry = {
-      timestamp: new Date().toISOString(),
-      type: callType,
-      request: request,
-      response: response
-    };
-    
-    setDebugInfo(prev => ({
-      lastApiCall: callType,
-      lastApiResponse: response,
-      allApiCalls: [...prev.allApiCalls, debugEntry]
-    }));
+  const getRoomTypeName = (type) => {
+    switch (type) {
+      case 0: return 'Wall';
+      case 1: return 'Entrance';
+      case 2: return 'Exit';
+      case 3: return 'Normal';
+      case 4: return 'Pit';
+      default: return 'Unknown';
+    }
   };
 
-  // Get initial game state
+  const getPillarName = (type) => {
+    switch (type) {
+      case 1: return 'Abstraction';
+      case 2: return 'Encapsulation';
+      case 3: return 'Inheritance';
+      case 4: return 'Polymorphism';
+      default: return 'None';
+    }
+  };
+
+  const getPotionName = (type) => {
+    switch (type) {
+      case 1: return 'Health';
+      case 2: return 'Vision';
+      case 3: return 'Strength';
+      default: return 'Unknown';
+    }
+  };
+
   useEffect(() => {
     const fetchGameData = async () => {
       try {
-        console.log("Fetching current game state...");
-        
-        // Get the current game state (should already be initialized from hero select)
         const res = await fetch('/api/game', { method: 'GET' });
-        
         if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
-        
         const data = await res.json();
-        console.log("Game state received:", data);
-        
-        addDebugInfo('GET /api/game', { method: 'GET' }, data);
-        
         setGameData(data);
-        
-        // Find starting position
-        if (data && data.Maze && data.Maze.Grid) {
-          const startPos = findStartPosition(data.Maze.Grid);
-          setPlayerPosition(startPos);
-          
-          // Get initial room state
-          await getRoomState(startPos.row, startPos.col);
-        }
       } catch (err) {
-        console.error('Error fetching game data:', err);
         setError(`Failed to fetch game state: ${err.message}`);
-        addDebugInfo('GET /api/game ERROR', { method: 'GET' }, { error: err.message });
       }
     };
 
     fetchGameData();
   }, []);
 
-  // Find the start position in the maze
-  const findStartPosition = (grid) => {
-    for (let i = 0; i < grid.length; i++) {
-      for (let j = 0; j < grid[i].length; j++) {
-        if (grid[i][j].RoomType === 1) {
-          return { row: i, col: j };
-        }
-      }
-    }
-    return { row: 0, col: 0 };
-  };
-
-  // Get room state from backend
-  const getRoomState = async (row, col) => {
-    try {
-      console.log(`Getting room state for position (${row}, ${col})`);
-      
-      // Assuming the backend expects coordinates in the request
-      // You might need to adjust this based on your actual backend API
-      const requestBody = {
-        row: row,
-        col: col
-      };
-      console.log(requestBody);
-      const res = await fetch('/api/move', {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(requestBody)
-      });
-      
-      if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
-      
-      const roomData = await res.json();
-      console.log("Room state received:", roomData);
-      
-      addDebugInfo('PUT /api/move', requestBody, roomData);
-      
-      setCurrentRoom(roomData);
-      
-      // Handle room contents based on backend response
-      // handleRoomContents(roomData);
-      
-      return roomData;
-    } catch (err) {
-      console.error('Error getting room state:', err);
-      setError(`Failed to get room state: ${err.message}`);
-      addDebugInfo('PUT /api/move ERROR', { row, col }, { error: err.message });
-      return null;
-    }
-  };
-
-  // Handle room contents based on backend response
-  // const handleRoomContents = (roomData) => {
-  //   // Handle encounter
-  //   if (roomData.encounter) {
-  //     setInEncounter(true);
-  //     if (roomData.Monster) {
-  //       setMessage(`You encountered a ${roomData.Monster.Name || 'Monster'}! Defeat it to proceed.`);
-  //     }
-  //   } else {
-  //     setInEncounter(false);
-  //   }
-    
-  //   // Handle pillars
-  //   if (roomData.pillar && roomData.pillar > 0 && !collectedPillars.includes(roomData.pillar)) {
-  //     const newPillars = [...collectedPillars, roomData.pillar];
-  //     setCollectedPillars(newPillars);
-  //     setMessage(`You found Pillar ${roomData.pillar}! ${4 - newPillars.length} pillars remaining.`);
-      
-  //     if (newPillars.length === 4) {
-  //       setMessage("You've collected all pillars! Find the exit to win.");
-  //     }
-  //   }
-    
-  //   // Handle potions
-  //   if (roomData.potion && roomData.potion > 0) {
-  //     const potionTypes = {
-  //       1: "Health Potion",
-  //       2: "Vision Potion",
-  //       3: "Strength Potion"
-  //     };
-  //     const potionName = potionTypes[roomData.potion] || `Potion type ${roomData.potion}`;
-      
-  //     const newPotions = { ...collectedPotions };
-  //     newPotions[roomData.potion] = (newPotions[roomData.potion] || 0) + 1;
-  //     setCollectedPotions(newPotions);
-      
-  //     setMessage(`You found a ${potionName}! (${newPotions[roomData.potion]} total)`);
-  //   }
-    
-  //   // Handle exit
-  //   if (roomData.roomtype === 2) {
-  //     if (hasAllPillars()) {
-  //       setGameStatus('won');
-  //       setMessage("Congratulations! You've collected all pillars and found the exit!");
-  //     } else {
-  //       setMessage(`You found the exit, but you need to collect all 4 pillars first! (${collectedPillars.length}/4 collected)`);
-  //     }
-  //   }
-  // };
-
-  // Check if all four pillars have been collected
-  const hasAllPillars = () => {
-    return collectedPillars.length === 4 && 
-           collectedPillars.includes(1) && 
-           collectedPillars.includes(2) && 
-           collectedPillars.includes(3) && 
-           collectedPillars.includes(4);
-  };
-
-  // Handle player movement
-  const movePlayer = async (direction) => {
-    if (gameStatus !== 'playing' || !playerPosition || !gameData) return;
-    
-    // Prevent movement during encounters (unless skipping monsters)
-    if (inEncounter && !skipMonsters) {
-      setMessage("You must defeat the monster before moving!");
-      return;
-    }
-
-    const newPosition = { ...playerPosition };
-    
-    switch (direction) {
-      case 'up':
-        newPosition.row = Math.max(0, playerPosition.row - 1);
-        break;
-      case 'down':
-        newPosition.row = Math.min(gameData.Maze.Grid.length - 1, playerPosition.row + 1);
-        break;
-      case 'left':
-        newPosition.col = Math.max(0, playerPosition.col - 1);
-        break;
-      case 'right':
-        newPosition.col = Math.min(gameData.Maze.Grid[0].length - 1, playerPosition.col + 1);
-        break;
-      default:
-        break;
-    }
-
-    // Check if the move is valid (not a wall)
-    const targetRoom = gameData.Maze.Grid[newPosition.row][newPosition.col];
-    if (targetRoom.RoomType === 0) {
-      setMessage("You can't move through walls!");
-      return;
-    }
-
-    // Move player to new position
-    setPlayerPosition(newPosition);
-    
-    // Get room state from backend
-    const roomState = await getRoomState(newPosition.row, newPosition.col);
-    
-    if (skipMonsters && roomState?.encounter) {
-      setMessage(`[DEBUG] Skipped combat with ${roomState.Monster?.Name || 'Monster'}`);
-      setInEncounter(false);
-    }
-  };
-
-  // Handle key presses for movement
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!gameData) return;
-      
-      switch (e.key) {
-        case 'ArrowUp':
-          movePlayer('up');
-          break;
-        case 'ArrowDown':
-          movePlayer('down');
-          break;
-        case 'ArrowLeft':
-          movePlayer('left');
-          break;
-        case 'ArrowRight':
-          movePlayer('right');
-          break;
-        default:
-          break;
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-    };
-  }, [playerPosition, gameStatus, gameData, collectedPillars, collectedPotions, skipMonsters, inEncounter]);
-
-  // Reset the game
-  const resetGame = () => {
-    window.location.reload();
-  };
-
-  // Toggle debug section visibility
-  const toggleDebugSection = () => {
-    setShowDebug(!showDebug);
-  };
-
-  // Toggle monster skipping
-  const toggleSkipMonsters = () => {
-    setSkipMonsters(!skipMonsters);
-    setMessage(skipMonsters ? "Monster skipping disabled." : "Monster skipping enabled! You can now pass through monsters.");
-  };
-
-  // Save game
   const saveGame = async () => {
     try {
       const res = await fetch('/api/load/', { 
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
+        headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({ Name: gName })
       });
-
       if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
-
       setgName("");
       setGMessage(`Game saved successfully! (${res.status})`);
-      console.log(res);
     } catch (err) {
-      console.log(err);
       setGMessage(`Error saving game: ${err.message}`);
     }
   };
 
-  // Display debug info
-  const renderDebugInfo = () => {
-    return (
-      <div className={styles.debugSection}>
-        <h3>Debug Controls</h3>
-        <div className={styles.debugControls}>
-          <button 
-            onClick={toggleSkipMonsters}
-            className={`${styles.debugButton} ${skipMonsters ? styles.debugButtonActive : ''}`}
-          >
-            {skipMonsters ? "Disable Monster Skipping" : "Enable Monster Skipping"}
-          </button>
-        </div>
-        
-        <h3>Debug Information</h3>
-        <div className={styles.debugItem}>
-          <strong>Last API Call:</strong> {debugInfo.lastApiCall || 'None'}
-        </div>
-        <div className={styles.debugItem}>
-          <strong>Last API Response:</strong>
-          <pre>{JSON.stringify(debugInfo.lastApiResponse, null, 2)}</pre>
-        </div>
-        <div className={styles.debugItem}>
-          <strong>Current Room State:</strong>
-          <pre>{JSON.stringify(currentRoom, null, 2)}</pre>
-        </div>
-        <div className={styles.debugItem}>
-          <strong>Player Position:</strong> Row: {playerPosition?.row}, Col: {playerPosition?.col}
-        </div>
-        <div className={styles.debugItem}>
-          <strong>In Encounter:</strong> {inEncounter ? 'Yes' : 'No'}
-        </div>
-        <div className={styles.debugItem}>
-          <strong>All API Calls:</strong>
-          <div style={{ maxHeight: '300px', overflow: 'auto' }}>
-            {debugInfo.allApiCalls.map((call, index) => (
-              <div key={index} style={{ marginBottom: '10px', borderBottom: '1px solid #ccc', paddingBottom: '10px' }}>
-                <strong>{call.timestamp} - {call.type}</strong>
-                <pre>Request: {JSON.stringify(call.request, null, 2)}</pre>
-                <pre>Response: {JSON.stringify(call.response, null, 2)}</pre>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Render pillar collection status
-  const renderPillarStatus = () => {
-    return (
-      <div className={styles.pillarStatus}>
-        <h3>Collected Pillars:</h3>
-        <div className={styles.pillarsContainer}>
-          {[1, 2, 3, 4].map(pillarNumber => (
-            <div 
-              key={pillarNumber} 
-              className={`${styles.pillarIndicator} ${collectedPillars.includes(pillarNumber) ? styles.collected : styles.missing}`}
-            >
-              {pillarNumber}
-            </div>
-          ))}
-        </div>
-      </div>
-    );
+  const attackMonster = async (specialAttack = false, potion = null) => {
+    try {
+      const res = await fetch('/api/battle', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ SpecialAttack: specialAttack, Potion: potion })
+      });
+      if (!res.ok) throw new Error(`Failed to attack: ${res.status}`);
+      const result = await res.json();
+  
+      setGameData(result);
+      const monster = result?.Maze?.Grid?.[result.Maze.coords.row]?.[result.Maze.coords.col]?.RoomMonster;
+      setGMessage(`Attacked monster! Hero HP: ${result.Hero.Health}, Monster HP: ${monster?.Health ?? 'Defeated'}`);
+    } catch (err) {
+      setGMessage(`Attack failed: ${err.message}`);
+    }
   };
   
-  // Render potion collection status
-  const renderPotionStatus = () => {
-    const potionTypes = {
-      1: "Health",
-      2: "Vision",
-      3: "Strength"
-    };
-    
-    const hasPotions = Object.values(collectedPotions).some(count => count > 0);
-    
-    return (
-      <div className={styles.potionStatus}>
-        <h3>Collected Potions:</h3>
-        <div className={styles.potionsContainer}>
-          {hasPotions ? (
-            Object.entries(collectedPotions).map(([potionType, count]) => {
-              if (count > 0) {
-                return (
-                  <div 
-                    key={potionType} 
-                    className={`${styles.potionIndicator} ${styles['potion' + potionType]}`}
-                  >
-                    {potionTypes[potionType] || `Type ${potionType}`}: {count}
-                  </div>
-                );
-              }
-              return null;
-            })
-          ) : (
-            <div className={styles.noPotions}>None yet</div>
-          )}
-        </div>
-      </div>
-    );
+
+  const movePlayer = async (newRow, newCol) => {
+    const { Maze } = gameData;
+    const { Grid, coords } = Maze;
+
+    if (Grid[coords.row][coords.col].RoomMonster) {
+      setGMessage("A monster blocks your path! Defeat it before moving.");
+      return;
+    }
+
+    if (
+      newRow < 0 || newRow >= Grid.length ||
+      newCol < 0 || newCol >= Grid[0].length ||
+      Grid[newRow][newCol].RoomType === 0
+    ) {
+      setGMessage("Invalid move: Wall or out of bounds.");
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/move', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ row: newRow, col: newCol })
+      });
+      if (!res.ok) throw new Error(`Failed to move: ${res.status}`);
+      const updatedData = await res.json();
+      setGameData(updatedData);
+      setGMessage(`Moved to row ${newRow + 1}, col ${newCol + 1}`);
+    } catch (err) {
+      setGMessage(`Move failed: ${err.message}`);
+    }
   };
 
-  // If there's an error, show error with debug info
+  useEffect(() => {
+    const handleKeyDown = (e) => {
+      if (!gameData) return;
+      const { coords } = gameData.Maze;
+      switch (e.key) {
+        case 'ArrowUp': movePlayer(coords.row - 1, coords.col); break;
+        case 'ArrowDown': movePlayer(coords.row + 1, coords.col); break;
+        case 'ArrowLeft': movePlayer(coords.row, coords.col - 1); break;
+        case 'ArrowRight': movePlayer(coords.row, coords.col + 1); break;
+        default: break;
+      }
+    };
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [gameData]);
+
+  const toggleDebugSection = () => {
+    setShowDebug(!showDebug);
+  };
+
   if (error) {
     return (
       <div className={styles.errorContainer}>
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Error</h2>
         <p className={styles.errorMessage}>{error}</p>
-        <button 
-          onClick={() => window.location.reload()} 
-          className={styles.retryButton}
-        >
+        <button onClick={() => window.location.reload()} className={styles.retryButton}>
           Retry
         </button>
-        {renderDebugInfo()}
       </div>
     );
   }
 
-  // If still loading, show loading with debug info
   if (!gameData) {
     return (
       <div className={styles.loadingContainer}>
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Loading Maze...</h2>
         <div className={styles.loadingSpinner}></div>
-        {showDebug && renderDebugInfo()}
       </div>
     );
   }
 
-  // Display the maze game
+  const { Maze, Hero } = gameData;
+  const { Grid, coords } = Maze;
+  const currentRoom = Grid[coords.row][coords.col];
+  const collectedPillars = Hero.AquiredPillars || [];
+  const collectedPotions = Hero.AquiredPotions || [];
+
   return (
     <div className={styles.mazeGame}>
       <h1 className={styles.gameTitle}>Maze Adventure</h1>
-  
-      <div>
-        <label htmlFor="gameName">Game Name: </label><br/>
-        <input type="text" id="gameName" name="gameName" value={gName} onChange={e => setgName(e.target.value)}/><br/>
+
+      <div className={styles.saveSection}>
+        <label htmlFor="gameName">Game Name: </label>
+        <input 
+          type="text" 
+          id="gameName" 
+          value={gName} 
+          onChange={e => setgName(e.target.value)}
+        />
         <button onClick={saveGame}>Save Game</button>
-        <p>{gMessage}</p>
+        <p className={styles.saveMessage}>{gMessage}</p>
       </div>
 
-      {/* Debug mode indicator */}
-      {skipMonsters && (
-        <div className={styles.debugModeIndicator}>
-          DEBUG MODE: Monster Skipping Enabled
+      {currentRoom.RoomMonster && (
+        <div className={styles.encounterAlert}>
+          <p>⚔️ A wild {currentRoom.RoomMonster.Name} blocks your path! HP: {currentRoom.RoomMonster.Health}</p>
+          <button onClick={() => attackMonster(false)}>Attack</button>
+          <button onClick={() => attackMonster(true)}>Special Attack</button>
         </div>
       )}
-      
-      {/* Encounter indicator */}
-      {inEncounter && !skipMonsters && (
-        <div className={styles.encounterIndicator}>
-          ⚔️ IN COMBAT - Defeat the monster to continue!
-        </div>
-      )}
-      
-      {/* Hero info */}
-      <div className={styles.heroInfo}>
-        <h3>{gameData.Hero.Name}</h3>
+
+      <div className={styles.heroCard}>
+        <h2>Hero: {Hero.Name}</h2>
         <div className={styles.heroStats}>
-          <div className={styles.healthBar}>
-            <div 
-              className={styles.healthFill} 
-              style={{ width: `${(gameData.Hero.CurrHealth / gameData.Hero.TotalHealh) * 100}%` }}
-            ></div>
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Health:</span>
+            <div className={styles.healthBar}>
+              <div
+                className={styles.healthFill}
+                style={{ width: `${(Hero.CurrHealth / Hero.TotalHealh) * 100}%` }}
+              ></div>
+              <span className={styles.healthText}>
+                {Hero.CurrHealth} / {Hero.TotalHealh}
+              </span>
+            </div>
           </div>
-          <div className={styles.healthText}>
-            {gameData.Hero.CurrHealth} / {gameData.Hero.TotalHealh}
+          <div className={styles.statItem}>
+            <span className={styles.statLabel}>Attack:</span> {Hero.Attack}
           </div>
         </div>
       </div>
-      
-      {/* Pillar collection status */}
-      {renderPillarStatus()}
-      
-      {/* Potion collection status */}
-      {renderPotionStatus()}
-      
-      <div className={styles.gameStatus}>
-        <p>{message}</p>
-        {gameStatus !== 'playing' && (
-          <button onClick={resetGame} className={styles.resetButton}>Play Again</button>
-        )}
+
+      <div className={styles.collectionSection}>
+        <h2>Pillars Collected</h2>
+        <div className={styles.pillarsContainer}>
+          {[1, 2, 3, 4].map(pillar => (
+            <div
+              key={pillar}
+              className={`${styles.pillarItem} ${collectedPillars.includes(pillar) ? styles.collected : styles.missing}`}
+            >
+              <div className={styles.pillarIcon}>P</div>
+              <span>{getPillarName(pillar)}</span>
+              {collectedPillars.includes(pillar) ? (
+                <span className={styles.checkmark}>✓</span>
+              ) : (
+                <span className={styles.crossmark}>✗</span>
+              )}
+            </div>
+          ))}
+        </div>
       </div>
-      
-      {/* Use the Maze component */}
-      <Maze 
-        gameData={gameData}
-        playerPosition={playerPosition}
-        movePlayer={movePlayer}
-        skipMonsters={skipMonsters}
-        collectedPillars={collectedPillars}
-        setCollectedPillars={setCollectedPillars}
-        collectedPotions={collectedPotions}
-        setCollectedPotions={setCollectedPotions}
-        setMessage={setMessage}
-        hasAllPillars={hasAllPillars}
-        inEncounter={inEncounter}
-      />
-      
-      {/* Debug toggle */}
+
+      <div className={styles.collectionSection}>
+        <h2>Potions Collected</h2>
+        <div className={styles.potionsContainer}>
+          {[1, 2, 3].map(potion => {
+            const count = collectedPotions.filter(p => p === potion).length;
+            return (
+              <div key={potion} className={styles.potionItem}>
+                <div className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
+                  {count}
+                </div>
+                <span>{getPotionName(potion)} Potions: {count}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className={styles.mazeSection}>
+        <h2>Maze Map</h2>
+        <div className={styles.mazeGrid}>
+          {Grid.map((row, rowIndex) => (
+            <div key={rowIndex} className={styles.mazeRow}>
+              {row.map((cell, colIndex) => {
+                const isCurrent = rowIndex === coords.row && colIndex === coords.col;
+                const isWall = cell.RoomType === 0;
+
+                return (
+                  <div
+                    key={`${rowIndex}-${colIndex}`}
+                    className={`
+                      ${styles.mazeCell}
+                      ${isWall ? styles.wall : ''}
+                      ${isCurrent ? styles.currentCell : ''}
+                      ${cell.RoomType === 1 ? styles.entrance : ''}
+                      ${cell.RoomType === 2 ? styles.exit : ''}
+                      ${cell.RoomType === 4 ? styles.pit : ''}
+                    `}
+                  >
+                    {isCurrent && <div className={styles.player}>☺</div>}
+
+                    {!isWall && (
+                      <div className={styles.cellContents}>
+                        {cell.RoomMonster && (
+                          <div className={styles.monsterIndicator}>M</div>
+                        )}
+                        {cell.PillarType > 0 && (
+                          <div className={styles.pillarIndicator}>P{cell.PillarType}</div>
+                        )}
+                        {cell.PotionType > 0 && (
+                          <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
+                            {cell.PotionType}
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          ))}
+        </div>
+
+        <div className={styles.mapLegend}>
+          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.wall}></div> Wall</div>
+          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.entrance}></div> Entrance</div>
+          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.exit}></div> Exit</div>
+          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.normal}></div> Normal Room</div>
+          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.pit}></div> Pit</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon}>☺</div> Player</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon}>M</div> Monster</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon}>P#</div> Pillar</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion1}></div> Health Potion</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion2}></div> Vision Potion</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion3}></div> Strength Potion</div>
+        </div>
+      </div>
+
+      <div className={styles.roomDetails}>
+        <h2>Current Room</h2>
+        <div className={styles.roomInfo}>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Position:</span>
+            Row {coords.row + 1}, Column {coords.col + 1}
+          </div>
+          <div className={styles.infoItem}>
+            <span className={styles.infoLabel}>Room Type:</span>
+            {getRoomTypeName(currentRoom.RoomType)}
+          </div>
+
+          {currentRoom.RoomMonster && (
+            <div className={styles.monsterCard}>
+              <h3>Monster: {currentRoom.RoomMonster.Name}</h3>
+              <div className={styles.monsterStats}>
+                <div className={styles.statItem}>
+                  <span className={styles.statLabel}>Health:</span>
+                  <div className={styles.healthBar}>
+                    <div
+                      className={styles.healthFill}
+                      style={{ width: `${(currentRoom.RoomMonster.CurrHealth / currentRoom.RoomMonster.TotalHealth) * 100}%` }}
+                    ></div>
+                    <span className={styles.healthText}>
+                      {currentRoom.RoomMonster.CurrHealth} / {currentRoom.RoomMonster.TotalHealth}
+                    </span>
+                  </div>
+                </div>
+                <div className={styles.statItem}>
+                  <span className={styles.statLabel}>Attack:</span> {currentRoom.RoomMonster.Attack}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {currentRoom.PillarType > 0 && (
+            <div className={styles.featureCard}>
+              <h3>Pillar: {getPillarName(currentRoom.PillarType)}</h3>
+              <div className={styles.pillarIcon}>P{currentRoom.PillarType}</div>
+            </div>
+          )}
+
+          {currentRoom.PotionType > 0 && (
+            <div className={styles.featureCard}>
+              <h3>Potion: {getPotionName(currentRoom.PotionType)}</h3>
+              <div className={`${styles.potionIcon} ${styles[`potion${currentRoom.PotionType}`]}`}></div>
+            </div>
+          )}
+        </div>
+      </div>
+
       <div className={styles.debugToggle}>
         <button onClick={toggleDebugSection}>
           {showDebug ? "Hide Debug Info" : "Show Debug Info"}
         </button>
       </div>
-      
-      {/* Debug section */}
-      {showDebug && renderDebugInfo()}
+
+      {showDebug && (
+        <div className={styles.debugSection}>
+          <h3>Game State JSON</h3>
+          <pre className={styles.jsonPre}>{JSON.stringify(gameData, null, 2)}</pre>
+        </div>
+      )}
     </div>
   );
 };

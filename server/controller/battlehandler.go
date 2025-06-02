@@ -29,15 +29,15 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 
 		s.Game.Attack(CurrAttack.SpecialAttack, CurrAttack.Potion)
 
-		AttackResult := struct {
-			Mon  model.Monster `json:"Monster"`
-			Hero model.Hero    `json:"Hero"`
-		}{
-			Mon:  *s.Game.TheMaze.Grid[s.Game.TheMaze.CurrCoords.X][s.Game.TheMaze.CurrCoords.X].RoomMonster,
-			Hero: *s.Game.TheHero,
-		}
+		// AttackResult := struct {
+		// 	Mon  model.Monster `json:"Monster"`
+		// 	Hero model.Hero    `json:"Hero"`
+		// }{
+		// 	Mon:  *s.Game.TheMaze.Grid[s.Game.TheMaze.CurrCoords.X][s.Game.TheMaze.CurrCoords.X].RoomMonster,
+		// 	Hero: *s.Game.TheHero,
+		// }
 
-		if err := json.NewEncoder(w).Encode(AttackResult); err != nil {
+		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)
 		}
 
