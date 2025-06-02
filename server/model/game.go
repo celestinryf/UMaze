@@ -61,7 +61,7 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 // attack
 func (g *Game) Attack(specialAttack bool, potionType Potion) {
 
-	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.X]
+	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y]
 	roomMonster := room.RoomMonster
 	hero := g.TheHero
 

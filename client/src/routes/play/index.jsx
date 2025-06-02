@@ -36,7 +36,7 @@ const Play = () => {
       case 1: return 'Health';
       case 2: return 'Vision';
       case 3: return 'Strength';
-      default: return 'Unknown';
+      default: return 'None';
     }
   };
 
@@ -82,7 +82,7 @@ const Play = () => {
   
       setGameData(result);
       const monster = result?.Maze?.Grid?.[result.Maze.coords.row]?.[result.Maze.coords.col]?.RoomMonster;
-      setGMessage(`Attacked monster! Hero HP: ${result.Hero.Health}, Monster HP: ${monster?.Health ?? 'Defeated'}`);
+      setGMessage(`Attacked monster! Hero HP: ${result.Hero.CurrHealth}, Monster HP: ${monster?.CurrHealth ?? 'Defeated'}`);
     } catch (err) {
       setGMessage(`Attack failed: ${err.message}`);
     }
@@ -189,7 +189,7 @@ const Play = () => {
 
       {currentRoom.RoomMonster && (
         <div className={styles.encounterAlert}>
-          <p>⚔️ A wild {currentRoom.RoomMonster.Name} blocks your path! HP: {currentRoom.RoomMonster.Health}</p>
+          <p>⚔️ A wild {currentRoom.RoomMonster.Name} blocks your path! HP: {currentRoom.RoomMonster.CurrHealth}</p>
           <button onClick={() => attackMonster(false)}>Attack</button>
           <button onClick={() => attackMonster(true)}>Special Attack</button>
         </div>
