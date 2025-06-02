@@ -27,6 +27,10 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 		return InProgress
 	}
 
+	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == wall {
+		return InProgress
+	}
+
 	g.TheMaze.CurrCoords = newCoords
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
 

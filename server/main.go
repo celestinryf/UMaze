@@ -14,7 +14,7 @@ func main() {
 	srv := controller.InitServer()
 
 	http.HandleFunc("/api/game/", srv.GameHandler)
-	http.HandleFunc("/api/maze/", srv.MazeHandler)
+	http.HandleFunc("/api/move/", srv.MoveHandler)
 	http.HandleFunc("/api/load/", srv.LoadHandler)
 	http.HandleFunc("/api/battle/", srv.BattleHandler)
 
