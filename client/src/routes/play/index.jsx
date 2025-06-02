@@ -107,8 +107,8 @@ const Play = () => {
         positionx: col,
         positiony: row
       };
-      
-      const res = await fetch('/api/maze', {
+      console.log(requestBody);
+      const res = await fetch('/api/move', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json'
@@ -121,71 +121,71 @@ const Play = () => {
       const roomData = await res.json();
       console.log("Room state received:", roomData);
       
-      addDebugInfo('POST /api/maze', requestBody, roomData);
+      addDebugInfo('POST /api/move', requestBody, roomData);
       
       setCurrentRoom(roomData);
       
       // Handle room contents based on backend response
-      handleRoomContents(roomData);
+      // handleRoomContents(roomData);
       
       return roomData;
     } catch (err) {
       console.error('Error getting room state:', err);
       setError(`Failed to get room state: ${err.message}`);
-      addDebugInfo('POST /api/maze ERROR', { row, col }, { error: err.message });
+      addDebugInfo('POST /api/move ERROR', { row, col }, { error: err.message });
       return null;
     }
   };
 
   // Handle room contents based on backend response
-  const handleRoomContents = (roomData) => {
-    // Handle encounter
-    if (roomData.encounter) {
-      setInEncounter(true);
-      if (roomData.Monster) {
-        setMessage(`You encountered a ${roomData.Monster.Name || 'Monster'}! Defeat it to proceed.`);
-      }
-    } else {
-      setInEncounter(false);
-    }
+  // const handleRoomContents = (roomData) => {
+  //   // Handle encounter
+  //   if (roomData.encounter) {
+  //     setInEncounter(true);
+  //     if (roomData.Monster) {
+  //       setMessage(`You encountered a ${roomData.Monster.Name || 'Monster'}! Defeat it to proceed.`);
+  //     }
+  //   } else {
+  //     setInEncounter(false);
+  //   }
     
-    // Handle pillars
-    if (roomData.pillar && roomData.pillar > 0 && !collectedPillars.includes(roomData.pillar)) {
-      const newPillars = [...collectedPillars, roomData.pillar];
-      setCollectedPillars(newPillars);
-      setMessage(`You found Pillar ${roomData.pillar}! ${4 - newPillars.length} pillars remaining.`);
+  //   // Handle pillars
+  //   if (roomData.pillar && roomData.pillar > 0 && !collectedPillars.includes(roomData.pillar)) {
+  //     const newPillars = [...collectedPillars, roomData.pillar];
+  //     setCollectedPillars(newPillars);
+  //     setMessage(`You found Pillar ${roomData.pillar}! ${4 - newPillars.length} pillars remaining.`);
       
-      if (newPillars.length === 4) {
-        setMessage("You've collected all pillars! Find the exit to win.");
-      }
-    }
+  //     if (newPillars.length === 4) {
+  //       setMessage("You've collected all pillars! Find the exit to win.");
+  //     }
+  //   }
     
-    // Handle potions
-    if (roomData.potion && roomData.potion > 0) {
-      const potionTypes = {
-        1: "Health Potion",
-        2: "Vision Potion",
-        3: "Strength Potion"
-      };
-      const potionName = potionTypes[roomData.potion] || `Potion type ${roomData.potion}`;
+  //   // Handle potions
+  //   if (roomData.potion && roomData.potion > 0) {
+  //     const potionTypes = {
+  //       1: "Health Potion",
+  //       2: "Vision Potion",
+  //       3: "Strength Potion"
+  //     };
+  //     const potionName = potionTypes[roomData.potion] || `Potion type ${roomData.potion}`;
       
-      const newPotions = { ...collectedPotions };
-      newPotions[roomData.potion] = (newPotions[roomData.potion] || 0) + 1;
-      setCollectedPotions(newPotions);
+  //     const newPotions = { ...collectedPotions };
+  //     newPotions[roomData.potion] = (newPotions[roomData.potion] || 0) + 1;
+  //     setCollectedPotions(newPotions);
       
-      setMessage(`You found a ${potionName}! (${newPotions[roomData.potion]} total)`);
-    }
+  //     setMessage(`You found a ${potionName}! (${newPotions[roomData.potion]} total)`);
+  //   }
     
-    // Handle exit
-    if (roomData.roomtype === 2) {
-      if (hasAllPillars()) {
-        setGameStatus('won');
-        setMessage("Congratulations! You've collected all pillars and found the exit!");
-      } else {
-        setMessage(`You found the exit, but you need to collect all 4 pillars first! (${collectedPillars.length}/4 collected)`);
-      }
-    }
-  };
+  //   // Handle exit
+  //   if (roomData.roomtype === 2) {
+  //     if (hasAllPillars()) {
+  //       setGameStatus('won');
+  //       setMessage("Congratulations! You've collected all pillars and found the exit!");
+  //     } else {
+  //       setMessage(`You found the exit, but you need to collect all 4 pillars first! (${collectedPillars.length}/4 collected)`);
+  //     }
+  //   }
+  // };
 
   // Check if all four pillars have been collected
   const hasAllPillars = () => {

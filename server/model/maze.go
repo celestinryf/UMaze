@@ -10,8 +10,8 @@ import (
 
 // Coordinates of the player
 type Coords struct {
-	X int `json:"positionx"`
-	Y int `json:"positiony"`
+	X int `json:"row"`
+	Y int `json:"col"`
 }
 
 // Holds the grid of the maze.
