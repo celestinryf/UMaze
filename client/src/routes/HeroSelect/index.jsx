@@ -69,9 +69,16 @@ const myHeroes = [
   }
 ];
 
+const DIFFICULTY_OPTIONS = [
+  { label: 'Easy', value: 9 },
+  { label: 'Medium', value: 11 },
+  { label: 'Hard', value: 13 }
+];
+
 const HeroSelect = () => {
   const [mySelectedHero, setMySelectedHero] = useState(null);
   const [myHoveredHero, setMyHoveredHero] = useState(null);
+  const [selectedDifficulty, setSelectedDifficulty] = useState(DIFFICULTY_OPTIONS[1]); // Default to Medium
   const { playSFX } = useContext(AudioContext);
   const myNavigate = useNavigate();
 
@@ -80,25 +87,29 @@ const HeroSelect = () => {
     setMySelectedHero(finalTheHero);
   };
 
+  const handleDifficultyChange = (e) => {
+    playSFX(clickSFX);
+    const difficulty = DIFFICULTY_OPTIONS.find(opt => opt.value === parseInt(e.target.value));
+    setSelectedDifficulty(difficulty);
+  };
+
   const handleStartGame = async () => {
     playSFX(startSFX);
-    console.log(`Starting game with hero: ${mySelectedHero.name}`);
+    console.log(`Starting game with hero: ${mySelectedHero.name}, difficulty: ${selectedDifficulty.label} (maze size: ${selectedDifficulty.value})`);
     try {
       const res = await fetch('api/game/', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        // can have variable maze_size, however must be odd
-        // maybe 7, 9, 11, or 13
-        body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: 7 }),
+        body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: selectedDifficulty.value }),
       });
       if (!res.ok) {
         throw new Error('http err')
       }
       const result = await res.json();
       console.log(result)
-      myNavigate('/play', { state: { hero: mySelectedHero } });
+      myNavigate('/play', { state: { hero: mySelectedHero, difficulty: selectedDifficulty } });
     } catch (error) {
       console.log("Coulndt set the game")
     }
@@ -166,9 +177,24 @@ const HeroSelect = () => {
             ))}
           </div>
 
-          {/* Button wrapper with spacing */}
+          {/* Difficulty Selection and Start Button */}
           {mySelectedHero && (
-            <div style={{ marginTop: '2.5rem', display: 'flex', justifyContent: 'center' }}>
+            <div style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
+              <div className={styles.difficultySelector}>
+                <label className={styles.difficultyLabel}>Select Difficulty:</label>
+                <select 
+                  className={styles.difficultyDropdown}
+                  value={selectedDifficulty.value}
+                  onChange={handleDifficultyChange}
+                >
+                  {DIFFICULTY_OPTIONS.map(option => (
+                    <option key={option.value} value={option.value}>
+                      {option.label} (Maze Size: {option.value})
+                    </option>
+                  ))}
+                </select>
+              </div>
+              
               <button className={styles.startButton} onClick={handleStartGame}>
                 <span className={styles.buttonText}>BEGIN ADVENTURE</span>
                 <div className={styles.buttonGlow} />
