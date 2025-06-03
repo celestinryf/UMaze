@@ -8,8 +8,9 @@ import (
 
 // This represents the current game
 type Game struct {
-	TheMaze *Maze `json:"Maze"`
-	TheHero *Hero `json:"Hero"`
+	TheMaze *Maze  `json:"Maze"`
+	TheHero *Hero  `json:"Hero"`
+	Status  string `json:"Status"`
 }
 
 // Gives an initialzed game.
@@ -17,18 +18,19 @@ func InitGame(theHeroType HeroType, db *sql.DB, mazeSize int) *Game {
 	return &Game{
 		TheMaze: initMaze(db, mazeSize),
 		TheHero: initHero(theHeroType, db),
+		Status:  "InProgress",
 	}
 }
 
 // Sets curr location to x and y
-func (g *Game) Move(newCoords *Coords) GameStatus {
+func (g *Game) Move(newCoords *Coords) {
 
 	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomMonster != nil {
-		return InProgress
+		return
 	}
 
 	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == wall {
-		return InProgress
+		return
 	}
 
 	g.TheMaze.CurrCoords = newCoords
@@ -54,14 +56,14 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 	}
 
 	if g.TheHero.CurrHealth <= 0 {
-		return Lost
+		g.Status = "Lost"
+		return
 	}
 
 	if currRoom.RoomType == end && len(g.TheHero.AquiredPillars) == 4 {
-		return Won
+		g.Status = "Won"
+		return
 	}
-
-	return InProgress
 }
 
 // attack
@@ -85,4 +87,9 @@ func (g *Game) Attack() {
 	} else {
 		room.RoomMonster = nil
 	}
+
+	if g.TheHero.CurrHealth <= 0 {
+		g.Status = "Lost"
+	}
+
 }
