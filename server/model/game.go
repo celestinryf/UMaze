@@ -44,11 +44,17 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 		currRoom.PillarType = noPillar
 	}
 
-	if currRoom.RoomType == pit {
+	if g.TheHero.Name != "NICK" && currRoom.RoomType == pit {
 		g.TheHero.CurrHealth -= 20 // can change the pit damage
-		if g.TheHero.CurrHealth <= 0 {
-			return Lost
-		}
+	}
+
+	if g.TheHero.CurrHealth < 1 && g.TheHero.Name == "CELESTIN" && g.TheHero.TotalHealth == 150 {
+		g.TheHero.TotalHealth = 125
+		g.TheHero.CurrHealth = g.TheHero.TotalHealth
+	}
+
+	if g.TheHero.CurrHealth <= 0 {
+		return Lost
 	}
 
 	if currRoom.RoomType == end && len(g.TheHero.AquiredPillars) == 4 {
@@ -59,7 +65,7 @@ func (g *Game) Move(newCoords *Coords) GameStatus {
 }
 
 // attack
-func (g *Game) Attack(specialAttack bool) {
+func (g *Game) Attack() {
 
 	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y]
 	roomMonster := room.RoomMonster
@@ -69,15 +75,13 @@ func (g *Game) Attack(specialAttack bool) {
 		return
 	}
 
-	if !specialAttack {
-		roomMonster.CurrHealth -= hero.Attack
-	} else {
-		// implement later (special attack)
-		roomMonster.CurrHealth -= hero.Attack
-	}
-
+	roomMonster.CurrHealth -= hero.Attack
 	if roomMonster.CurrHealth > 0 {
 		hero.CurrHealth -= roomMonster.Attack
+		if g.TheHero.CurrHealth < 1 && g.TheHero.Name == "CELESTIN" && g.TheHero.TotalHealth == 150 {
+			g.TheHero.TotalHealth = 125
+			g.TheHero.CurrHealth = g.TheHero.TotalHealth
+		}
 	} else {
 		room.RoomMonster = nil
 	}

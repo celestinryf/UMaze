@@ -37,7 +37,7 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 		log.Fatal(err)
 	}
 
-	return &Hero{
+	temp := &Hero{
 		Name:           name,
 		TotalHealth:    health,
 		CurrHealth:     health,
@@ -45,4 +45,10 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 		AquiredPillars: make([]Pillar, 0),
 		AquiredPotions: make([]Potion, 0),
 	}
+
+	if temp.Name == "MATT" {
+		temp.AquiredPotions = append(temp.AquiredPotions, HealingPotion, AttackPotion)
+	}
+
+	return temp
 }
