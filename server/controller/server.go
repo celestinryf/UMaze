@@ -24,7 +24,7 @@ func (s *Server) saveGame(name string, db *sql.DB) {
 	}
 	_, err = db.Exec(`INSERT INTO saved_games
 		(name, info, date) VALUES (?, ?, ?)`,
-		name, string(gameBytes), time.Now().Format("5/5/06"))
+		name, string(gameBytes), time.Now().Format("2006-01-02"))
 	if err != nil {
 		log.Fatal(err)
 	}
