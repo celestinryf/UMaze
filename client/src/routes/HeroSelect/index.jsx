@@ -16,7 +16,7 @@ const myHeroes = [
     name: "Nick",
     img: nickImg,
     desc: "A powerful warrior with high attack damage and strong defense capabilities.",
-    skills: ["Heavy Strike", "Shield Bash", "Battle Cry"],
+    skills: ["Immune To Pits"],
     stats: {
       attack: 8,
       defense: 7,
@@ -29,43 +29,43 @@ const myHeroes = [
     id: 4,
     name: "Matthew",
     img: matthewImg,
-    desc: "A brilliant mage who masters arcane spells and tactical positioning.",
-    skills: ["Fireball", "Ice Shield", "Teleport"],
+    desc: "A nerdy fella, who is always prepared.",
+    skills: ["Starts with 2 potions"],
     stats: {
       attack: 3,
       defense: 4,
       health: 5,
       magic: 10
     },
-    class: "Mage"
+    class: "Collecter"
   },
   {
     id: 7,
     name: "Celestin",
     img: celestinImg,
-    desc: "A nimble rogue with exceptional speed and evasion abilities.",
-    skills: ["Shadow Step", "Backstab", "Smoke Bomb"],
+    desc: "No matter the damage, he always gets back up.",
+    skills: ["Gets a second chance"],
     stats: {
       attack: 7,
       defense: 5,
       health: 6,
       magic: 4
     },
-    class: "Rogue"
+    class: "Pheonix"
   },
   {
     id: 5,
     name: "Primo",
     img: primoImg,
-    desc: "A dedicated healer with support abilities and protective enchantments.",
-    skills: ["Healing Touch", "Protection Aura", "Divine Blessing"],
+    desc: "Crafty Mage that can make the best of what he has.",
+    skills: ["Better Utilize Potions"],
     stats: {
       attack: 2,
       defense: 6,
       health: 7,
       magic: 9
     },
-    class: "Healer"
+    class: "Mage"
   }
 ];
 

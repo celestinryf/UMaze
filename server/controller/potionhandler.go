@@ -18,7 +18,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 
 		var CurrPotion struct {
-			PotionType model.Potion `json:"potion_type"`
+			PotionType int `json:"potion_type"`
 		}
 
 		if err := json.NewDecoder(r.Body).Decode(&CurrPotion); err != nil {
@@ -26,11 +26,21 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		log.Println(CurrPotion.PotionType)
+		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&s.Game.TheHero.AquiredPotions, model.HealingPotion) {
+			if s.Game.TheHero.Name == "PRIMO" {
+				s.Game.TheHero.CurrHealth += 150
+			} else {
+				s.Game.TheHero.CurrHealth += 100
+			}
+			s.Game.TheHero.CurrHealth = min(s.Game.TheHero.CurrHealth, s.Game.TheHero.TotalHealth)
+		}
 
-		if len(s.Game.TheHero.AquiredPotions) != 0 && CurrPotion.PotionType != model.NoPotion {
-			s.Game.TheHero.CurrHealth += 100 // every potion is a healing potion rn
-			s.Game.TheHero.AquiredPotions = s.Game.TheHero.AquiredPotions[1:]
+		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&s.Game.TheHero.AquiredPotions, model.AttackPotion) {
+			if s.Game.TheHero.Name == "PRIMO" {
+				s.Game.TheHero.Attack += 15
+			} else {
+				s.Game.TheHero.Attack += 10
+			}
 		}
 
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
@@ -44,5 +54,14 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			"message": "Method not allowed",
 		})
 	}
+}
 
+func hasPotionAndRemove(arr *[]model.Potion, potion model.Potion) bool {
+	for i, p := range *arr {
+		if p == potion {
+			*arr = append((*arr)[:i], (*arr)[i+1:]...)
+			return true
+		}
+	}
+	return false
 }

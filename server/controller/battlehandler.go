@@ -14,18 +14,7 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPut:
-
-		var CurrAttack struct {
-			SpecialAttack bool `json:"SpecialAttack"`
-		}
-
-		if err := json.NewDecoder(r.Body).Decode(&CurrAttack); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
-			return
-		}
-
-		s.Game.Attack(CurrAttack.SpecialAttack)
-
+		s.Game.Attack()
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)
 		}

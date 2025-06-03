@@ -36,9 +36,8 @@ type Potion int
 // potion enums
 const (
 	NoPotion Potion = iota
-	Potion1
-	Potion2
-	Potion3
+	HealingPotion
+	AttackPotion
 )
 
 // Rooms make up the maze
@@ -99,14 +98,12 @@ func (r *Room) SetUpRoom(db *sql.DB) {
 	case 2:
 		r.RoomMonster = initMonster(db)
 	case 3:
-		potion := rand.Intn(3) + 1
+		potion := rand.Intn(2) + 1
 		switch potion {
 		case 1:
-			r.PotionType = Potion1
+			r.PotionType = HealingPotion
 		case 2:
-			r.PotionType = Potion2
-		case 3:
-			r.PotionType = Potion3
+			r.PotionType = AttackPotion
 		}
 	}
 }

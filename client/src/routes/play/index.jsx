@@ -34,8 +34,7 @@ const Play = () => {
   const getPotionName = (type) => {
     switch (type) {
       case 1: return 'Health';
-      case 2: return 'Vision';
-      case 3: return 'Strength';
+      case 2: return 'Attack';
       default: return 'None';
     }
   };
@@ -70,12 +69,12 @@ const Play = () => {
     }
   };
 
-  const attackMonster = async (specialAttack = false, potion = null) => {
+  const attackMonster = async () => {
     try {
       const res = await fetch('/api/battle', {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ SpecialAttack: specialAttack, Potion: potion })
+        body: JSON.stringify({ })
       });
       if (!res.ok) throw new Error(`Failed to attack: ${res.status}`);
       const result = await res.json();
@@ -214,10 +213,7 @@ const Play = () => {
             <button onClick={() => usePotion(1)}>Use Health Potion</button>
           )}
           {collectedPotions.includes(2) && (
-            <button onClick={() => usePotion(2)}>Use Vision Potion</button>
-          )}
-          {collectedPotions.includes(3) && (
-            <button onClick={() => usePotion(3)}>Use Strength Potion</button>
+            <button onClick={() => usePotion(2)}>Use Strength Potion</button>
           )}
         </div>
       )}
@@ -335,8 +331,7 @@ const Play = () => {
           <div className={styles.legendItem}><div className={styles.legendIcon}>M</div> Monster</div>
           <div className={styles.legendItem}><div className={styles.legendIcon}>P#</div> Pillar</div>
           <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion1}></div> Health Potion</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion2}></div> Vision Potion</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion3}></div> Strength Potion</div>
+          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion2}></div> Attack Potion</div>
         </div>
       </div>
 
