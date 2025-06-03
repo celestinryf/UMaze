@@ -1,115 +1,311 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
 import styles from './Play.module.css';
+
+/*
+ * Maze Adventure Game Component
+ * Features:
+ * - Pokemon-style battle overlay system
+ * - Turn-based combat with attack/special attack options
+ * - Potion usage allowed during battle for strategic healing
+ * - Real-time maze navigation with arrow keys
+ * - Collectible pillars and potions
+ * - Save/load game functionality
+ * - Visual health bars and battle animations
+ * - Debug mode: Game Over bypass for testing
+ * 
+ * Battle System:
+ * - Encounters trigger a full-screen overlay
+ * - Game content is dimmed and disabled during battle
+ * - Players can use potions during combat for strategic advantage
+ * - Victory allows continuation
+ * 
+ * Debug Features:
+ * - Toggle to bypass Game Over screen and continue playing after death
+ * - Visual indicators when playing in "ghost mode"
+ */
+
+// Constants
+const ROOM_TYPES = {
+  0: 'Wall',
+  1: 'Entrance',
+  2: 'Exit',
+  3: 'Normal',
+  4: 'Pit'
+};
+
+const PILLAR_TYPES = {
+  1: 'Abstraction',
+  2: 'Encapsulation',
+  3: 'Inheritance',
+  4: 'Polymorphism'
+};
+
+const POTION_TYPES = {
+  1: 'Health',
+  2: 'Attack'
+};
+
+const DIRECTIONS = {
+  ArrowUp: [-1, 0],
+  ArrowDown: [1, 0],
+  ArrowLeft: [0, -1],
+  ArrowRight: [0, 1]
+};
+
+// Utility functions
+const getName = (type, mapping) => mapping[type] || 'Unknown';
+
+// Reusable API function
+const apiCall = async (url, method = 'GET', body = null) => {
+  const options = {
+    method,
+    headers: method !== 'GET' ? { 'Content-Type': 'application/json' } : {},
+    ...(body && { body: JSON.stringify(body) })
+  };
+  
+  const res = await fetch(url, options);
+  if (!res.ok) throw new Error(`${method} failed: ${res.status} ${res.statusText}`);
+  return res.json();
+};
+
+// Reusable Components
+const HealthBar = ({ current, total, label, showLabel = true, className = '' }) => (
+  <div className={`${styles.statItem} ${className}`}>
+    {showLabel && <span className={styles.statLabel}>{label}:</span>}
+    <div className={styles.healthBar}>
+      <div
+        className={styles.healthFill}
+        style={{ width: `${(current / total) * 100}%` }}
+      />
+      <span className={styles.healthText}>{current} / {total}</span>
+    </div>
+  </div>
+);
+
+const StatCard = ({ title, stats, children }) => (
+  <div className={styles[`${title.toLowerCase()}Card`]}>
+    <h2>{title}</h2>
+    <div className={styles[`${title.toLowerCase()}Stats`]}>
+      {stats}
+      {children}
+    </div>
+  </div>
+);
+
+const LegendItem = ({ colorClass, icon, label }) => (
+  <div className={styles.legendItem}>
+    {colorClass ? (
+      <div className={`${styles.legendColor} ${styles[colorClass]}`} />
+    ) : (
+      <div className={styles.legendIcon}>{icon}</div>
+    )}
+    {label}
+  </div>
+);
+
+const GameEndScreen = ({ status, message }) => (
+  <div className={styles.endgameContainer}>
+    <h1 className={styles.gameTitle}>Maze Adventure</h1>
+    <h2 className={styles[`${status.toLowerCase()}Message`]}>
+      {status === 'Won' ? '🎉 You Win! 🎉' : '💀 Game Over 💀'}
+    </h2>
+    <p>{message}</p>
+  </div>
+);
+
+// Battle Overlay Component
+const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, onUsePotion, battleMessage, collectedPotions }) => (
+  <div className={styles.battleOverlay}>
+    <div className={styles.battleContainer}>
+      <h2 className={styles.battleTitle}>⚔️ BATTLE ⚔️</h2>
+      
+      <div className={styles.battleArena}>
+        {/* Monster Section */}
+        <div className={styles.battleMonsterSection}>
+          <div className={styles.battleCharacterInfo}>
+            <h3>{monster.Name}</h3>
+            <HealthBar 
+              current={monster.CurrHealth} 
+              total={monster.TotalHealth} 
+              showLabel={false}
+              className={styles.battleHealthBar}
+            />
+            <p className={styles.battleStats}>ATK: {monster.Attack}</p>
+          </div>
+          <div className={styles.battleMonsterSprite}>
+            <span className={styles.monsterEmoji}>👹</span>
+          </div>
+        </div>
+
+        {/* Hero Section */}
+        <div className={styles.battleHeroSection}>
+          <div className={styles.battleHeroSprite}>
+            <span className={styles.heroEmoji}>🗡️</span>
+          </div>
+          <div className={styles.battleCharacterInfo}>
+            <h3>{hero.Name}</h3>
+            <HealthBar 
+              current={hero.CurrHealth} 
+              total={hero.TotalHealh} 
+              showLabel={false}
+              className={styles.battleHealthBar}
+            />
+            <p className={styles.battleStats}>ATK: {hero.Attack}</p>
+          </div>
+        </div>
+      </div>
+
+      {/* Battle Message */}
+      {battleMessage && (
+        <div className={styles.battleMessage}>
+          <p>{battleMessage}</p>
+        </div>
+      )}
+
+      {/* Battle Actions */}
+      {monster.CurrHealth > 0 ? (
+        <div className={styles.battleActions}>
+          <button 
+            onClick={onAttack} 
+            className={styles.battleButton}
+          >
+            Attack
+          </button>
+          <button 
+            onClick={onSpecialAttack} 
+            className={styles.battleButton}
+          >
+            Special Attack
+          </button>
+          
+          {/* Potion Actions */}
+          {[1, 2].map(potion => {
+            const count = collectedPotions.filter(p => p === potion).length;
+            const canUse = count > 0;
+            const potionName = getName(potion, POTION_TYPES);
+
+            return (
+              <button
+                key={potion}
+                onClick={() => canUse && onUsePotion(potion)}
+                className={`${styles.battleButton} ${styles.battlePotionButton}`}
+                disabled={!canUse}
+                title={canUse ? `Use ${potionName} Potion` : `No ${potionName} potions available`}
+              >
+                Use {potionName} ({count})
+              </button>
+            );
+          })}
+        </div>
+      ) : (
+        <div className={styles.battleVictory}>
+          <p>Victory! The {monster.Name} has been defeated!</p>
+          <button onClick={onContinue} className={styles.battleButton}>
+            Continue
+          </button>
+        </div>
+      )}
+    </div>
+  </div>
+);
 
 const Play = () => {
   const location = useLocation();
   const [gameData, setGameData] = useState(null);
   const [error, setError] = useState(null);
   const [showDebug, setShowDebug] = useState(false);
+  const [bypassGameOver, setBypassGameOver] = useState(false);
   const [gName, setgName] = useState("");
   const [gMessage, setGMessage] = useState("");
+  const [inBattle, setInBattle] = useState(false);
+  const [battleMessage, setBattleMessage] = useState("");
 
-  const getRoomTypeName = (type) => {
-    switch (type) {
-      case 0: return 'Wall';
-      case 1: return 'Entrance';
-      case 2: return 'Exit';
-      case 3: return 'Normal';
-      case 4: return 'Pit';
-      default: return 'Unknown';
-    }
-  };
-
-  const getPillarName = (type) => {
-    switch (type) {
-      case 1: return 'Abstraction';
-      case 2: return 'Encapsulation';
-      case 3: return 'Inheritance';
-      case 4: return 'Polymorphism';
-      default: return 'None';
-    }
-  };
-
-  const getPotionName = (type) => {
-    switch (type) {
-      case 1: return 'Health';
-      case 2: return 'Attack';
-      default: return 'None';
-    }
-  };
-
+  // Fetch game data on mount
   useEffect(() => {
-    const fetchGameData = async () => {
-      try {
-        const res = await fetch('/api/game', { method: 'GET' });
-        if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
-        const data = await res.json();
+    apiCall('/api/game')
+      .then(data => {
         setGameData(data);
-      } catch (err) {
-        setError(`Failed to fetch game state: ${err.message}`);
-      }
-    };
-
-    fetchGameData();
+        // Check if we should be in battle on load
+        const currentRoom = data?.Maze?.Grid?.[data.Maze.coords.row]?.[data.Maze.coords.col];
+        if (currentRoom?.RoomMonster) {
+          setInBattle(true);
+          setBattleMessage(`A wild ${currentRoom.RoomMonster.Name} appears!`);
+        }
+      })
+      .catch(err => setError(`Failed to fetch game state: ${err.message}`));
   }, []);
 
+  // Game actions
   const saveGame = async () => {
     try {
-      const res = await fetch('/api/load/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ Name: gName })
-      });
-      if (!res.ok) throw new Error(`Network response was not ok: ${res.status} ${res.statusText}`);
+      await apiCall('/api/load/', 'POST', { Name: gName });
       setgName("");
-      setGMessage(`Game saved successfully! (${res.status})`);
+      setGMessage('Game saved successfully!');
     } catch (err) {
       setGMessage(`Error saving game: ${err.message}`);
     }
   };
 
-  const attackMonster = async () => {
+  const attackMonster = async (isSpecial = false) => {
     try {
-      const res = await fetch('/api/battle', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ })
-      });
-      if (!res.ok) throw new Error(`Failed to attack: ${res.status}`);
-      const result = await res.json();
-
+      const result = await apiCall('/api/battle', 'PUT', {});
       setGameData(result);
+      
       const monster = result?.Maze?.Grid?.[result.Maze.coords.row]?.[result.Maze.coords.col]?.RoomMonster;
-      setGMessage(`Attacked monster! Hero HP: ${result.Hero.CurrHealth}, Monster HP: ${monster?.CurrHealth ?? 'Defeated'}`);
+      const attackType = isSpecial ? 'special attack' : 'attack';
+      
+      if (monster) {
+        setBattleMessage(`You used ${attackType}! Monster HP: ${monster.CurrHealth}`);
+      } else {
+        setBattleMessage(`Your ${attackType} defeated the monster!`);
+        // Automatically exit battle after a short delay when monster is defeated
+        setTimeout(() => {
+          setInBattle(false);
+          setBattleMessage("");
+          setGMessage("Monster defeated! You can now move freely.");
+        }, 1500);
+      }
     } catch (err) {
-      setGMessage(`Attack failed: ${err.message}`);
+      setBattleMessage(`Attack failed: ${err.message}`);
+    }
+  };
+
+  const continueBattle = async () => {
+    try {
+      // Fetch updated game state from backend after monster defeat
+      const updatedData = await apiCall('/api/game');
+      setGameData(updatedData);
+      setInBattle(false);
+      setBattleMessage("");
+      setGMessage("Monster defeated! You can now move freely.");
+    } catch (err) {
+      setGMessage(`Error syncing game state: ${err.message}`);
+      // Still exit battle even if sync fails
+      setInBattle(false);
+      setBattleMessage("");
     }
   };
 
   const usePotion = async (potionType) => {
     try {
-      const res = await fetch('/api/potion', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ potion_type: potionType })
-      });
-      if (!res.ok) throw new Error(`Failed to use potion: ${res.status}`);
-      const result = await res.json();
-      console.log(result);
+      const result = await apiCall('/api/potion', 'PUT', { potion_type: potionType });
       setGameData(result);
-      setGMessage(`Used ${getPotionName(potionType)} Potion!`);
+      setGMessage(`Used ${getName(potionType, POTION_TYPES)} Potion!`);
     } catch (err) {
       setGMessage(`Potion use failed: ${err.message}`);
     }
   };
 
-  const movePlayer = async (newRow, newCol) => {
+  const movePlayer = useCallback(async (newRow, newCol) => {
+    if (!gameData || inBattle) return;
+    
     const { Maze } = gameData;
     const { Grid, coords } = Maze;
 
     if (Grid[coords.row][coords.col].RoomMonster) {
-      setGMessage("A monster blocks your path! Defeat it before moving.");
+      setInBattle(true);
+      setBattleMessage(`A wild ${Grid[coords.row][coords.col].RoomMonster.Name} blocks your path!`);
       return;
     }
 
@@ -123,40 +319,36 @@ const Play = () => {
     }
 
     try {
-      const res = await fetch('/api/move', {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ row: newRow, col: newCol })
-      });
-      if (!res.ok) throw new Error(`Failed to move: ${res.status}`);
-      const updatedData = await res.json();
+      const updatedData = await apiCall('/api/move', 'PUT', { row: newRow, col: newCol });
       setGameData(updatedData);
       setGMessage(`Moved to row ${newRow + 1}, col ${newCol + 1}`);
+      
+      // Check if new room has a monster
+      const newRoom = updatedData.Maze.Grid[newRow][newCol];
+      if (newRoom.RoomMonster) {
+        setInBattle(true);
+        setBattleMessage(`A wild ${newRoom.RoomMonster.Name} appears!`);
+      }
     } catch (err) {
       setGMessage(`Move failed: ${err.message}`);
     }
-  };
+  }, [gameData, inBattle]);
 
+  // Keyboard controls
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!gameData) return;
+      if (!gameData || !DIRECTIONS[e.key] || inBattle) return;
+      
       const { coords } = gameData.Maze;
-      switch (e.key) {
-        case 'ArrowUp': movePlayer(coords.row - 1, coords.col); break;
-        case 'ArrowDown': movePlayer(coords.row + 1, coords.col); break;
-        case 'ArrowLeft': movePlayer(coords.row, coords.col - 1); break;
-        case 'ArrowRight': movePlayer(coords.row, coords.col + 1); break;
-        default: break;
-      }
+      const [dRow, dCol] = DIRECTIONS[e.key];
+      movePlayer(coords.row + dRow, coords.col + dCol);
     };
+
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameData]);
+  }, [gameData, movePlayer, inBattle]);
 
-  const toggleDebugSection = () => {
-    setShowDebug(!showDebug);
-  };
-
+  // Loading and error states
   if (error) {
     return (
       <div className={styles.errorContainer}>
@@ -180,102 +372,145 @@ const Play = () => {
     );
   }
 
+  // Game end states
+  if (gameData.Status === "Won") {
+    return <GameEndScreen status="Won" message="Congratulations! You have collected all pillars and reached the exit." />;
+  }
+
+  if (gameData.Status === "Lost" && !bypassGameOver) {
+    return <GameEndScreen status="Lost" message="You have perished in the maze. Better luck next time!" />;
+  }
+
+  // Game state
   const { Maze, Hero } = gameData;
   const { Grid, coords } = Maze;
   const currentRoom = Grid[coords.row][coords.col];
   const collectedPillars = Hero.AquiredPillars || [];
   const collectedPotions = Hero.AquiredPotions || [];
 
+  // Cell class helper
+  const getCellClasses = (cell, rowIndex, colIndex) => {
+    const isCurrent = rowIndex === coords.row && colIndex === coords.col;
+    const roomTypeClass = {
+      0: styles.wall,
+      1: styles.entrance,
+      2: styles.exit,
+      4: styles.pit
+    }[cell.RoomType];
+
+    return [
+      styles.mazeCell,
+      roomTypeClass,
+      isCurrent && styles.currentCell
+    ].filter(Boolean).join(' ');
+  };
+
   return (
     <div className={styles.mazeGame}>
-      <h1 className={styles.gameTitle}>Maze Adventure</h1>
+      <h1 className={styles.gameTitle}>
+        Maze Adventure
+        {gameData.Status === "Lost" && bypassGameOver && (
+          <span className={styles.debugStatus}> [DEBUG: Playing as Ghost]</span>
+        )}
+      </h1>
 
-      <div className={styles.saveSection}>
-        <label htmlFor="gameName">Game Name: </label>
-        <input
-          type="text"
-          id="gameName"
-          value={gName}
-          onChange={e => setgName(e.target.value)}
+      {/* Battle Overlay - Renders on top when in battle */}
+      {inBattle && currentRoom.RoomMonster && (
+        <BattleOverlay
+          hero={Hero}
+          monster={currentRoom.RoomMonster}
+          onAttack={() => attackMonster(false)}
+          onSpecialAttack={() => attackMonster(true)}
+          onContinue={continueBattle}
+          onUsePotion={usePotion}
+          battleMessage={battleMessage}
+          collectedPotions={collectedPotions}
         />
-        <button onClick={saveGame}>Save Game</button>
-        <p className={styles.saveMessage}>{gMessage}</p>
-      </div>
-
-      {currentRoom.RoomMonster && (
-        <div className={styles.encounterAlert}>
-          <p>⚔️ A wild {currentRoom.RoomMonster.Name} blocks your path! HP: {currentRoom.RoomMonster.CurrHealth}</p>
-          <button onClick={() => attackMonster(false)}>Attack</button>
-          <button onClick={() => attackMonster(true)}>Special Attack</button>
-
-          {/* Allow potion usage during encounter */}
-          {collectedPotions.includes(1) && (
-            <button onClick={() => usePotion(1)}>Use Health Potion</button>
-          )}
-          {collectedPotions.includes(2) && (
-            <button onClick={() => usePotion(2)}>Use Strength Potion</button>
-          )}
-        </div>
       )}
 
-      <div className={styles.heroCard}>
-        <h2>Hero: {Hero.Name}</h2>
-        <div className={styles.heroStats}>
-          <div className={styles.statItem}>
-            <span className={styles.statLabel}>Health:</span>
-            <div className={styles.healthBar}>
-              <div
-                className={styles.healthFill}
-                style={{ width: `${(Hero.CurrHealth / Hero.TotalHealh) * 100}%` }}
-              ></div>
-              <span className={styles.healthText}>
-                {Hero.CurrHealth} / {Hero.TotalHealh}
-              </span>
-            </div>
-          </div>
-          <div className={styles.statItem}>
-            <span className={styles.statLabel}>Attack:</span> {Hero.Attack}
-          </div>
+      {/* Main Game Content - Dimmed when in battle */}
+      <div className={inBattle ? styles.dimmedContent : ''}>
+        {/* Save Game Section */}
+        <div className={styles.saveSection}>
+          <label htmlFor="gameName">Game Name: </label>
+          <input
+            type="text"
+            id="gameName"
+            value={gName}
+            onChange={e => setgName(e.target.value)}
+            disabled={inBattle}
+          />
+          <button onClick={saveGame} disabled={inBattle}>Save Game</button>
+          <p className={styles.saveMessage}>{gMessage}</p>
         </div>
-      </div>
 
+        {/* Hero Stats */}
+        <StatCard 
+          title="Hero"
+          stats={
+            <>
+              <HealthBar current={Hero.CurrHealth} total={Hero.TotalHealh} label="Health" />
+              <div className={styles.statItem}>
+                <span className={styles.statLabel}>Attack:</span> {Hero.Attack}
+              </div>
+            </>
+          }
+        />
+
+      {/* Pillars Collection */}
       <div className={styles.collectionSection}>
         <h2>Pillars Collected</h2>
         <div className={styles.pillarsContainer}>
-          {[1, 2, 3, 4].map(pillar => (
-            <div
-              key={pillar}
-              className={`${styles.pillarItem} ${collectedPillars.includes(pillar) ? styles.collected : styles.missing}`}
-            >
-              <div className={styles.pillarIcon}>P</div>
-              <span>{getPillarName(pillar)}</span>
-              {collectedPillars.includes(pillar) ? (
-                <span className={styles.checkmark}>✓</span>
-              ) : (
-                <span className={styles.crossmark}>✗</span>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className={styles.collectionSection}>
-        <h2>Potions Collected</h2>
-        <div className={styles.potionsContainer}>
-          {[1, 2, 3].map(potion => {
-            const count = collectedPotions.filter(p => p === potion).length;
+          {Object.entries(PILLAR_TYPES).map(([id, name]) => {
+            const pillarId = parseInt(id);
+            const isCollected = collectedPillars.includes(pillarId);
             return (
-              <div key={potion} className={styles.potionItem}>
-                <div className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
-                  {count}
-                </div>
-                <span>{getPotionName(potion)} Potions: {count}</span>
+              <div
+                key={pillarId}
+                className={`${styles.pillarItem} ${isCollected ? styles.collected : styles.missing}`}
+              >
+                <div className={styles.pillarIcon}>P</div>
+                <span>{name}</span>
+                <span className={isCollected ? styles.checkmark : styles.crossmark}>
+                  {isCollected ? '✓' : '✗'}
+                </span>
               </div>
             );
           })}
         </div>
       </div>
 
+      {/* Potions Collection */}
+      <div className={styles.collectionSection}>
+        <h2>Potions Collected</h2>
+        <div className={styles.potionsContainer}>
+          {[1, 2].map(potion => {
+            const count = collectedPotions.filter(p => p === potion).length;
+            const canUse = count > 0;
+
+            return (
+              <div key={potion} className={styles.potionItem}>
+                <div className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
+                  {count}
+                </div>
+                <span
+                  className={styles.potionName}
+                  onClick={() => canUse && usePotion(potion)}
+                  style={{ 
+                    cursor: canUse ? 'pointer' : 'not-allowed', 
+                    textDecoration: 'underline'
+                  }}
+                  title={canUse ? 'Click to use potion' : 'No potions available'}
+                >
+                  {getName(potion, POTION_TYPES)} Potions: {count}
+                </span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Maze Grid */}
       <div className={styles.mazeSection}>
         <h2>Maze Map</h2>
         <div className={styles.mazeGrid}>
@@ -288,25 +523,14 @@ const Play = () => {
                 return (
                   <div
                     key={`${rowIndex}-${colIndex}`}
-                    className={`
-                      ${styles.mazeCell}
-                      ${isWall ? styles.wall : ''}
-                      ${isCurrent ? styles.currentCell : ''}
-                      ${cell.RoomType === 1 ? styles.entrance : ''}
-                      ${cell.RoomType === 2 ? styles.exit : ''}
-                      ${cell.RoomType === 4 ? styles.pit : ''}
-                    `}
+                    className={getCellClasses(cell, rowIndex, colIndex)}
                   >
                     {isCurrent && <div className={styles.player}>☺</div>}
 
                     {!isWall && (
                       <div className={styles.cellContents}>
-                        {cell.RoomMonster && (
-                          <div className={styles.monsterIndicator}>M</div>
-                        )}
-                        {cell.PillarType > 0 && (
-                          <div className={styles.pillarIndicator}>P{cell.PillarType}</div>
-                        )}
+                        {cell.RoomMonster && <div className={styles.monsterIndicator}>M</div>}
+                        {cell.PillarType > 0 && <div className={styles.pillarIndicator}>P{cell.PillarType}</div>}
                         {cell.PotionType > 0 && (
                           <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
                             {cell.PotionType}
@@ -321,83 +545,48 @@ const Play = () => {
           ))}
         </div>
 
+        {/* Map Legend */}
         <div className={styles.mapLegend}>
-          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.wall}></div> Wall</div>
-          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.entrance}></div> Entrance</div>
-          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.exit}></div> Exit</div>
-          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.normal}></div> Normal Room</div>
-          <div className={styles.legendItem}><div className={styles.legendColor + ' ' + styles.pit}></div> Pit</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon}>☺</div> Player</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon}>M</div> Monster</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon}>P#</div> Pillar</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion1}></div> Health Potion</div>
-          <div className={styles.legendItem}><div className={styles.legendIcon + ' ' + styles.potion2}></div> Attack Potion</div>
+          <LegendItem colorClass="wall" label="Wall" />
+          <LegendItem colorClass="entrance" label="Entrance" />
+          <LegendItem colorClass="exit" label="Exit" />
+          <LegendItem colorClass="normal" label="Normal Room" />
+          <LegendItem colorClass="pit" label="Pit" />
+          <LegendItem icon="☺" label="Player" />
+          <LegendItem icon="M" label="Monster" />
+          <LegendItem icon="P#" label="Pillar" />
+          <LegendItem colorClass="potion1" label="Health Potion" />
+          <LegendItem colorClass="potion2" label="Attack Potion" />
         </div>
       </div>
 
-      <div className={styles.roomDetails}>
-        <h2>Current Room</h2>
-        <div className={styles.roomInfo}>
-          <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Position:</span>
-            Row {coords.row + 1}, Column {coords.col + 1}
+        {/* Debug Section */}
+        <div className={styles.debugToggle}>
+          <button onClick={() => setShowDebug(!showDebug)} disabled={inBattle}>
+            {showDebug ? "Hide Debug Info" : "Show Debug Info"}
+          </button>
+          <button 
+            onClick={() => setBypassGameOver(!bypassGameOver)} 
+            disabled={inBattle}
+            className={bypassGameOver ? styles.debugActiveButton : ''}
+            title="When enabled, prevents the Game Over screen from appearing, allowing continued play after death"
+          >
+            {bypassGameOver ? "Debug: Game Over Bypass ON" : "Debug: Game Over Bypass OFF"}
+          </button>
+          {gameData.Status === "Lost" && bypassGameOver && (
+            <p className={styles.debugWarning}>
+              ⚠️ DEBUG MODE: You are currently dead but can continue playing
+            </p>
+          )}
+        </div>
+
+        {showDebug && (
+          <div className={styles.debugSection}>
+            <h3>Game State JSON</h3>
+            <pre className={styles.jsonPre}>{JSON.stringify(gameData, null, 2)}</pre>
           </div>
-          <div className={styles.infoItem}>
-            <span className={styles.infoLabel}>Room Type:</span>
-            {getRoomTypeName(currentRoom.RoomType)}
-          </div>
-
-          {currentRoom.RoomMonster && (
-            <div className={styles.monsterCard}>
-              <h3>Monster: {currentRoom.RoomMonster.Name}</h3>
-              <div className={styles.monsterStats}>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Health:</span>
-                  <div className={styles.healthBar}>
-                    <div
-                      className={styles.healthFill}
-                      style={{ width: `${(currentRoom.RoomMonster.CurrHealth / currentRoom.RoomMonster.TotalHealth) * 100}%` }}
-                    ></div>
-                    <span className={styles.healthText}>
-                      {currentRoom.RoomMonster.CurrHealth} / {currentRoom.RoomMonster.TotalHealth}
-                    </span>
-                  </div>
-                </div>
-                <div className={styles.statItem}>
-                  <span className={styles.statLabel}>Attack:</span> {currentRoom.RoomMonster.Attack}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {currentRoom.PillarType > 0 && (
-            <div className={styles.featureCard}>
-              <h3>Pillar: {getPillarName(currentRoom.PillarType)}</h3>
-              <div className={styles.pillarIcon}>P{currentRoom.PillarType}</div>
-            </div>
-          )}
-
-          {currentRoom.PotionType > 0 && (
-            <div className={styles.featureCard}>
-              <h3>Potion: {getPotionName(currentRoom.PotionType)}</h3>
-              <div className={`${styles.potionIcon} ${styles[`potion${currentRoom.PotionType}`]}`}></div>
-            </div>
-          )}
-        </div>
+        )}
       </div>
-
-      <div className={styles.debugToggle}>
-        <button onClick={toggleDebugSection}>
-          {showDebug ? "Hide Debug Info" : "Show Debug Info"}
-        </button>
-      </div>
-
-      {showDebug && (
-        <div className={styles.debugSection}>
-          <h3>Game State JSON</h3>
-          <pre className={styles.jsonPre}>{JSON.stringify(gameData, null, 2)}</pre>
-        </div>
-      )}
     </div>
   );
 };
