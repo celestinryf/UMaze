@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -11,12 +10,11 @@ import (
 
 // Hanldes requests for making games
 func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
-
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
 	switch r.Method {
-	case http.MethodPost: // makes a new game given the hero id
+	case http.MethodPost:
 		var HeroIdJson struct {
 			HeroId   int `json:"hero_id"`
 			MazeSize int `json:"maze_size"`
@@ -27,13 +25,8 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		db, err := sql.Open("sqlite3", "./db/360Game.db")
-		if err != nil {
-			log.Fatal(err)
-		}
-		defer db.Close()
-
-		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), db, HeroIdJson.MazeSize)
+		// Use the shared DB connection from Server
+		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), s.DB, HeroIdJson.MazeSize)
 		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}

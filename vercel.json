@@ -1,0 +1,13 @@
+{
+    "functions": {
+      "api/game.go": {
+        "runtime": "@vercel/go"
+      }
+    },
+    "rewrites": [
+      {
+        "source": "/api/game/(.*)",
+        "destination": "/api/game"
+      }
+    ]
+  }

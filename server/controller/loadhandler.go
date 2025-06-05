@@ -1,7 +1,6 @@
 package controller
 
 import (
-	"database/sql"
 	"encoding/json"
 	"log"
 	"net/http"
@@ -18,22 +17,14 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
-	db, err := sql.Open("sqlite3", "./db/360Game.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	defer db.Close()
-
 	switch r.Method {
-	case http.MethodGet: // Get list of all saved games
-
-		if err := json.NewEncoder(w).Encode(s.getSavedGames(db)); err != nil {
+	case http.MethodGet:
+		if err := json.NewEncoder(w).Encode(s.getSavedGames()); err != nil {
 			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
 			return
 		}
 
-	case http.MethodPost: // Save current game
-
+	case http.MethodPost:
 		var dataName struct {
 			Name string `json:"name"`
 		}
@@ -41,7 +32,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.saveGame(dataName.Name, db)
+		s.saveGame(dataName.Name)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
@@ -56,7 +47,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.loadGame(dataId.Id, db)
+		s.loadGame(dataId.Id)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
@@ -72,7 +63,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.deleteGame(dataId.Id, db)
+		s.deleteGame(dataId.Id)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game deleted successfully",
