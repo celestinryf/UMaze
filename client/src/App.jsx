@@ -8,7 +8,7 @@ import StartScreen from './routes/startscreen/index.jsx';
 import Play from './routes/play/index.jsx';
 import HeroSelect from './routes/HeroSelect/index.jsx';
 import LoadGames from './routes/loadgamescreen/index.jsx';
-import Options from './routes/Options/Options.jsx';
+import Options from './routes/Options/index.jsx';
 
 function AppContent() {
   const location = useLocation();
