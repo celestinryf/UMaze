@@ -1,13 +1,26 @@
 {
-    "functions": {
-      "api/game.go": {
-        "runtime": "@vercel/go"
-      }
-    },
-    "rewrites": [
+    "version": 2,
+    "builds": [
       {
-        "source": "/api/game/(.*)",
-        "destination": "/api/game"
+        "src": "client/package.json",
+        "use": "@vercel/static-build",
+        "config": {
+          "distDir": "dist"
+        }
+      },
+      {
+        "src": "server/main.go",
+        "use": "@vercel/go"
+      }
+    ],
+    "routes": [
+      {
+        "src": "/api/(.*)",
+        "dest": "/server/main.go"
+      },
+      {
+        "src": "/(.*)",
+        "dest": "/client/$1"
       }
     ]
   }

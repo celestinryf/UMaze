@@ -8,6 +8,7 @@
     "frontend": "vite",
     "backend": "cd ../server && go run .",
     "build": "vite build",
+    "vercel-build": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
