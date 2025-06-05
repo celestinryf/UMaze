@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation } from 'react-router-dom';
-import styles from './Play.module.css';
+import styles from './play.module.css';
 
 /*
  * Maze Adventure Game Component
