@@ -1,5 +1,5 @@
 import React, { useState, useContext } from 'react';
-import styles from './heroselect.module.css';
+import styles from './HeroSelect.module.css';
 import { useNavigate } from 'react-router-dom';
 import { AudioContext } from '../../context/AudioContext';
 import clickSFX from '../../assets/click.mp3';
