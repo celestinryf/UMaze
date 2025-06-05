@@ -16,19 +16,18 @@ type Monster struct {
 }
 
 // inits a random monster
+// return a pointer to created monster
 func initMonster(db *sql.DB) *Monster {
-
 	var (
-		name               string
-		health, attack_dmg int
+		name       string
+		health     int
+		attack_dmg int
 	)
-
 	err := db.QueryRow("SELECT name, health, attack_dmg FROM entities WHERE id = ?", rand.Intn(3)+1).
 		Scan(&name, &health, &attack_dmg)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	return &Monster{
 		Name:        name,
 		TotalHealth: health,

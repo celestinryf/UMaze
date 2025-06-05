@@ -5,9 +5,6 @@ import (
 	"math/rand"
 )
 
-// maze has dimensions of mazeSize * mazeSize
-//const mazeSize = 7
-
 // Coordinates of the player
 type Coords struct {
 	X int `json:"row"`
@@ -16,8 +13,8 @@ type Coords struct {
 
 // Holds the grid of the maze.
 type Maze struct {
-	Grid       [][]*Room `json:"Grid"`
-	CurrCoords *Coords   `json:"coords"`
+	Grid   [][]*Room `json:"Grid"`
+	Coords `json:"coords"`
 }
 
 // Gives the status of the game
@@ -34,8 +31,7 @@ const (
 func initMaze(db *sql.DB, mazeSize int) *Maze {
 
 	newMaze := Maze{
-		Grid:       newGrid(mazeSize),
-		CurrCoords: nil,
+		Grid: newGrid(mazeSize),
 	}
 
 	validRooms := make([]*Room, 0)
@@ -68,7 +64,7 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 	for i := range newMaze.Grid {
 		for j := range newMaze.Grid[0] {
 			if newMaze.Grid[i][j].RoomType == start {
-				newMaze.CurrCoords = &Coords{
+				newMaze.Coords = Coords{
 					X: i,
 					Y: j,
 				}

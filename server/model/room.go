@@ -67,18 +67,14 @@ func InitRoom(isPath bool) *Room {
 
 // sets up rooms with pits, potions, and monsters
 func (r *Room) SetUpRoom(db *sql.DB) {
-
 	probs, err := db.Query("SELECT * FROM spawn_rates")
 	if err != nil {
 		log.Fatal(err)
 	}
 	defer probs.Close()
-
 	ranNum := rand.Intn(100) // random number generated
-
-	currProb := 0 // curr number from probabilities
-	id := 0       // curr id, at end of loop it will be 1->3
-
+	currProb := 0            // curr number from probabilities
+	id := 0                  // curr id, at end of loop it will be 1->3
 	for probs.Next() {
 		var prob, currId int
 		err = probs.Scan(&currId, &prob)
@@ -91,7 +87,6 @@ func (r *Room) SetUpRoom(db *sql.DB) {
 			break
 		}
 	}
-
 	switch id {
 	case 1:
 		r.RoomType = pit

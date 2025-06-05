@@ -31,12 +31,10 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 		name               string
 		health, attack_dmg int
 	)
-
 	err := db.QueryRow("SELECT name, health, attack_dmg FROM entities WHERE id = ?", heroType).Scan(&name, &health, &attack_dmg)
 	if err != nil {
 		log.Fatal(err)
 	}
-
 	temp := &Hero{
 		Name:           name,
 		TotalHealth:    health,
@@ -45,10 +43,8 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 		AquiredPillars: make([]Pillar, 0),
 		AquiredPotions: make([]Potion, 0),
 	}
-
 	if temp.Name == "MATT" {
 		temp.AquiredPotions = append(temp.AquiredPotions, HealingPotion, AttackPotion)
 	}
-
 	return temp
 }

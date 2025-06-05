@@ -25,15 +25,15 @@ func InitGame(theHeroType HeroType, db *sql.DB, mazeSize int) *Game {
 // Sets curr location to x and y
 func (g *Game) Move(newCoords *Coords) {
 
-	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomMonster != nil {
+	if g.TheMaze.Grid[g.TheMaze.Coords.X][g.TheMaze.Coords.Y].RoomMonster != nil {
 		return
 	}
 
-	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == wall {
+	if g.TheMaze.Grid[g.TheMaze.Coords.X][g.TheMaze.Coords.Y].RoomType == wall {
 		return
 	}
 
-	g.TheMaze.CurrCoords = newCoords
+	g.TheMaze.Coords = *newCoords
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
 
 	if currRoom.PotionType != NoPotion {
@@ -69,7 +69,7 @@ func (g *Game) Move(newCoords *Coords) {
 // attack
 func (g *Game) Attack() {
 
-	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y]
+	room := g.TheMaze.Grid[g.TheMaze.Coords.X][g.TheMaze.Coords.Y]
 	roomMonster := room.RoomMonster
 	hero := g.TheHero
 
