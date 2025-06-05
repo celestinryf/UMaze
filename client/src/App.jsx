@@ -4,8 +4,8 @@ import { AudioProvider } from './context/AudioContext';
 import VolumeMenu from './components/VolumeOptions/VolumeMenu';
 import './App.css';
 
-import StartScreen from './routes/StartScreen/StartScreen.jsx';
-import Play from './routes/Play/Play.jsx';
+import StartScreen from './routes/startscreen/StartScreen.jsx';
+import Play from './routes/play/Play.jsx';
 import HeroSelect from './routes/HeroSelect/HeroSelect.jsx';
 import LoadGames from './routes/LoadGameScreen/LoadGameScreen.jsx';
 import Options from './routes/Options/Options.jsx';

@@ -1,7 +1,7 @@
 // src/components/StartScreen.jsx
 import React, { useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
-import styles from './StartScreen.module.css';
+import styles from './startscreen.module.css';
 import backgroundImg from '../../assets/background.jpg';
 import { AudioContext } from '../../context/AudioContext';
 import clickSFX from '../../assets/click.mp3';
