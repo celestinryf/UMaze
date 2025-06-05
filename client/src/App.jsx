@@ -7,7 +7,7 @@ import './App.css';
 import StartScreen from './routes/startscreen/StartScreen.jsx';
 import Play from './routes/play/Play.jsx';
 import HeroSelect from './routes/HeroSelect/HeroSelect.jsx';
-import LoadGames from './routes/LoadGameScreen/LoadGameScreen.jsx';
+import LoadGames from './routes/loadgamescreen/LoadGameScreen.jsx';
 import Options from './routes/Options/Options.jsx';
 
 function AppContent() {
