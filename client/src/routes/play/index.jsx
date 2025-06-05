@@ -4,7 +4,7 @@ import styles from './Play.module.css';
 
 /*
  * Maze Adventure Game Component
- * Features:
+ * Features: meow
  * - Pokemon-style battle overlay system
  * - Turn-based combat with attack/special attack options
  * - Potion usage allowed during battle for strategic healing

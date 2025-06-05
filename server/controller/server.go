@@ -11,58 +11,68 @@ import (
 
 type Server struct {
 	Game *model.Game `json:"Game"`
+	DB   *sql.DB     // Add DB connection
 }
 
-func InitServer() *Server {
-	return &Server{Game: nil}
+// Pass DB connection when initializing server
+func InitServer(db *sql.DB) *Server {
+	return &Server{
+		Game: nil,
+		DB:   db,
+	}
 }
 
-func (s *Server) saveGame(name string, db *sql.DB) {
+func (s *Server) saveGame(name string) {
 	gameBytes, err := json.Marshal(s.Game)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to marshal game: %v", err)
+		return
 	}
-	_, err = db.Exec(`INSERT INTO saved_games
+	_, err = s.DB.Exec(`INSERT INTO saved_games
 		(name, info, date) VALUES (?, ?, ?)`,
 		name, string(gameBytes), time.Now().Format("2006-01-02"))
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to save game: %v", err)
 	}
 }
 
-func (s *Server) getSavedGames(db *sql.DB) []JsonGame {
-	savedGameQuery, err := db.Query("SELECT id, name, date FROM saved_games")
+func (s *Server) getSavedGames() []JsonGame {
+	savedGameQuery, err := s.DB.Query("SELECT id, name, date FROM saved_games")
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to query saved games: %v", err)
+		return nil
 	}
 	defer savedGameQuery.Close()
+
 	savedGameArr := make([]JsonGame, 0)
 	for savedGameQuery.Next() {
 		saved_game := JsonGame{}
 		err = savedGameQuery.Scan(&saved_game.Id, &saved_game.Name, &saved_game.Date)
 		if err != nil {
-			log.Fatal(err)
+			log.Printf("Failed to scan saved game: %v", err)
+			continue
 		}
 		savedGameArr = append(savedGameArr, saved_game)
 	}
 	return savedGameArr
 }
 
-func (s *Server) loadGame(id int, db *sql.DB) {
+func (s *Server) loadGame(id int) {
 	var jsonData []byte
-	err := db.QueryRow("SELECT info FROM saved_games WHERE id = ?", id).Scan(&jsonData)
+	err := s.DB.QueryRow("SELECT info FROM saved_games WHERE id = ?", id).Scan(&jsonData)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to load game: %v", err)
+		return
 	}
 	err = json.Unmarshal(jsonData, &s.Game)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to unmarshal game: %v", err)
 	}
 }
 
-func (s *Server) deleteGame(id int, db *sql.DB) {
-	_, err := db.Exec(`DELETE FROM saved_games WHERE id = ?`, id)
+func (s *Server) deleteGame(id int) {
+	_, err := s.DB.Exec(`DELETE FROM saved_games WHERE id = ?`, id)
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Failed to delete game: %v", err)
 	}
 }

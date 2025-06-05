@@ -6,8 +6,9 @@
   "scripts": {
     "dev": "concurrently \"npm run frontend\" \"npm run backend\"",
     "frontend": "vite",
-    "backend": "cd ../server && go run main.go",
+    "backend": "cd ../server && go run .",
     "build": "vite build",
+    "vercel-build": "npm run build",
     "lint": "eslint .",
     "preview": "vite preview"
   },
