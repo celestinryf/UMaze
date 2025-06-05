@@ -16,12 +16,12 @@ const (
 
 // Hero Type with name, totalHealth, currHealth, and attack.
 type Hero struct {
-	Name           string   `json:"Name"`
-	TotalHealth    int      `json:"TotalHealh"`
-	CurrHealth     int      `json:"CurrHealth"`
-	Attack         int      `json:"Attack"`
-	AquiredPillars []Pillar `json:"AquiredPillars"`
-	AquiredPotions []Potion `json:"AquiredPotions"`
+	Name           string         `json:"Name"`
+	TotalHealth    int            `json:"TotalHealh"`
+	CurrHealth     int            `json:"CurrHealth"`
+	Attack         int            `json:"Attack"`
+	AquiredPillars []Pillar       `json:"AquiredPillars"`
+	AquiredPotions map[Potion]int `json:"AquiredPotions"`
 }
 
 // Inits hero with totalHealth,
@@ -41,10 +41,13 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 		CurrHealth:     health,
 		Attack:         attack_dmg,
 		AquiredPillars: make([]Pillar, 0),
-		AquiredPotions: make([]Potion, 0),
+		AquiredPotions: make(map[Potion]int, 0),
 	}
+	temp.AquiredPotions[HealingPotion] = 0
+	temp.AquiredPotions[AttackPotion] = 0
 	if temp.Name == "MATT" {
-		temp.AquiredPotions = append(temp.AquiredPotions, HealingPotion, AttackPotion)
+		temp.AquiredPotions[HealingPotion]++
+		temp.AquiredPotions[AttackPotion]++
 	}
 	return temp
 }

@@ -2,13 +2,22 @@ package model
 
 import (
 	"database/sql"
+	"log"
+	"os"
 	"testing"
+
+	"github.com/joho/godotenv"
 )
 
 // Tests the init monster function
 func TestInitMonster(t *testing.T) {
-
-	db, err := sql.Open("sqlite3", "../db/360Game.db")
+	err := godotenv.Load()
+	if err != nil {
+		log.Println("ENV issue")
+	}
+	dbURL := os.Getenv("TURSO_DATABASE_URL")
+	connStr := dbURL
+	db, err := sql.Open("libsql", connStr)
 	if err != nil {
 		t.Fatalf("failed to open database: %v", err)
 	}

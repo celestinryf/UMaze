@@ -8,7 +8,7 @@ import (
 // Test initing a new Matthew
 func TestInitMatt(t *testing.T) {
 
-	db, err := sql.Open("sqlite3", "../db/360Game.db")
+	db, err := sql.Open("libsql", "../db/360Game.db")
 	if err != nil {
 		t.Fatal("failed to open db")
 	}
