@@ -6,19 +6,19 @@ import (
 	"log"
 	"time"
 
-	"github.com/celestinryf/go-backend/model"
+	"github.com/redis/go-redis/v9"
 )
 
 type Server struct {
-	Game *model.Game `json:"Game"`
-	DB   *sql.DB     // Add DB connection
+	DB   *sql.DB       // Add DB connection
+	Redi *redis.Client // Redi Connection
 }
 
 // Pass DB connection when initializing server
-func InitServer(db *sql.DB) *Server {
+func InitServer(db *sql.DB, redi *redis.Client) *Server {
 	return &Server{
-		Game: nil,
 		DB:   db,
+		Redi: redi,
 	}
 }
 

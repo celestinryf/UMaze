@@ -23,13 +23,13 @@ func main() {
 		DB:       0,
 		Protocol: 2,
 	})
-	ctx := context.Background()
+	defer rediClient.Close()
 
+	ctx := context.Background()
 	err := rediClient.Set(ctx, "foo", "bar", 0).Err()
 	if err != nil {
 		fmt.Println(err)
 	}
-
 	val, err := rediClient.Get(ctx, "foo").Result()
 	if err != nil {
 		fmt.Println(err)
@@ -63,10 +63,7 @@ func main() {
 		log.Fatalf("Failed to ping database: %v", err)
 	}
 
-	log.Println("Successfully connected to Turso database")
-
-	srv := controller.InitServer(db)
-
+	srv := controller.InitServer(db, rediClient)
 	fmt.Println("Starting server on :8080")
 	http.HandleFunc("/api/game/", srv.GameHandler)
 	http.HandleFunc("/api/move/", srv.MoveHandler)
