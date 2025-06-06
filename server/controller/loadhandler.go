@@ -16,14 +16,12 @@ type JsonGame struct {
 func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
-
 	switch r.Method {
 	case http.MethodGet:
 		if err := json.NewEncoder(w).Encode(s.getSavedGames()); err != nil {
 			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
 			return
 		}
-
 	case http.MethodPost:
 		var dataName struct {
 			Name string `json:"name"`
@@ -37,9 +35,7 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			"status":  "success",
 			"message": "Game saved successfully",
 		})
-
 	case http.MethodPut: // Load a game
-
 		var dataId struct {
 			Id int `json:"id"`
 		}
@@ -52,13 +48,10 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			"status":  "success",
 			"message": "Game saved successfully",
 		})
-
 	case http.MethodDelete: // delete game by id
-
 		var dataId struct {
 			Id int `json:"id"`
 		}
-
 		if err := json.NewDecoder(r.Body).Decode(&dataId); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
@@ -68,14 +61,11 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			"status":  "success",
 			"message": "Game deleted successfully",
 		})
-
 	default:
-
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "error",
 			"message": "Method not allowed",
 		})
-
 	}
 }
