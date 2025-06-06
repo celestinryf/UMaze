@@ -80,7 +80,7 @@ func (s *Server) deleteGame(id int) {
 	}
 }
 
-func (s *Server) rediGetGame(username string) model.Game {
+func (s *Server) redisGetGame(username string) model.Game {
 	ctx := context.Background()
 	gameStr, err := s.Redi.Get(ctx, username).Result()
 	if err != nil {
@@ -93,7 +93,7 @@ func (s *Server) rediGetGame(username string) model.Game {
 	return game
 }
 
-func (s *Server) rediSetGame(username string, game model.Game) {
+func (s *Server) redisSetGame(username string, game model.Game) {
 	ctx := context.Background()
 	gameJson, err := json.Marshal(game)
 	if err != nil {

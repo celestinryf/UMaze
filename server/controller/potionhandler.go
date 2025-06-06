@@ -10,40 +10,42 @@ import (
 
 // Handles battles
 func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
-
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Recieved %s request to %s", r.Method, r.URL.Path)
-
 	switch r.Method {
 	case http.MethodPut:
-
+		// get username
 		var CurrPotion struct {
-			PotionType int `json:"potion_type"`
+			PotionType int    `json:"potion_type"`
+			Username   string `json:"username"`
 		}
-
 		if err := json.NewDecoder(r.Body).Decode(&CurrPotion); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-
-		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&s.Game.TheHero.AquiredPotions, model.HealingPotion) {
-			if s.Game.TheHero.Name == "PRIMO" {
-				s.Game.TheHero.CurrHealth += 150
+		// get redis game
+		game := s.redisGetGame(CurrPotion.Username)
+		// update potion
+		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.HealingPotion) {
+			if game.TheHero.Name == "PRIMO" {
+				game.TheHero.CurrHealth += 150
 			} else {
-				s.Game.TheHero.CurrHealth += 100
+				game.TheHero.CurrHealth += 100
 			}
-			s.Game.TheHero.CurrHealth = min(s.Game.TheHero.CurrHealth, s.Game.TheHero.TotalHealth)
+			game.TheHero.CurrHealth = min(game.TheHero.CurrHealth, game.TheHero.TotalHealth)
 		}
 
-		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&s.Game.TheHero.AquiredPotions, model.AttackPotion) {
-			if s.Game.TheHero.Name == "PRIMO" {
-				s.Game.TheHero.Attack += 15
+		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.AttackPotion) {
+			if game.TheHero.Name == "PRIMO" {
+				game.TheHero.Attack += 15
 			} else {
-				s.Game.TheHero.Attack += 10
+				game.TheHero.Attack += 10
 			}
 		}
-
-		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
+		// save to redis
+		s.redisSetGame(CurrPotion.Username, game)
+		// send to front end
+		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)
 		}
 

@@ -27,7 +27,7 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 		// make game
 		newGame := model.InitGame(model.HeroType(HeroIdJson.HeroId), s.DB, HeroIdJson.MazeSize)
 		// set up redis
-		s.rediSetGame(HeroIdJson.Username, *newGame)
+		s.redisSetGame(HeroIdJson.Username, *newGame)
 		// send to front
 		if err := json.NewEncoder(w).Encode(newGame); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
@@ -42,7 +42,7 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// get game
-		game := s.rediGetGame(UserJson.Username)
+		game := s.redisGetGame(UserJson.Username)
 		// send to front
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)

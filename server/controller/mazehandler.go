@@ -24,11 +24,11 @@ func (s *Server) MoveHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// get game from redis
-		game := s.rediGetGame(MoveJson.Username)
+		game := s.redisGetGame(MoveJson.Username)
 		// update game
 		game.Move(&MoveJson.UpdatedCoord)
 		// save to redi
-		s.rediSetGame(MoveJson.Username, game)
+		s.redisSetGame(MoveJson.Username, game)
 		// send to front
 		json.NewEncoder(w).Encode(game)
 	default:

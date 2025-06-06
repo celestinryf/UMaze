@@ -21,11 +21,11 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// get game from redis
-		game := s.rediGetGame(UserJson.Username)
+		game := s.redisGetGame(UserJson.Username)
 		// update game
 		game.Attack()
 		//  save to redis
-		s.rediSetGame(UserJson.Username, game)
+		s.redisSetGame(UserJson.Username, game)
 		// send to frontend
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)
