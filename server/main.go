@@ -64,6 +64,7 @@ func main() {
 	}
 
 	srv := controller.InitServer(db, rediClient)
+
 	fmt.Println("Starting server on :8080")
 	http.HandleFunc("/api/game/", srv.GameHandler)
 	http.HandleFunc("/api/move/", srv.MoveHandler)

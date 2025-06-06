@@ -25,28 +25,28 @@ func InitServer(db *sql.DB, redi *redis.Client) *Server {
 	}
 }
 
-func (s *Server) saveGame(name string) {
-	gameBytes, err := json.Marshal(s.Game)
+func (s *Server) saveGame(username, name string) {
+	game := s.redisGetGame(username)
+	gameBytes, err := json.Marshal(game)
 	if err != nil {
 		log.Printf("Failed to marshal game: %v", err)
 		return
 	}
 	_, err = s.DB.Exec(`INSERT INTO saved_games
-		(name, info, date) VALUES (?, ?, ?)`,
-		name, string(gameBytes), time.Now().Format("2006-01-02"))
+		(username, name, info, date) VALUES (?, ?, ?, ?)`,
+		username, name, string(gameBytes), time.Now().Format("2006-01-02"))
 	if err != nil {
 		log.Printf("Failed to save game: %v", err)
 	}
 }
 
-func (s *Server) getSavedGames() []JsonGame {
-	savedGameQuery, err := s.DB.Query("SELECT id, name, date FROM saved_games")
+func (s *Server) getSavedGames(username string) []JsonGame {
+	savedGameQuery, err := s.DB.Query("SELECT id, name, date FROM saved_games WHERE username = ?", username)
 	if err != nil {
 		log.Printf("Failed to query saved games: %v", err)
 		return nil
 	}
 	defer savedGameQuery.Close()
-
 	savedGameArr := make([]JsonGame, 0)
 	for savedGameQuery.Next() {
 		saved_game := JsonGame{}
@@ -60,17 +60,19 @@ func (s *Server) getSavedGames() []JsonGame {
 	return savedGameArr
 }
 
-func (s *Server) loadGame(id int) {
+func (s *Server) loadGame(username string, id int) {
 	var jsonData []byte
 	err := s.DB.QueryRow("SELECT info FROM saved_games WHERE id = ?", id).Scan(&jsonData)
 	if err != nil {
 		log.Printf("Failed to load game: %v", err)
 		return
 	}
-	err = json.Unmarshal(jsonData, &s.Game)
+	var game model.Game
+	err = json.Unmarshal(jsonData, &game)
 	if err != nil {
 		log.Printf("Failed to unmarshal game: %v", err)
 	}
+	s.redisSetGame(username, game)
 }
 
 func (s *Server) deleteGame(id int) {

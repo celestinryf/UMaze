@@ -18,32 +18,41 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 	switch r.Method {
 	case http.MethodGet:
-		if err := json.NewEncoder(w).Encode(s.getSavedGames()); err != nil {
+		var UserJson struct {
+			Username string `json:"username"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&UserJson); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
+		if err := json.NewEncoder(w).Encode(s.getSavedGames(UserJson.Username)); err != nil {
 			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
 			return
 		}
 	case http.MethodPost:
 		var dataName struct {
-			Name string `json:"name"`
+			Name     string `json:"name"`
+			Username string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&dataName); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.saveGame(dataName.Name)
+		s.saveGame(dataName.Username, dataName.Name)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
 		})
 	case http.MethodPut: // Load a game
 		var dataId struct {
-			Id int `json:"id"`
+			Id       int    `json:"id"`
+			Username string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&dataId); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.loadGame(dataId.Id)
+		s.loadGame(dataId.Username, dataId.Id)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
