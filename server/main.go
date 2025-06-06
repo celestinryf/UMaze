@@ -79,15 +79,15 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 	path := strings.TrimPrefix(r.URL.Path, "/api")
 
 	switch {
-	case strings.HasPrefix(path, "/game/"):
+	case strings.HasPrefix(path, "/game"):
 		srv.GameHandler(w, r)
-	case strings.HasPrefix(path, "/move/"):
+	case strings.HasPrefix(path, "/move"):
 		srv.MoveHandler(w, r)
-	case strings.HasPrefix(path, "/potion/"):
+	case strings.HasPrefix(path, "/potion"):
 		srv.PotionHandler(w, r)
-	case strings.HasPrefix(path, "/load/"):
+	case strings.HasPrefix(path, "/load"):
 		srv.LoadHandler(w, r)
-	case strings.HasPrefix(path, "/battle/"):
+	case strings.HasPrefix(path, "/battle"):
 		srv.BattleHandler(w, r)
 	default:
 		w.WriteHeader(http.StatusNotFound)
