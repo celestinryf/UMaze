@@ -1,11 +1,14 @@
 package controller
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
+	"github.com/celestinryf/go-backend/model"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -74,5 +77,31 @@ func (s *Server) deleteGame(id int) {
 	_, err := s.DB.Exec(`DELETE FROM saved_games WHERE id = ?`, id)
 	if err != nil {
 		log.Printf("Failed to delete game: %v", err)
+	}
+}
+
+func (s *Server) rediGetGame(username string) model.Game {
+	ctx := context.Background()
+	gameStr, err := s.Redi.Get(ctx, username).Result()
+	if err != nil {
+		fmt.Println(err)
+	}
+	var game model.Game
+	if err := json.Unmarshal([]byte(gameStr), &game); err != nil {
+		fmt.Println(err)
+	}
+	return game
+}
+
+func (s *Server) rediSetGame(username string, game model.Game) {
+	ctx := context.Background()
+	gameJson, err := json.Marshal(game)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = s.Redi.Set(ctx, username, gameJson, 0).Err()
+	if err != nil {
+		fmt.Println(err)
 	}
 }
