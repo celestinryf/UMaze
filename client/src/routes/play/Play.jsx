@@ -277,7 +277,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
           
           {/* Potion Actions */}
           {[1, 2].map(potion => {
-            const count = collectedPotions.filter(p => p === potion).length;
+            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 69;
             const canUse = count > 0;
             const potionName = getName(potion, POTION_TYPES);
 
@@ -490,7 +490,7 @@ const Play = () => {
   const { Grid, coords } = Maze;
   const currentRoom = Grid[coords.row][coords.col];
   const collectedPillars = Hero.AquiredPillars || [];
-  const collectedPotions = Hero.AquiredPotions || [];
+  const collectedPotions = new Map(Object.entries(Hero.AquiredPotions || {}));
 
   // Cell class helper
   const getCellClasses = (cell, rowIndex, colIndex) => {
@@ -589,7 +589,7 @@ const Play = () => {
         <h2>Potions Collected</h2>
         <div className={styles.potionsContainer}>
           {[1, 2].map(potion => {
-            const count = collectedPotions.filter(p => p === potion).length;
+            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 69;
             const canUse = count > 0;
 
             return (

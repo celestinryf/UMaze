@@ -56,12 +56,11 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func hasPotionAndRemove(arr *[]model.Potion, potion model.Potion) bool {
-	for i, p := range *arr {
-		if p == potion {
-			*arr = append((*arr)[:i], (*arr)[i+1:]...)
-			return true
-		}
+func hasPotionAndRemove(bag *map[model.Potion]int, potion model.Potion) bool {
+	val := (*bag)[potion]
+	if val > 0 {
+		(*bag)[potion]--
+		return true
 	}
 	return false
 }
