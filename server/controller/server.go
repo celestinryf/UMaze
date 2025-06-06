@@ -1,49 +1,52 @@
 package controller
 
 import (
+	"context"
 	"database/sql"
 	"encoding/json"
+	"fmt"
 	"log"
 	"time"
 
 	"github.com/celestinryf/go-backend/model"
+	"github.com/redis/go-redis/v9"
 )
 
 type Server struct {
-	Game *model.Game `json:"Game"`
-	DB   *sql.DB     // Add DB connection
+	DB   *sql.DB       // Add DB connection
+	Redi *redis.Client // Redi Connection
 }
 
 // Pass DB connection when initializing server
-func InitServer(db *sql.DB) *Server {
+func InitServer(db *sql.DB, redi *redis.Client) *Server {
 	return &Server{
-		Game: nil,
 		DB:   db,
+		Redi: redi,
 	}
 }
 
-func (s *Server) saveGame(name string) {
-	gameBytes, err := json.Marshal(s.Game)
+func (s *Server) saveGame(username, name string) {
+	game := s.redisGetGame(username)
+	gameBytes, err := json.Marshal(game)
 	if err != nil {
 		log.Printf("Failed to marshal game: %v", err)
 		return
 	}
 	_, err = s.DB.Exec(`INSERT INTO saved_games
-		(name, info, date) VALUES (?, ?, ?)`,
-		name, string(gameBytes), time.Now().Format("2006-01-02"))
+		(username, name, info, date) VALUES (?, ?, ?, ?)`,
+		username, name, string(gameBytes), time.Now().Format("2006-01-02"))
 	if err != nil {
 		log.Printf("Failed to save game: %v", err)
 	}
 }
 
-func (s *Server) getSavedGames() []JsonGame {
-	savedGameQuery, err := s.DB.Query("SELECT id, name, date FROM saved_games")
+func (s *Server) getSavedGames(username string) []JsonGame {
+	savedGameQuery, err := s.DB.Query("SELECT id, name, date FROM saved_games WHERE username = ?", username)
 	if err != nil {
 		log.Printf("Failed to query saved games: %v", err)
 		return nil
 	}
 	defer savedGameQuery.Close()
-
 	savedGameArr := make([]JsonGame, 0)
 	for savedGameQuery.Next() {
 		saved_game := JsonGame{}
@@ -57,22 +60,50 @@ func (s *Server) getSavedGames() []JsonGame {
 	return savedGameArr
 }
 
-func (s *Server) loadGame(id int) {
+func (s *Server) loadGame(username string, id int) {
 	var jsonData []byte
 	err := s.DB.QueryRow("SELECT info FROM saved_games WHERE id = ?", id).Scan(&jsonData)
 	if err != nil {
 		log.Printf("Failed to load game: %v", err)
 		return
 	}
-	err = json.Unmarshal(jsonData, &s.Game)
+	var game model.Game
+	err = json.Unmarshal(jsonData, &game)
 	if err != nil {
 		log.Printf("Failed to unmarshal game: %v", err)
 	}
+	s.redisSetGame(username, game)
 }
 
 func (s *Server) deleteGame(id int) {
 	_, err := s.DB.Exec(`DELETE FROM saved_games WHERE id = ?`, id)
 	if err != nil {
 		log.Printf("Failed to delete game: %v", err)
+	}
+}
+
+func (s *Server) redisGetGame(username string) model.Game {
+	ctx := context.Background()
+	gameStr, err := s.Redi.Get(ctx, username).Result()
+	if err != nil {
+		fmt.Println(err)
+	}
+	var game model.Game
+	if err := json.Unmarshal([]byte(gameStr), &game); err != nil {
+		fmt.Println(err)
+	}
+	return game
+}
+
+func (s *Server) redisSetGame(username string, game model.Game) {
+	ctx := context.Background()
+	gameJson, err := json.Marshal(game)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+	err = s.Redi.Set(ctx, username, gameJson, 0).Err()
+	if err != nil {
+		fmt.Println(err)
 	}
 }
