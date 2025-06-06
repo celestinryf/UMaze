@@ -10,12 +10,25 @@ import (
 
 // Handles battles
 func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
-
 	w.Header().Set("Content-Type", "application/json")
-	log.Printf("Recieved %s request to %s", r.Method, r.URL.Path)
+	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
+
+	// Get username from query params
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
 
 	switch r.Method {
 	case http.MethodPut:
+		// Get game from Redis
+		game, err := s.getGameFromRedis(username)
+		if err != nil {
+			log.Printf("No game found for user %s: %v", username, err)
+			http.Error(w, "No active game found", http.StatusNotFound)
+			return
+		}
 
 		var CurrPotion struct {
 			PotionType int `json:"potion_type"`
@@ -26,24 +39,31 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&s.Game.TheHero.AquiredPotions, model.HealingPotion) {
-			if s.Game.TheHero.Name == "PRIMO" {
-				s.Game.TheHero.CurrHealth += 150
+		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.HealingPotion) {
+			if game.TheHero.Name == "PRIMO" {
+				game.TheHero.CurrHealth += 150
 			} else {
-				s.Game.TheHero.CurrHealth += 100
+				game.TheHero.CurrHealth += 100
 			}
-			s.Game.TheHero.CurrHealth = min(s.Game.TheHero.CurrHealth, s.Game.TheHero.TotalHealth)
+			game.TheHero.CurrHealth = min(game.TheHero.CurrHealth, game.TheHero.TotalHealth)
 		}
 
-		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&s.Game.TheHero.AquiredPotions, model.AttackPotion) {
-			if s.Game.TheHero.Name == "PRIMO" {
-				s.Game.TheHero.Attack += 15
+		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.AttackPotion) {
+			if game.TheHero.Name == "PRIMO" {
+				game.TheHero.Attack += 15
 			} else {
-				s.Game.TheHero.Attack += 10
+				game.TheHero.Attack += 10
 			}
 		}
 
-		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
+		// Save updated game back to Redis
+		if err := s.saveGameToRedis(username, game); err != nil {
+			log.Printf("Failed to save game to Redis: %v", err)
+			http.Error(w, "Failed to save game state", http.StatusInternalServerError)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)
 		}
 

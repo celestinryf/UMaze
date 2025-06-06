@@ -8,10 +8,17 @@ import (
 	"github.com/celestinryf/go-backend/model"
 )
 
-// Hanldes requests for making games
+// Handles requests for making games
 func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
+
+	// Get username from query params
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
 
 	switch r.Method {
 	case http.MethodPost:
@@ -25,15 +32,32 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		// Use the shared DB connection from Server
-		s.Game = model.InitGame(model.HeroType(HeroIdJson.HeroId), s.DB, HeroIdJson.MazeSize)
-		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
+		// Create new game
+		game := model.InitGame(model.HeroType(HeroIdJson.HeroId), s.DB, HeroIdJson.MazeSize)
+
+		// Save to Redis
+		if err := s.saveGameToRedis(username, game); err != nil {
+			log.Printf("Failed to save game to Redis: %v", err)
+			http.Error(w, "Failed to create game", http.StatusInternalServerError)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
+
 	case http.MethodGet: // gets curr game json
-		if err := json.NewEncoder(w).Encode(s.Game); err != nil {
+		game, err := s.getGameFromRedis(username)
+		if err != nil {
+			log.Printf("No game found for user %s: %v", username, err)
+			http.Error(w, "No active game found", http.StatusNotFound)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
+
 	default:
 		w.WriteHeader(http.StatusMethodNotAllowed)
 		json.NewEncoder(w).Encode(map[string]string{

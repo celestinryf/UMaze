@@ -1,4 +1,4 @@
-import React, { useState, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import styles from './HeroSelect.module.css';
 import { useNavigate } from 'react-router-dom';
 import { AudioContext } from '../../context/AudioContext';
@@ -79,12 +79,26 @@ const HeroSelect = () => {
   const [mySelectedHero, setMySelectedHero] = useState(null);
   const [myHoveredHero, setMyHoveredHero] = useState(null);
   const [selectedDifficulty, setSelectedDifficulty] = useState(DIFFICULTY_OPTIONS[1]); // Default to Medium
+  const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
   const { playSFX } = useContext(AudioContext);
   const myNavigate = useNavigate();
+
+  // Get username from sessionStorage
+  const getUsername = () => sessionStorage.getItem('username') || '';
+
+  // Check for username and redirect if not found
+  useEffect(() => {
+    const username = getUsername();
+    if (!username) {
+      myNavigate('/');
+    }
+  }, [myNavigate]);
 
   const handleSelectHero = (finalTheHero) => {
     playSFX(clickSFX);
     setMySelectedHero(finalTheHero);
+    setError(null); // Clear any previous errors
   };
 
   const handleDifficultyChange = (e) => {
@@ -94,24 +108,41 @@ const HeroSelect = () => {
   };
 
   const handleStartGame = async () => {
+    const username = getUsername();
+    if (!username) {
+      setError('No username found. Please return to the main menu.');
+      return;
+    }
+
     playSFX(startSFX);
-    console.log(`Starting game with hero: ${mySelectedHero.name}, difficulty: ${selectedDifficulty.label} (maze size: ${selectedDifficulty.value})`);
+    setLoading(true);
+    setError(null);
+    
+    console.log(`Starting game for ${username} with hero: ${mySelectedHero.name}, difficulty: ${selectedDifficulty.label} (maze size: ${selectedDifficulty.value})`);
+    
     try {
-      const res = await fetch('api/game/', {
+      const res = await fetch(`api/game/?username=${encodeURIComponent(username)}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: selectedDifficulty.value }),
       });
+      
       if (!res.ok) {
-        throw new Error('http err')
+        const errorText = await res.text();
+        throw new Error(`Failed to start game: ${res.status} - ${errorText}`);
       }
+      
       const result = await res.json();
-      console.log(result)
+      console.log('Game created:', result);
+      
+      // Navigate to play screen
       myNavigate('/play', { state: { hero: mySelectedHero, difficulty: selectedDifficulty } });
     } catch (error) {
-      console.log("Coulndt set the game")
+      console.error("Couldn't start the game:", error);
+      setError(`Failed to start game: ${error.message}`);
+      setLoading(false);
     }
   };
 
@@ -133,6 +164,8 @@ const HeroSelect = () => {
     </div>
   );
 
+  const username = getUsername();
+
   return (
     <div 
       className={styles.heroSelectContainer} 
@@ -147,6 +180,11 @@ const HeroSelect = () => {
       <div className={styles.header}>
         <h1 className={styles.mainTitle}>CHOOSE YOUR HERO</h1>
         <div className={styles.titleUnderline} />
+        {username && (
+          <p style={{ color: '#fff', marginTop: '0.5rem', fontSize: '1.2rem' }}>
+            Player: <strong>{username}</strong>
+          </p>
+        )}
       </div>
 
       <div className={styles.mainContent}>
@@ -177,6 +215,20 @@ const HeroSelect = () => {
             ))}
           </div>
 
+          {/* Error Message */}
+          {error && (
+            <div style={{ 
+              color: '#ff4757', 
+              textAlign: 'center', 
+              marginTop: '1rem',
+              padding: '0.5rem',
+              backgroundColor: 'rgba(255, 71, 87, 0.1)',
+              borderRadius: '4px'
+            }}>
+              {error}
+            </div>
+          )}
+
           {/* Difficulty Selection and Start Button */}
           {mySelectedHero && (
             <div style={{ marginTop: '2.5rem', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '1.5rem' }}>
@@ -186,6 +238,7 @@ const HeroSelect = () => {
                   className={styles.difficultyDropdown}
                   value={selectedDifficulty.value}
                   onChange={handleDifficultyChange}
+                  disabled={loading}
                 >
                   {DIFFICULTY_OPTIONS.map(option => (
                     <option key={option.value} value={option.value}>
@@ -195,8 +248,15 @@ const HeroSelect = () => {
                 </select>
               </div>
               
-              <button className={styles.startButton} onClick={handleStartGame}>
-                <span className={styles.buttonText}>BEGIN ADVENTURE</span>
+              <button 
+                className={styles.startButton} 
+                onClick={handleStartGame}
+                disabled={loading}
+                style={{ opacity: loading ? 0.7 : 1 }}
+              >
+                <span className={styles.buttonText}>
+                  {loading ? 'STARTING...' : 'BEGIN ADVENTURE'}
+                </span>
                 <div className={styles.buttonGlow} />
               </button>
             </div>
