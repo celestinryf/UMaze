@@ -8,7 +8,8 @@ import styles from './play.module.css';
  * - Pokemon-style battle overlay system
  * - Turn-based combat with attack/special attack options
  * - Potion usage allowed during battle for strategic healing
- * - Real-time maze navigation with arrow keys
+ * - Real-time maze navigation with arrow keys AND WASD
+ * - On-screen movement buttons for touch/mouse control
  * - Collectible pillars and potions
  * - Save/load game functionality
  * - Visual health bars and battle animations
@@ -46,11 +47,20 @@ const POTION_TYPES = {
   2: 'Attack'
 };
 
+// Extended directions to include both arrow keys and WASD
 const DIRECTIONS = {
   ArrowUp: [-1, 0],
   ArrowDown: [1, 0],
   ArrowLeft: [0, -1],
-  ArrowRight: [0, 1]
+  ArrowRight: [0, 1],
+  w: [-1, 0],
+  W: [-1, 0],
+  s: [1, 0],
+  S: [1, 0],
+  a: [0, -1],
+  A: [0, -1],
+  d: [0, 1],
+  D: [0, 1]
 };
 
 // Utility functions
@@ -113,6 +123,92 @@ const GameEndScreen = ({ status, message }) => (
     <p>{message}</p>
   </div>
 );
+
+// Movement Controls Component
+const MovementControls = ({ onMove, disabled }) => {
+  const buttonStyle = {
+    padding: '10px 15px',
+    margin: '2px',
+    backgroundColor: disabled ? '#ccc' : '#4CAF50',
+    color: disabled ? '#666' : 'white',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: disabled ? 'not-allowed' : 'pointer',
+    fontSize: '16px',
+    fontWeight: 'bold',
+    minWidth: '50px',
+    userSelect: 'none'
+  };
+
+  const containerStyle = {
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    gap: '5px',
+    padding: '15px',
+    backgroundColor: '#f5f5f5',
+    borderRadius: '10px',
+    border: '2px solid #ddd',
+    marginBottom: '20px'
+  };
+
+  const rowStyle = {
+    display: 'flex',
+    gap: '5px'
+  };
+
+  return (
+    <div style={containerStyle}>
+      <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>Movement Controls</h3>
+      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
+        {/* Top row - Up button */}
+        <div style={rowStyle}>
+          <div style={{ width: '62px' }}></div>
+          <button
+            style={buttonStyle}
+            onClick={() => onMove(-1, 0)}
+            disabled={disabled}
+            title="Move Up (W or Arrow Up)"
+          >
+            ↑
+          </button>
+          <div style={{ width: '62px' }}></div>
+        </div>
+        
+        {/* Middle row - Left, Down, Right buttons */}
+        <div style={rowStyle}>
+          <button
+            style={buttonStyle}
+            onClick={() => onMove(0, -1)}
+            disabled={disabled}
+            title="Move Left (A or Arrow Left)"
+          >
+            ←
+          </button>
+          <button
+            style={buttonStyle}
+            onClick={() => onMove(1, 0)}
+            disabled={disabled}
+            title="Move Down (S or Arrow Down)"
+          >
+            ↓
+          </button>
+          <button
+            style={buttonStyle}
+            onClick={() => onMove(0, 1)}
+            disabled={disabled}
+            title="Move Right (D or Arrow Right)"
+          >
+            →
+          </button>
+        </div>
+      </div>
+      <p style={{ margin: '10px 0 0 0', fontSize: '12px', color: '#666', textAlign: 'center' }}>
+        Use WASD or Arrow Keys for keyboard control
+      </p>
+    </div>
+  );
+};
 
 // Battle Overlay Component
 const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, onUsePotion, battleMessage, collectedPotions }) => (
@@ -334,7 +430,15 @@ const Play = () => {
     }
   }, [gameData, inBattle]);
 
-  // Keyboard controls
+  // Handle movement from buttons (relative movement)
+  const handleButtonMove = useCallback((deltaRow, deltaCol) => {
+    if (!gameData || inBattle) return;
+    
+    const { coords } = gameData.Maze;
+    movePlayer(coords.row + deltaRow, coords.col + deltaCol);
+  }, [gameData, inBattle, movePlayer]);
+
+  // Keyboard controls (now supports both arrow keys and WASD)
   useEffect(() => {
     const handleKeyDown = (e) => {
       if (!gameData || !DIRECTIONS[e.key] || inBattle) return;
@@ -509,6 +613,12 @@ const Play = () => {
           })}
         </div>
       </div>
+
+      {/* Movement Controls */}
+      <MovementControls 
+        onMove={handleButtonMove} 
+        disabled={inBattle}
+      />
 
       {/* Maze Grid */}
       <div className={styles.mazeSection}>
