@@ -12,19 +12,26 @@ import (
 func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Recieved %s request to %s", r.Method, r.URL.Path)
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodPut:
 		// get username
 		var CurrPotion struct {
-			PotionType int    `json:"potion_type"`
-			Username   string `json:"username"`
+			PotionType int `json:"potion_type"`
+			// Username   string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&CurrPotion); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 		// get redis game
-		game := s.redisGetGame(CurrPotion.Username)
+		game := s.redisGetGame(username)
 		// update potion
 		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.HealingPotion) {
 			if game.TheHero.Name == "PRIMO" {
@@ -43,7 +50,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		// save to redis
-		s.redisSetGame(CurrPotion.Username, game)
+		s.redisSetGame(username, game)
 		// send to front end
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)

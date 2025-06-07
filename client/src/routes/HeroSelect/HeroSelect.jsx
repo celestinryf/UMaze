@@ -2,6 +2,7 @@ import React, { useState, useContext } from 'react';
 import styles from './HeroSelect.module.css';
 import { useNavigate } from 'react-router-dom';
 import { AudioContext } from '../../context/AudioContext';
+import { gameAPI } from '../../services/api.js';
 import clickSFX from '../../assets/click.mp3';
 import startSFX from '../../assets/startGame.mp3';
 import nickImg from '../../assets/nick.png';
@@ -96,22 +97,13 @@ const HeroSelect = () => {
   const handleStartGame = async () => {
     playSFX(startSFX);
     console.log(`Starting game with hero: ${mySelectedHero.name}, difficulty: ${selectedDifficulty.label} (maze size: ${selectedDifficulty.value})`);
+    
     try {
-      const res = await fetch('api/game/', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: selectedDifficulty.value, username: "matchew" }),
-      });
-      if (!res.ok) {
-        throw new Error('http err')
-      }
-      const result = await res.json();
-      console.log(result)
+      const result = await gameAPI.startGame(mySelectedHero.id, selectedDifficulty.value);
+      console.log(result);
       myNavigate('/play', { state: { hero: mySelectedHero, difficulty: selectedDifficulty } });
     } catch (error) {
-      console.log("Coulndt set the game")
+      console.log("Couldn't start the game:", error.message);
     }
   };
 

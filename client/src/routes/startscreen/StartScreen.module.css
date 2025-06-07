@@ -30,6 +30,131 @@
   animation: pulse 2s infinite;
 }
 
+/* Username Section Styles */
+.usernameSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2rem;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 4rem;
+}
+
+.usernamePrompt {
+  font-size: 1.8rem;
+  margin: 0;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #fff;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+}
+
+.usernameForm {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  width: 100%;
+}
+
+.usernameInput {
+  padding: 1rem 1.5rem;
+  font-size: 1.2rem;
+  font-weight: 500;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 8px;
+  color: white;
+  text-align: center;
+  letter-spacing: 1px;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.usernameInput::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+  font-style: italic;
+}
+
+.usernameInput:focus {
+  outline: none;
+  border-color: rgba(255, 0, 212, 0.8);
+  background-color: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 15px rgba(255, 0, 212, 0.3);
+  transform: scale(1.02);
+}
+
+.usernameButton {
+  padding: 1rem 2rem;
+  font-size: 1.25rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  background: linear-gradient(45deg, rgba(255, 0, 212, 0.3), rgba(255, 0, 150, 0.3));
+  border: 2px solid rgba(255, 0, 212, 0.7);
+  color: white;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.usernameButton:hover {
+  background: linear-gradient(45deg, rgba(255, 0, 212, 0.5), rgba(255, 0, 150, 0.5));
+  transform: scale(1.05);
+  box-shadow: 0 0 20px rgba(255, 0, 212, 0.6);
+}
+
+.usernameButton:active {
+  transform: scale(0.98);
+}
+
+.usernameHint {
+  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.7);
+  font-style: italic;
+  margin: 0;
+  text-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+}
+
+/* Welcome Section Styles */
+.welcomeSection {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 3rem;
+}
+
+.welcomeText {
+  font-size: 2rem;
+  margin: 0;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.4);
+  letter-spacing: 1px;
+}
+
+.changeUsernameButton {
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  background-color: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: rgba(255, 255, 255, 0.8);
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.changeUsernameButton:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  transform: scale(1.05);
+}
+
+/* Game Buttons */
 .gameButtons {
   display: flex;
   flex-direction: column;
@@ -89,10 +214,30 @@
   .gameTitle {
     font-size: 3rem;
   }
+  
+  .usernamePrompt {
+    font-size: 1.5rem;
+  }
+  
+  .welcomeText {
+    font-size: 1.6rem;
+  }
 }
 
 @media (max-width: 480px) {
   .gameTitle {
     font-size: 2.5rem;
+  }
+  
+  .usernamePrompt {
+    font-size: 1.3rem;
+  }
+  
+  .welcomeText {
+    font-size: 1.4rem;
+  }
+  
+  .usernameInput {
+    font-size: 1rem;
   }
 }

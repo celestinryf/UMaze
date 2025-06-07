@@ -16,43 +16,43 @@ type JsonGame struct {
 func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodGet:
-		var UserJson struct {
-			Username string `json:"username"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&UserJson); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
-			return
-		}
-		if err := json.NewEncoder(w).Encode(s.getSavedGames(UserJson.Username)); err != nil {
+		if err := json.NewEncoder(w).Encode(s.getSavedGames(username)); err != nil {
 			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
 			return
 		}
 	case http.MethodPost:
 		var dataName struct {
-			Name     string `json:"name"`
-			Username string `json:"username"`
+			Name string `json:"name"`
+			// Username string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&dataName); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.saveGame(dataName.Username, dataName.Name)
+		s.saveGame(username, dataName.Name)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
 		})
 	case http.MethodPut: // Load a game
 		var dataId struct {
-			Id       int    `json:"id"`
-			Username string `json:"username"`
+			Id int `json:"id"`
+			// Username string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&dataId); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.loadGame(dataId.Username, dataId.Id)
+		s.loadGame(username, dataId.Id)
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",

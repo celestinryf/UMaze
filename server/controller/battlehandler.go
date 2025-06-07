@@ -10,22 +10,21 @@ import (
 func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Recieved %s request to %s", r.Method, r.URL.Path)
+
+	username := r.URL.Query().Get("username")
+	if username == "" {
+		http.Error(w, "Username is required", http.StatusBadRequest)
+		return
+	}
+
 	switch r.Method {
 	case http.MethodPut:
-		// get username from body
-		var UserJson struct {
-			Username string `json:"username"`
-		}
-		if err := json.NewDecoder(r.Body).Decode(&UserJson); err != nil {
-			http.Error(w, "Invalid request body", http.StatusBadRequest)
-			return
-		}
 		// get game from redis
-		game := s.redisGetGame(UserJson.Username)
+		game := s.redisGetGame(username)
 		// update game
 		game.Attack()
 		//  save to redis
-		s.redisSetGame(UserJson.Username, game)
+		s.redisSetGame(username, game)
 		// send to frontend
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)

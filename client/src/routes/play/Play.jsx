@@ -1,29 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
+import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../services/api.js';
 import styles from './play.module.css';
 
 /*
- * Maze Adventure Game Component
- * Features: meow
- * - Pokemon-style battle overlay system
- * - Turn-based combat with attack/special attack options
- * - Potion usage allowed during battle for strategic healing
- * - Real-time maze navigation with arrow keys AND WASD
- * - On-screen movement buttons for touch/mouse control
- * - Collectible pillars and potions
- * - Save/load game functionality
- * - Visual health bars and battle animations
- * - Debug mode: Game Over bypass for testing
- * 
- * Battle System:
- * - Encounters trigger a full-screen overlay
- * - Game content is dimmed and disabled during battle
- * - Players can use potions during combat for strategic advantage
- * - Victory allows continuation
- * 
- * Debug Features:
- * - Toggle to bypass Game Over screen and continue playing after death
- * - Visual indicators when playing in "ghost mode"
+ * Maze Adventure Game Component - Updated for new API service layer
+ * Uses centralized API service with automatic username handling
  */
 
 // Constants
@@ -65,19 +47,6 @@ const DIRECTIONS = {
 
 // Utility functions
 const getName = (type, mapping) => mapping[type] || 'Unknown';
-
-// Reusable API function
-const apiCall = async (url, method = 'GET', body = null) => {
-  const options = {
-    method,
-    headers: method !== 'GET' ? { 'Content-Type': 'application/json' } : {},
-    ...(body && { body: JSON.stringify(body) })
-  };
-  
-  const res = await fetch(url, options);
-  if (!res.ok) throw new Error(`${method} failed: ${res.status} ${res.statusText}`);
-  return res.json();
-};
 
 // Reusable Components
 const HealthBar = ({ current, total, label, showLabel = true, className = '' }) => (
@@ -243,7 +212,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             <h3>{hero.Name}</h3>
             <HealthBar 
               current={hero.CurrHealth} 
-              total={hero.TotalHealh} 
+              total={hero.TotalHealth} 
               showLabel={false}
               className={styles.battleHealthBar}
             />
@@ -277,7 +246,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
           
           {/* Potion Actions */}
           {[1, 2].map(potion => {
-            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 69;
+            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
             const canUse = count > 0;
             const potionName = getName(potion, POTION_TYPES);
 
@@ -308,6 +277,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
 
 const Play = () => {
   const location = useLocation();
+  const navigate = useNavigate();
   const [gameData, setGameData] = useState(null);
   const [error, setError] = useState(null);
   const [showDebug, setShowDebug] = useState(false);
@@ -317,25 +287,57 @@ const Play = () => {
   const [inBattle, setInBattle] = useState(false);
   const [battleMessage, setBattleMessage] = useState("");
 
+  // Get username from API service
+  const username = hasUsername() ? getDisplayUsername() : null;
+
+  // Check for username and redirect if not found
+  useEffect(() => {
+    if (!username) {
+      navigate('/');
+    }
+  }, [username, navigate]);
+
   // Fetch game data on mount
   useEffect(() => {
-    apiCall('/api/game')
+    if (!username) return;
+    
+    gameAPI.getGame()
       .then(data => {
         setGameData(data);
         // Check if we should be in battle on load
-        const currentRoom = data?.Maze?.Grid?.[data.Maze.coords.row]?.[data.Maze.coords.col];
+        const currentRoom = data?.Maze?.Grid?.[data.Maze.CurrCoords.X]?.[data.Maze.CurrCoords.Y];
         if (currentRoom?.RoomMonster) {
           setInBattle(true);
           setBattleMessage(`A wild ${currentRoom.RoomMonster.Name} appears!`);
         }
       })
-      .catch(err => setError(`Failed to fetch game state: ${err.message}`));
-  }, []);
+      .catch(err => {
+        if (err.message.includes('404')) {
+          // No active game found, might need to start a new one
+          setError('No active game found. Please start a new game.');
+        } else {
+          setError(`Failed to fetch game state: ${err.message}`);
+        }
+      });
+  }, [username]);
+
+  // Auto-save game every 30 seconds
+  useEffect(() => {
+    if (!gameData || !username) return;
+    
+    const autoSaveInterval = setInterval(() => {
+      // Game is automatically saved to Redis on every action
+      // This is just a reminder that the game is being saved
+      console.log('Game auto-saved to cloud');
+    }, 30000);
+
+    return () => clearInterval(autoSaveInterval);
+  }, [gameData, username]);
 
   // Game actions
   const saveGame = async () => {
     try {
-      await apiCall('/api/load/', 'POST', { Name: gName , username: "matchew"});
+      await saveLoadAPI.saveGame(gName);
       setgName("");
       setGMessage('Game saved successfully!');
     } catch (err) {
@@ -345,10 +347,10 @@ const Play = () => {
 
   const attackMonster = async (isSpecial = false) => {
     try {
-      const result = await apiCall('/api/battle', 'PUT', {username: "matchew"});
+      const result = await gameAPI.attack();
       setGameData(result);
       
-      const monster = result?.Maze?.Grid?.[result.Maze.coords.row]?.[result.Maze.coords.col]?.RoomMonster;
+      const monster = result?.Maze?.Grid?.[result.Maze.CurrCoords.X]?.[result.Maze.CurrCoords.Y]?.RoomMonster;
       const attackType = isSpecial ? 'special attack' : 'attack';
       
       if (monster) {
@@ -370,7 +372,7 @@ const Play = () => {
   const continueBattle = async () => {
     try {
       // Fetch updated game state from backend after monster defeat
-      const updatedData = await apiCall('/api/game', {username: "matchew"});
+      const updatedData = await gameAPI.getGame();
       setGameData(updatedData);
       setInBattle(false);
       setBattleMessage("");
@@ -385,7 +387,7 @@ const Play = () => {
 
   const usePotion = async (potionType) => {
     try {
-      const result = await apiCall('/api/potion', 'PUT', { potion_type: potionType, username: "matchew" });
+      const result = await gameAPI.usePotion(potionType);
       setGameData(result);
       setGMessage(`Used ${getName(potionType, POTION_TYPES)} Potion!`);
     } catch (err) {
@@ -393,34 +395,34 @@ const Play = () => {
     }
   };
 
-  const movePlayer = useCallback(async (newRow, newCol) => {
+  const movePlayer = useCallback(async (newX, newY) => {
     if (!gameData || inBattle) return;
     
     const { Maze } = gameData;
-    const { Grid, coords } = Maze;
+    const { Grid, CurrCoords } = Maze;
 
-    if (Grid[coords.row][coords.col].RoomMonster) {
+    if (Grid[CurrCoords.X][CurrCoords.Y].RoomMonster) {
       setInBattle(true);
-      setBattleMessage(`A wild ${Grid[coords.row][coords.col].RoomMonster.Name} blocks your path!`);
+      setBattleMessage(`A wild ${Grid[CurrCoords.X][CurrCoords.Y].RoomMonster.Name} blocks your path!`);
       return;
     }
 
     if (
-      newRow < 0 || newRow >= Grid.length ||
-      newCol < 0 || newCol >= Grid[0].length ||
-      Grid[newRow][newCol].RoomType === 0
+      newX < 0 || newX >= Grid.length ||
+      newY < 0 || newY >= Grid[0].length ||
+      Grid[newX][newY].RoomType === 0
     ) {
       setGMessage("Invalid move: Wall or out of bounds.");
       return;
     }
 
     try {
-      const updatedData = await apiCall('/api/move', 'PUT', { row: newRow, col: newCol , username: "matchew"});
+      const updatedData = await gameAPI.move({ x: newX, y: newY });
       setGameData(updatedData);
-      setGMessage(`Moved to row ${newRow + 1}, col ${newCol + 1}`);
+      setGMessage(`Moved to row ${newX + 1}, col ${newY + 1}`);
       
       // Check if new room has a monster
-      const newRoom = updatedData.Maze.Grid[newRow][newCol];
+      const newRoom = updatedData.Maze.Grid[newX][newY];
       if (newRoom.RoomMonster) {
         setInBattle(true);
         setBattleMessage(`A wild ${newRoom.RoomMonster.Name} appears!`);
@@ -431,11 +433,11 @@ const Play = () => {
   }, [gameData, inBattle]);
 
   // Handle movement from buttons (relative movement)
-  const handleButtonMove = useCallback((deltaRow, deltaCol) => {
+  const handleButtonMove = useCallback((deltaX, deltaY) => {
     if (!gameData || inBattle) return;
     
-    const { coords } = gameData.Maze;
-    movePlayer(coords.row + deltaRow, coords.col + deltaCol);
+    const { CurrCoords } = gameData.Maze;
+    movePlayer(CurrCoords.X + deltaX, CurrCoords.Y + deltaY);
   }, [gameData, inBattle, movePlayer]);
 
   // Keyboard controls (now supports both arrow keys and WASD)
@@ -443,9 +445,9 @@ const Play = () => {
     const handleKeyDown = (e) => {
       if (!gameData || !DIRECTIONS[e.key] || inBattle) return;
       
-      const { coords } = gameData.Maze;
-      const [dRow, dCol] = DIRECTIONS[e.key];
-      movePlayer(coords.row + dRow, coords.col + dCol);
+      const { CurrCoords } = gameData.Maze;
+      const [dX, dY] = DIRECTIONS[e.key];
+      movePlayer(CurrCoords.X + dX, CurrCoords.Y + dY);
     };
 
     window.addEventListener('keydown', handleKeyDown);
@@ -459,8 +461,11 @@ const Play = () => {
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Error</h2>
         <p className={styles.errorMessage}>{error}</p>
-        <button onClick={() => window.location.reload()} className={styles.retryButton}>
-          Retry
+        <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
+          Start New Game
+        </button>
+        <button onClick={() => navigate('/')} className={styles.retryButton}>
+          Back to Menu
         </button>
       </div>
     );
@@ -471,6 +476,7 @@ const Play = () => {
       <div className={styles.loadingContainer}>
         <h1 className={styles.gameTitle}>Maze Adventure</h1>
         <h2>Loading Maze...</h2>
+        <p>Player: {username}</p>
         <div className={styles.loadingSpinner}></div>
       </div>
     );
@@ -487,14 +493,14 @@ const Play = () => {
 
   // Game state
   const { Maze, Hero } = gameData;
-  const { Grid, coords } = Maze;
-  const currentRoom = Grid[coords.row][coords.col];
+  const { Grid, CurrCoords } = Maze;
+  const currentRoom = Grid[CurrCoords.X][CurrCoords.Y];
   const collectedPillars = Hero.AquiredPillars || [];
   const collectedPotions = new Map(Object.entries(Hero.AquiredPotions || {}));
 
   // Cell class helper
   const getCellClasses = (cell, rowIndex, colIndex) => {
-    const isCurrent = rowIndex === coords.row && colIndex === coords.col;
+    const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
     const roomTypeClass = {
       0: styles.wall,
       1: styles.entrance,
@@ -512,7 +518,7 @@ const Play = () => {
   return (
     <div className={styles.mazeGame}>
       <h1 className={styles.gameTitle}>
-        Maze Adventure
+        Maze Adventure - {username}
         {gameData.Status === "Lost" && bypassGameOver && (
           <span className={styles.debugStatus}> [DEBUG: Playing as Ghost]</span>
         )}
@@ -536,16 +542,18 @@ const Play = () => {
       <div className={inBattle ? styles.dimmedContent : ''}>
         {/* Save Game Section */}
         <div className={styles.saveSection}>
-          <label htmlFor="gameName">Game Name: </label>
+          <label htmlFor="gameName">Save Game As: </label>
           <input
             type="text"
             id="gameName"
             value={gName}
             onChange={e => setgName(e.target.value)}
             disabled={inBattle}
+            placeholder="Enter save name..."
           />
-          <button onClick={saveGame} disabled={inBattle}>Save Game</button>
+          <button onClick={saveGame} disabled={inBattle || !gName.trim()}>Save to Database</button>
           <p className={styles.saveMessage}>{gMessage}</p>
+          <small style={{ color: '#666' }}>Your game is auto-saved to the cloud every action</small>
         </div>
 
         {/* Hero Stats */}
@@ -553,7 +561,7 @@ const Play = () => {
           title="Hero"
           stats={
             <>
-              <HealthBar current={Hero.CurrHealth} total={Hero.TotalHealh} label="Health" />
+              <HealthBar current={Hero.CurrHealth} total={Hero.TotalHealth} label="Health" />
               <div className={styles.statItem}>
                 <span className={styles.statLabel}>Attack:</span> {Hero.Attack}
               </div>
@@ -589,7 +597,7 @@ const Play = () => {
         <h2>Potions Collected</h2>
         <div className={styles.potionsContainer}>
           {[1, 2].map(potion => {
-            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 69;
+            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
             const canUse = count > 0;
 
             return (
@@ -627,7 +635,7 @@ const Play = () => {
           {Grid.map((row, rowIndex) => (
             <div key={rowIndex} className={styles.mazeRow}>
               {row.map((cell, colIndex) => {
-                const isCurrent = rowIndex === coords.row && colIndex === coords.col;
+                const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
                 const isWall = cell.RoomType === 0;
 
                 return (
