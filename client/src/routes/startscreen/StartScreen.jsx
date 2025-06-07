@@ -4,8 +4,77 @@ import { useNavigate } from 'react-router-dom';
 import styles from './StartScreen.module.css';
 import backgroundImg from '../../assets/background.jpg';
 import { AudioContext } from '../../context/AudioContext';
-import { setUsername, hasUsername, getDisplayUsername } from '../../context/api';
+import { setUsername, hasUsername, getDisplayUsername, checkUsernameAvailability } from '../../context/api';
 import clickSFX from '../../assets/click.mp3';
+
+// Username validation utility class
+class UsernameValidator {
+  static MIN_LENGTH = 3;
+  static MAX_LENGTH = 20;
+  static DEBOUNCE_DELAY = 500;
+
+  static validateFormat(username) {
+    if (!username || username.length < this.MIN_LENGTH) {
+      return `Username must be at least ${this.MIN_LENGTH} characters`;
+    }
+    if (username.length > this.MAX_LENGTH) {
+      return `Username must be ${this.MAX_LENGTH} characters or less`;
+    }
+    if (!/^[a-zA-Z0-9_-]+$/.test(username)) {
+      return 'Username can only contain letters, numbers, hyphens, and underscores';
+    }
+    if (/^[_-]/.test(username) || /[_-]$/.test(username)) {
+      return 'Username cannot start or end with underscore or hyphen';
+    }
+    return null;
+  }
+
+  static async checkAvailability(username) {
+    try {
+      const result = await checkUsernameAvailability(username);
+      return result.available ? null : 'Username is already taken';
+    } catch (error) {
+      console.error('Error checking username availability:', error);
+      return 'Error checking username. Please try again.';
+    }
+  }
+}
+
+// Custom hook for username validation with debouncing
+function useUsernameValidation() {
+  const [status, setStatus] = useState({
+    isChecking: false,
+    message: '',
+    isValid: false,
+    type: 'idle' // 'idle', 'error', 'success', 'checking'
+  });
+
+  const validateUsername = async (username) => {
+    if (!username.trim()) {
+      setStatus({ isChecking: false, message: '', isValid: false, type: 'idle' });
+      return;
+    }
+
+    // Format validation first
+    const formatError = UsernameValidator.validateFormat(username);
+    if (formatError) {
+      setStatus({ isChecking: false, message: formatError, isValid: false, type: 'error' });
+      return;
+    }
+
+    // Availability check
+    setStatus({ isChecking: true, message: 'Checking availability...', isValid: false, type: 'checking' });
+    
+    const availabilityError = await UsernameValidator.checkAvailability(username);
+    if (availabilityError) {
+      setStatus({ isChecking: false, message: availabilityError, isValid: false, type: 'error' });
+    } else {
+      setStatus({ isChecking: false, message: '✓ Username is available!', isValid: true, type: 'success' });
+    }
+  };
+
+  return { status, validateUsername };
+}
 
 function StartScreen() {
   const navigate = useNavigate();
@@ -13,6 +82,7 @@ function StartScreen() {
   const [usernameInput, setUsernameInput] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
   const [showButtons, setShowButtons] = useState(false);
+  const { status: validationStatus, validateUsername } = useUsernameValidation();
 
   useEffect(() => {
     // Check if user already has a username
@@ -22,7 +92,18 @@ function StartScreen() {
     }
   }, []);
 
-  const handleUsernameSubmit = (e) => {
+  // Debounced validation effect
+  useEffect(() => {
+    const timeoutId = setTimeout(() => {
+      if (usernameInput && !showButtons) {
+        validateUsername(usernameInput);
+      }
+    }, UsernameValidator.DEBOUNCE_DELAY);
+
+    return () => clearTimeout(timeoutId);
+  }, [usernameInput, showButtons, validateUsername]);
+
+  const handleUsernameSubmit = async (e) => {
     e.preventDefault();
     
     if (!usernameInput.trim()) {
@@ -30,8 +111,8 @@ function StartScreen() {
       return;
     }
 
-    if (usernameInput.trim().length < 2) {
-      alert('Username must be at least 2 characters long');
+    if (!validationStatus.isValid) {
+      alert(validationStatus.message || 'Please enter a valid username');
       return;
     }
 
@@ -57,6 +138,36 @@ function StartScreen() {
     setCurrentUsername('');
   };
 
+  const getInputClassName = () => {
+    let className = styles.usernameInput;
+    if (validationStatus.type === 'error') className += ` ${styles.inputError}`;
+    if (validationStatus.type === 'success') className += ` ${styles.inputSuccess}`;
+    return className;
+  };
+
+  const getStatusMessage = () => {
+    if (!validationStatus.message) return null;
+    
+    return (
+      <div className={`${styles.statusMessage} ${styles[validationStatus.type]}`}>
+        {validationStatus.isChecking && <span className={styles.spinner}></span>}
+        {validationStatus.message}
+      </div>
+    );
+  };
+
+  const getUsernameGuidelines = () => (
+    <div className={styles.usernameGuidelines}>
+      <strong>Username Requirements:</strong>
+      <ul>
+        <li>{UsernameValidator.MIN_LENGTH}-{UsernameValidator.MAX_LENGTH} characters long</li>
+        <li>Letters, numbers, hyphens (-), and underscores (_) only</li>
+        <li>Cannot start or end with hyphen or underscore</li>
+        <li>Must be unique</li>
+      </ul>
+    </div>
+  );
+
   return (
     <div
       className={styles.gameContainer}
@@ -80,14 +191,24 @@ function StartScreen() {
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
                 placeholder="Your username..."
-                className={styles.usernameInput}
-                maxLength={20}
+                className={getInputClassName()}
+                maxLength={UsernameValidator.MAX_LENGTH}
                 autoFocus
               />
-              <button type="submit" className={styles.usernameButton}>
-                BEGIN QUEST
+              
+              {getStatusMessage()}
+              
+              <button 
+                type="submit" 
+                className={styles.usernameButton}
+                disabled={!validationStatus.isValid}
+              >
+                {validationStatus.isValid ? 'BEGIN QUEST' : 'ENTER VALID USERNAME'}
               </button>
             </form>
+            
+            {getUsernameGuidelines()}
+            
             <p className={styles.usernameHint}>
               Choose a name that will strike fear into the hearts of monsters!
             </p>
