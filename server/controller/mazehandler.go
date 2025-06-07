@@ -8,14 +8,12 @@ import (
 	"github.com/celestinryf/go-backend/model"
 )
 
-// Handle functions in the game, like attacking a monster
 func (s *Server) MoveHandler(w http.ResponseWriter, r *http.Request) {
 	log.Println("This should be triggering")
 
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Received %s request to %s", r.Method, r.URL.Path)
 
-	// Get username from query params
 	username := r.URL.Query().Get("username")
 	if username == "" {
 		http.Error(w, "Username is required", http.StatusBadRequest)
@@ -23,8 +21,7 @@ func (s *Server) MoveHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	switch r.Method {
-	case http.MethodPut: // gives an x and a y and change to that location
-		// Get game from Redis
+	case http.MethodPut:
 		game, err := s.getGameFromRedis(username)
 		if err != nil {
 			log.Printf("No game found for user %s: %v", username, err)
@@ -44,7 +41,6 @@ func (s *Server) MoveHandler(w http.ResponseWriter, r *http.Request) {
 		log.Println(game.TheMaze.CurrCoords.X)
 		log.Println(game.TheMaze.CurrCoords.Y)
 
-		// Save updated game back to Redis
 		if err := s.saveGameToRedis(username, game); err != nil {
 			log.Printf("Failed to save game to Redis: %v", err)
 			http.Error(w, "Failed to save game state", http.StatusInternalServerError)

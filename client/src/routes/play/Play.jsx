@@ -440,7 +440,7 @@ const Play = () => {
     }
 
     try {
-      const updatedData = await apiCall('/api/move/', 'PUT', { X: newX, Y: newY });
+      const updatedData = await apiCall('/api/move/', 'PUT', { row: newX, col: newY });
       setGameData(updatedData);
       setGMessage(`Moved to row ${newX + 1}, col ${newY + 1}`);
       
