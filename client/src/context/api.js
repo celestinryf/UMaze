@@ -3,166 +3,175 @@
 // For Vercel deployment - both frontend and backend on same domain
 const API_BASE_URL = '/api';
 
-// Generate a unique username with timestamp and random suffix
-const generateUniqueUsername = (baseUsername) => {
-  const timestamp = Date.now();
-  const randomSuffix = Math.random().toString(36).substring(2, 8);
-  // return `${baseUsername}_${timestamp}_${randomSuffix}`;
-  return baseUsername;
+// Username management functions
+const setUsername = (username) => {
+  localStorage.setItem('gameUsername', username);
 };
 
-// Set username in localStorage with unique identifier
-export const setUsername = (username) => {
-  if (!username || username.trim() === '') {
-    throw new Error('Username cannot be empty');
-  }
-  
-  // Clean the username (remove spaces, special chars)
-  const cleanUsername = username.trim().replace(/[^a-zA-Z0-9]/g, '').toLowerCase();
-  
-  // Generate unique version
-  const uniqueUsername = generateUniqueUsername(cleanUsername);
-  
-  // Store both original and unique versions
-  localStorage.setItem('gameUsername', uniqueUsername);
-  localStorage.setItem('displayUsername', username.trim());
-  
-  return uniqueUsername;
-};
-
-// Get unique username from localStorage
 const getUsername = () => {
-  let username = localStorage.getItem('gameUsername');
-  
-  // If no username exists, create a unique anonymous one
-  if (!username) {
-    username = generateUniqueUsername('anonymous');
-    localStorage.setItem('gameUsername', username);
-    localStorage.setItem('displayUsername', 'Anonymous');
-  }
-  
-  return username;
+  return localStorage.getItem('gameUsername');
 };
 
-// Get display username (what user originally entered)
-export const getDisplayUsername = () => {
-  return localStorage.getItem('displayUsername') || 'Anonymous';
+const getDisplayUsername = () => {
+  return getUsername() || 'Anonymous';
 };
 
-// Clear username (for logout/reset)
-export const clearUsername = () => {
+const hasUsername = () => {
+  return !!getUsername();
+};
+
+const clearUsername = () => {
   localStorage.removeItem('gameUsername');
-  localStorage.removeItem('displayUsername');
 };
 
-// Check if username is set
-export const hasUsername = () => {
-  return !!localStorage.getItem('gameUsername');
-};
+// Base API helper
+const apiRequest = async (endpoint, options = {}) => {
+  const {
+    method = 'GET',
+    body = null,
+    requiresUsername = true,
+    queryParams = {}
+  } = options;
 
-// Game API calls
-export const gameAPI = {
-  // Start a new game
-  startGame: async (heroId, mazeSize) => {
+  // Get username if required
+  if (requiresUsername) {
     const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/game/?username=${encodeURIComponent(username)}`, {
+    if (!username) {
+      throw new Error('No username set');
+    }
+    queryParams.username = username;
+  }
+
+  // Build URL with query parameters
+  const url = new URL(`${API_BASE_URL}/${endpoint}`, window.location.origin);
+  Object.entries(queryParams).forEach(([key, value]) => {
+    url.searchParams.append(key, value);
+  });
+
+  // Build fetch options
+  const fetchOptions = {
+    method,
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  };
+
+  if (body) {
+    fetchOptions.body = JSON.stringify(body);
+  }
+
+  // Make request
+  const response = await fetch(url.toString(), fetchOptions);
+
+  // Handle response
+  if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('Resource not found');
+    }
+    throw new Error(`HTTP error! status: ${response.status}`);
+  }
+
+  return response.json();
+};
+
+// Check if username is available
+const checkUsernameAvailability = async (username) => {
+  return apiRequest('load', {
+    requiresUsername: false,
+    queryParams: { 
+      username: username, 
+      check: 'availability' 
+    }
+  });
+};
+
+// Game API functions
+const gameAPI = {
+  // Start a new game - FIXED: Added required parameters
+  startGame: async (heroId, mazeSize) => {
+    return apiRequest('game', { 
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ 
-        hero_id: heroId, 
-        maze_size: mazeSize 
-      }),
+      body: {
+        hero_id: heroId,
+        maze_size: mazeSize
+      }
     });
-    if (!response.ok) throw new Error('Failed to start game');
-    return response.json();
   },
 
   // Get current game state
   getGame: async () => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/game/?username=${encodeURIComponent(username)}`);
-    if (!response.ok) throw new Error('Failed to get game');
-    return response.json();
+    try {
+      return await apiRequest('game');
+    } catch (err) {
+      if (err.message === 'Resource not found') {
+        throw new Error('No active game found');
+      }
+      throw err;
+    }
   },
 
-  // Move player (expects x, y coordinates)
+  // Move player - FIXED: Backend expects new_coords, not direction
   move: async (newCoords) => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/move/?username=${encodeURIComponent(username)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ new_coords: newCoords }),
+    return apiRequest('move', { 
+      method: 'PUT', 
+      body: { new_coords: newCoords }
     });
-    if (!response.ok) throw new Error('Failed to move');
-    return response.json();
   },
 
-  // Use potion (potionType: 1 = healing, 2 = attack)
-  usePotion: async (potionType) => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/potion/?username=${encodeURIComponent(username)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ potion_type: potionType }),
-    });
-    if (!response.ok) throw new Error('Failed to use potion');
-    return response.json();
-  },
-
-  // Battle action (only attack is available)
+  // Attack monster - FIXED: Changed to /battle with PUT method
   attack: async () => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/battle/?username=${encodeURIComponent(username)}`, {
-      method: 'PUT',
-    });
-    if (!response.ok) throw new Error('Failed to attack');
-    return response.json();
+    return apiRequest('battle', { method: 'PUT' });
   },
+
+  // Use potion - FIXED: Changed to PUT method and potion_type field
+  usePotion: async (potionType) => {
+    return apiRequest('potion', { 
+      method: 'PUT', 
+      body: { potion_type: potionType } 
+    });
+  }
 };
 
-// Save/Load game API calls
-export const saveLoadAPI = {
-  // Get list of saved games
+// Save/Load API functions
+const saveLoadAPI = {
+  // Get saved games list
   getSavedGames: async () => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/load/?username=${encodeURIComponent(username)}`);
-    if (!response.ok) throw new Error('Failed to get saved games');
-    return response.json();
+    return apiRequest('load');
   },
 
   // Save current game
   saveGame: async (gameName) => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/load/?username=${encodeURIComponent(username)}`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ name: gameName }),
+    return apiRequest('load', { 
+      method: 'POST', 
+      body: { name: gameName } 
     });
-    if (!response.ok) throw new Error('Failed to save game');
-    return response.json();
   },
 
   // Load a saved game
   loadGame: async (gameId) => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/load/?username=${encodeURIComponent(username)}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: gameId }),
+    return apiRequest('load', { 
+      method: 'PUT', 
+      body: { id: gameId } 
     });
-    if (!response.ok) throw new Error('Failed to load game');
-    return response.json();
   },
 
   // Delete a saved game
   deleteGame: async (gameId) => {
-    const username = getUsername();
-    const response = await fetch(`${API_BASE_URL}/load/?username=${encodeURIComponent(username)}`, {
-      method: 'DELETE',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: gameId }),
+    return apiRequest('load', { 
+      method: 'DELETE', 
+      body: { id: gameId } 
     });
-    if (!response.ok) throw new Error('Failed to delete game');
-    return response.json();
-  },
+  }
+};
+
+// Export all functions
+export { 
+  gameAPI, 
+  saveLoadAPI, 
+  setUsername, 
+  getUsername, 
+  getDisplayUsername, 
+  hasUsername, 
+  clearUsername,
+  checkUsernameAvailability 
 };
