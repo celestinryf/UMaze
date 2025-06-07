@@ -17,7 +17,7 @@ const (
 // Hero Type with name, totalHealth, currHealth, and attack.
 type Hero struct {
 	Name           string         `json:"Name"`
-	TotalHealth    int            `json:"TotalHealh"`
+	TotalHealth    int            `json:"TotalHealth"`
 	CurrHealth     int            `json:"CurrHealth"`
 	Attack         int            `json:"Attack"`
 	AquiredPillars []Pillar       `json:"AquiredPillars"`

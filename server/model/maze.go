@@ -10,14 +10,14 @@ import (
 
 // Coordinates of the player
 type Coords struct {
-	X int `json:"row"`
-	Y int `json:"col"`
+	X int `json:"X"`
+	Y int `json:"Y"`
 }
 
 // Holds the grid of the maze.
 type Maze struct {
 	Grid       [][]*Room `json:"Grid"`
-	CurrCoords *Coords   `json:"coords"`
+	CurrCoords *Coords   `json:"CurrCoords"`
 }
 
 // Gives the status of the game
