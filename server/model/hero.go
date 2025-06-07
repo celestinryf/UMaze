@@ -14,7 +14,7 @@ const (
 	Celestin
 )
 
-// Hero Type with name, totalHealth, currHealth, and attack.
+// Hero Type with name, totalHealth, currHealth, and attack.vssdvs
 type Hero struct {
 	Name           string         `json:"Name"`
 	TotalHealth    int            `json:"TotalHealth"`
