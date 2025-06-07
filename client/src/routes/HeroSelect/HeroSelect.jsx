@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import styles from './HeroSelect.module.css';
 import { useNavigate } from 'react-router-dom';
 import { AudioContext } from '../../context/AudioContext';
-import { gameAPI } from '../../services/api.js';
+import { gameAPI } from '../../context/api.js';
 import clickSFX from '../../assets/click.mp3';
 import startSFX from '../../assets/startGame.mp3';
 import nickImg from '../../assets/nick.png';

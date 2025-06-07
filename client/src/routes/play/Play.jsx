@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../services/api.js';
+import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import styles from './play.module.css';
 
 /*

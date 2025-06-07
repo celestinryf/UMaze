@@ -4,7 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import styles from './StartScreen.module.css';
 import backgroundImg from '../../assets/background.jpg';
 import { AudioContext } from '../../context/AudioContext';
-import { setUsername, hasUsername, getDisplayUsername } from '../../services/api.js';
+import { setUsername, hasUsername, getDisplayUsername } from '../../context/api';
 import clickSFX from '../../assets/click.mp3';
 
 function StartScreen() {
