@@ -11,7 +11,6 @@ import clickSFX from '../../assets/click.mp3';
 class UsernameValidator {
   static MIN_LENGTH = 3;
   static MAX_LENGTH = 20;
-  static DEBOUNCE_DELAY = 500;
 
   static validateFormat(username) {
     if (!username || username.length < this.MIN_LENGTH) {
@@ -40,49 +39,18 @@ class UsernameValidator {
   }
 }
 
-// Custom hook for username validation with debouncing
-function useUsernameValidation() {
-  const [status, setStatus] = useState({
-    isChecking: false,
-    message: '',
-    isValid: false,
-    type: 'idle' // 'idle', 'error', 'success', 'checking'
-  });
-
-  const validateUsername = async (username) => {
-    if (!username.trim()) {
-      setStatus({ isChecking: false, message: '', isValid: false, type: 'idle' });
-      return;
-    }
-
-    // Format validation first
-    const formatError = UsernameValidator.validateFormat(username);
-    if (formatError) {
-      setStatus({ isChecking: false, message: formatError, isValid: false, type: 'error' });
-      return;
-    }
-
-    // Availability check
-    setStatus({ isChecking: true, message: 'Checking availability...', isValid: false, type: 'checking' });
-    
-    const availabilityError = await UsernameValidator.checkAvailability(username);
-    if (availabilityError) {
-      setStatus({ isChecking: false, message: availabilityError, isValid: false, type: 'error' });
-    } else {
-      setStatus({ isChecking: false, message: '✓ Username is available!', isValid: true, type: 'success' });
-    }
-  };
-
-  return { status, validateUsername };
-}
-
 function StartScreen() {
   const navigate = useNavigate();
   const { playSFX } = useContext(AudioContext);
   const [usernameInput, setUsernameInput] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
   const [showButtons, setShowButtons] = useState(false);
-  const { status: validationStatus, validateUsername } = useUsernameValidation();
+  const [validationStatus, setValidationStatus] = useState({
+    isChecking: false,
+    message: '',
+    isValid: false,
+    type: 'idle' // 'idle', 'error', 'success', 'checking'
+  });
 
   useEffect(() => {
     // Check if user already has a username
@@ -92,27 +60,77 @@ function StartScreen() {
     }
   }, []);
 
-  // Debounced validation effect
+  // Clear validation status when user types (optional - keeps UI clean)
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (usernameInput && !showButtons) {
-        validateUsername(usernameInput);
-      }
-    }, UsernameValidator.DEBOUNCE_DELAY);
+    if (validationStatus.type !== 'idle') {
+      setValidationStatus({
+        isChecking: false,
+        message: '',
+        isValid: false,
+        type: 'idle'
+      });
+    }
+  }, [usernameInput]);
 
-    return () => clearTimeout(timeoutId);
-  }, [usernameInput, showButtons, validateUsername]);
+  const validateUsername = async (username) => {
+    if (!username.trim()) {
+      setValidationStatus({ 
+        isChecking: false, 
+        message: 'Please enter a username', 
+        isValid: false, 
+        type: 'error' 
+      });
+      return false;
+    }
+
+    // Format validation first
+    const formatError = UsernameValidator.validateFormat(username);
+    if (formatError) {
+      setValidationStatus({ 
+        isChecking: false, 
+        message: formatError, 
+        isValid: false, 
+        type: 'error' 
+      });
+      return false;
+    }
+
+    // Availability check
+    setValidationStatus({ 
+      isChecking: true, 
+      message: 'Checking availability...', 
+      isValid: false, 
+      type: 'checking' 
+    });
+    
+    const availabilityError = await UsernameValidator.checkAvailability(username);
+    if (availabilityError) {
+      setValidationStatus({ 
+        isChecking: false, 
+        message: availabilityError, 
+        isValid: false, 
+        type: 'error' 
+      });
+      return false;
+    } else {
+      setValidationStatus({ 
+        isChecking: false, 
+        message: '✓ Username is available!', 
+        isValid: true, 
+        type: 'success' 
+      });
+      return true;
+    }
+  };
 
   const handleUsernameSubmit = async (e) => {
     e.preventDefault();
     
-    if (!usernameInput.trim()) {
-      alert('Please enter a username');
-      return;
-    }
-
-    if (!validationStatus.isValid) {
-      alert(validationStatus.message || 'Please enter a valid username');
+    // Validate username
+    const isValid = await validateUsername(usernameInput.trim());
+    
+    if (!isValid) {
+      // Error message is already set by validateUsername
       return;
     }
 
@@ -121,8 +139,20 @@ function StartScreen() {
       setUsername(usernameInput.trim());
       setCurrentUsername(usernameInput.trim());
       setShowButtons(true);
+      // Clear the validation status when successful
+      setValidationStatus({
+        isChecking: false,
+        message: '',
+        isValid: false,
+        type: 'idle'
+      });
     } catch (error) {
-      alert(error.message);
+      setValidationStatus({ 
+        isChecking: false, 
+        message: error.message || 'Error setting username', 
+        isValid: false, 
+        type: 'error' 
+      });
     }
   };
 
@@ -136,6 +166,12 @@ function StartScreen() {
     setShowButtons(false);
     setUsernameInput('');
     setCurrentUsername('');
+    setValidationStatus({
+      isChecking: false,
+      message: '',
+      isValid: false,
+      type: 'idle'
+    });
   };
 
   const getInputClassName = () => {
@@ -201,9 +237,9 @@ function StartScreen() {
               <button 
                 type="submit" 
                 className={styles.usernameButton}
-                disabled={!validationStatus.isValid}
+                disabled={validationStatus.isChecking}
               >
-                {validationStatus.isValid ? 'BEGIN QUEST' : 'ENTER VALID USERNAME'}
+                {validationStatus.isChecking ? 'CHECKING...' : 'BEGIN QUEST'}
               </button>
             </form>
             
