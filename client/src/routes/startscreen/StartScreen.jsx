@@ -49,6 +49,8 @@ function useUsernameValidation() {
   });
 
   const validateUsername = async (username, force = false) => {
+    console.log('validateUsername called:', { username, force, currentStatus: status });
+    
     if (!username.trim()) {
       setStatus({ isChecking: false, message: '', isValid: false, type: 'idle' });
       return;
@@ -57,6 +59,7 @@ function useUsernameValidation() {
     // Format validation first (always instant, no API call)
     const formatError = UsernameValidator.validateFormat(username);
     if (formatError) {
+      console.log('Format error:', formatError);
       setStatus({ isChecking: false, message: formatError, isValid: false, type: 'error' });
       return;
     }
@@ -69,12 +72,17 @@ function useUsernameValidation() {
     }
 
     // Availability check (only when forced)
+    console.log('Checking availability for:', username);
     setStatus({ isChecking: true, message: 'Checking availability...', isValid: false, type: 'checking' });
     
     const availabilityError = await UsernameValidator.checkAvailability(username);
+    console.log('Availability check result:', { availabilityError });
+    
     if (availabilityError) {
+      console.log('Setting error status:', availabilityError);
       setStatus({ isChecking: false, message: availabilityError, isValid: false, type: 'error' });
     } else {
+      console.log('Username is available!');
       setStatus({ isChecking: false, message: '✓ Username is available!', isValid: true, type: 'success' });
     }
   };
@@ -116,6 +124,7 @@ function StartScreen() {
 
     // Always check availability when button is clicked (if not already valid)
     if (!validationStatus.isValid) {
+      console.log('Validating username before submit:', usernameInput.trim());
       await validateUsername(usernameInput.trim(), true);
       return; // Let the user see the result, they'll need to click again to proceed
     }
@@ -156,7 +165,7 @@ function StartScreen() {
     return (
       <div className={`${styles.statusMessage} ${styles[validationStatus.type]}`}>
         {validationStatus.isChecking && <span className={styles.spinner}></span>}
-        {validationStatus.message}
+        <span>{validationStatus.message}</span>
       </div>
     );
   };
