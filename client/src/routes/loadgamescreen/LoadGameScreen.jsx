@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { saveLoadAPI, hasUsername, getDisplayUsername } from '../../services/api.js';
+import { saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import GameCard from '../../components/GameCard/GameCard';
 
 const LoadGames = () => {
