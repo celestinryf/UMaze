@@ -319,7 +319,7 @@ const Play = () => {
 
   // Fetch game data on mount
   useEffect(() => {
-    apiCall('/api/game')
+    apiCall('/api/game', {username: "matchew"})
       .then(data => {
         setGameData(data);
         // Check if we should be in battle on load
@@ -335,7 +335,7 @@ const Play = () => {
   // Game actions
   const saveGame = async () => {
     try {
-      await apiCall('/api/load/', 'POST', { Name: gName });
+      await apiCall('/api/load/', 'POST', { Name: gName , username: "matchew"});
       setgName("");
       setGMessage('Game saved successfully!');
     } catch (err) {
@@ -345,7 +345,7 @@ const Play = () => {
 
   const attackMonster = async (isSpecial = false) => {
     try {
-      const result = await apiCall('/api/battle', 'PUT', {});
+      const result = await apiCall('/api/battle', 'PUT', {username: "matchew"});
       setGameData(result);
       
       const monster = result?.Maze?.Grid?.[result.Maze.coords.row]?.[result.Maze.coords.col]?.RoomMonster;
@@ -370,7 +370,7 @@ const Play = () => {
   const continueBattle = async () => {
     try {
       // Fetch updated game state from backend after monster defeat
-      const updatedData = await apiCall('/api/game');
+      const updatedData = await apiCall('/api/game', {username: "matchew"});
       setGameData(updatedData);
       setInBattle(false);
       setBattleMessage("");
@@ -385,7 +385,7 @@ const Play = () => {
 
   const usePotion = async (potionType) => {
     try {
-      const result = await apiCall('/api/potion', 'PUT', { potion_type: potionType });
+      const result = await apiCall('/api/potion', 'PUT', { potion_type: potionType, username: "matchew" });
       setGameData(result);
       setGMessage(`Used ${getName(potionType, POTION_TYPES)} Potion!`);
     } catch (err) {
@@ -415,7 +415,7 @@ const Play = () => {
     }
 
     try {
-      const updatedData = await apiCall('/api/move', 'PUT', { row: newRow, col: newCol });
+      const updatedData = await apiCall('/api/move', 'PUT', { row: newRow, col: newCol , username: "matchew"});
       setGameData(updatedData);
       setGMessage(`Moved to row ${newRow + 1}, col ${newCol + 1}`);
       
