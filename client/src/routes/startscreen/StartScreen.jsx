@@ -11,7 +11,6 @@ import clickSFX from '../../assets/click.mp3';
 class UsernameValidator {
   static MIN_LENGTH = 3;
   static MAX_LENGTH = 20;
-  static DEBOUNCE_DELAY = 500;
 
   static validateFormat(username) {
     if (!username || username.length < this.MIN_LENGTH) {
@@ -40,7 +39,7 @@ class UsernameValidator {
   }
 }
 
-// Custom hook for username validation with debouncing
+// Custom hook for username validation with intelligent checking
 function useUsernameValidation() {
   const [status, setStatus] = useState({
     isChecking: false,
@@ -49,20 +48,27 @@ function useUsernameValidation() {
     type: 'idle' // 'idle', 'error', 'success', 'checking'
   });
 
-  const validateUsername = async (username) => {
+  const validateUsername = async (username, force = false) => {
     if (!username.trim()) {
       setStatus({ isChecking: false, message: '', isValid: false, type: 'idle' });
       return;
     }
 
-    // Format validation first
+    // Format validation first (always instant, no API call)
     const formatError = UsernameValidator.validateFormat(username);
     if (formatError) {
       setStatus({ isChecking: false, message: formatError, isValid: false, type: 'error' });
       return;
     }
 
-    // Availability check
+    // Only check availability if format is valid AND we're forced to check
+    if (!force) {
+      // Just show that format is valid, don't mention checking availability
+      setStatus({ isChecking: false, message: '', isValid: false, type: 'idle' });
+      return;
+    }
+
+    // Availability check (only when forced)
     setStatus({ isChecking: true, message: 'Checking availability...', isValid: false, type: 'checking' });
     
     const availabilityError = await UsernameValidator.checkAvailability(username);
@@ -92,16 +98,21 @@ function StartScreen() {
     }
   }, []);
 
-  // Debounced validation effect
+  // Only validate format as user types, check availability when they finish
   useEffect(() => {
-    const timeoutId = setTimeout(() => {
-      if (usernameInput && !showButtons) {
-        validateUsername(usernameInput);
-      }
-    }, UsernameValidator.DEBOUNCE_DELAY);
-
-    return () => clearTimeout(timeoutId);
+    if (usernameInput && !showButtons) {
+      // Only format validation, no API calls
+      validateUsername(usernameInput, false);
+    }
   }, [usernameInput, showButtons, validateUsername]);
+
+  // Handle when user finishes typing and leaves the input
+  const handleInputBlur = () => {
+    if (usernameInput.trim() && validationStatus.type !== 'error') {
+      // Now check availability with API call
+      validateUsername(usernameInput.trim(), true);
+    }
+  };
 
   const handleUsernameSubmit = async (e) => {
     e.preventDefault();
@@ -109,6 +120,12 @@ function StartScreen() {
     if (!usernameInput.trim()) {
       alert('Please enter a username');
       return;
+    }
+
+    // If we haven't checked availability yet, check it now
+    if (validationStatus.type === 'idle' && !validationStatus.isValid) {
+      await validateUsername(usernameInput.trim(), true);
+      return; // Let the user see the result before proceeding
     }
 
     if (!validationStatus.isValid) {
@@ -190,6 +207,7 @@ function StartScreen() {
                 type="text"
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
+                onBlur={handleInputBlur}
                 placeholder="Your username..."
                 className={getInputClassName()}
                 maxLength={UsernameValidator.MAX_LENGTH}
@@ -201,16 +219,20 @@ function StartScreen() {
               <button 
                 type="submit" 
                 className={styles.usernameButton}
-                disabled={!validationStatus.isValid}
+                disabled={!usernameInput.trim() || validationStatus.type === 'error'}
               >
-                {validationStatus.isValid ? 'BEGIN QUEST' : 'ENTER VALID USERNAME'}
+                {validationStatus.isValid ? 'BEGIN QUEST' : 
+                 validationStatus.type === 'error' ? 'FIX USERNAME' :
+                 validationStatus.type === 'checking' ? 'CHECKING...' :
+                 usernameInput.trim() ? 'CHECK AVAILABILITY' : 'ENTER USERNAME'}
               </button>
             </form>
             
             {getUsernameGuidelines()}
             
             <p className={styles.usernameHint}>
-              Choose a name that will strike fear into the hearts of monsters!
+              Choose a name that will strike fear into the hearts of monsters!<br/>
+              <small style={{opacity: 0.8}}>Click outside the text box or press TAB to check availability</small>
             </p>
           </div>
         ) : (
