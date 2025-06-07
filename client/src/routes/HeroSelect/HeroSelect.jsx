@@ -102,7 +102,7 @@ const HeroSelect = () => {
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: selectedDifficulty.value }),
+        body: JSON.stringify({ hero_id: mySelectedHero.id, maze_size: selectedDifficulty.value, username: "matchew" }),
       });
       if (!res.ok) {
         throw new Error('http err')

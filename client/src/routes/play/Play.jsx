@@ -319,7 +319,7 @@ const Play = () => {
 
   // Fetch game data on mount
   useEffect(() => {
-    apiCall('/api/game', 'GET', {username: "matchew"})
+    apiCall('/api/game')
       .then(data => {
         setGameData(data);
         // Check if we should be in battle on load
