@@ -98,21 +98,13 @@ function StartScreen() {
     }
   }, []);
 
-  // Only validate format as user types, check availability when they finish
+  // Only validate format as user types, NO availability checking until button click
   useEffect(() => {
     if (usernameInput && !showButtons) {
-      // Only format validation, no API calls
+      // Only format validation, no API calls ever
       validateUsername(usernameInput, false);
     }
   }, [usernameInput, showButtons, validateUsername]);
-
-  // Handle when user finishes typing and leaves the input
-  const handleInputBlur = () => {
-    if (usernameInput.trim() && validationStatus.type !== 'error') {
-      // Now check availability with API call
-      validateUsername(usernameInput.trim(), true);
-    }
-  };
 
   const handleUsernameSubmit = async (e) => {
     e.preventDefault();
@@ -122,17 +114,13 @@ function StartScreen() {
       return;
     }
 
-    // If we haven't checked availability yet, check it now
-    if (validationStatus.type === 'idle' && !validationStatus.isValid) {
-      await validateUsername(usernameInput.trim(), true);
-      return; // Let the user see the result before proceeding
-    }
-
+    // Always check availability when button is clicked (if not already valid)
     if (!validationStatus.isValid) {
-      alert(validationStatus.message || 'Please enter a valid username');
-      return;
+      await validateUsername(usernameInput.trim(), true);
+      return; // Let the user see the result, they'll need to click again to proceed
     }
 
+    // If we get here, username is valid and available
     try {
       playSFX(clickSFX);
       setUsername(usernameInput.trim());
@@ -207,7 +195,6 @@ function StartScreen() {
                 type="text"
                 value={usernameInput}
                 onChange={(e) => setUsernameInput(e.target.value)}
-                onBlur={handleInputBlur}
                 placeholder="Your username..."
                 className={getInputClassName()}
                 maxLength={UsernameValidator.MAX_LENGTH}
@@ -219,12 +206,12 @@ function StartScreen() {
               <button 
                 type="submit" 
                 className={styles.usernameButton}
-                disabled={!usernameInput.trim() || validationStatus.type === 'error'}
+                disabled={!usernameInput.trim() || validationStatus.type === 'error' || validationStatus.isChecking}
               >
                 {validationStatus.isValid ? 'BEGIN QUEST' : 
-                 validationStatus.type === 'error' ? 'FIX USERNAME' :
                  validationStatus.type === 'checking' ? 'CHECKING...' :
-                 usernameInput.trim() ? 'CHECK AVAILABILITY' : 'ENTER USERNAME'}
+                 validationStatus.type === 'error' ? 'FIX USERNAME FIRST' :
+                 'CHECK & START'}
               </button>
             </form>
             
@@ -232,7 +219,7 @@ function StartScreen() {
             
             <p className={styles.usernameHint}>
               Choose a name that will strike fear into the hearts of monsters!<br/>
-              <small style={{opacity: 0.8}}>Click outside the text box or press TAB to check availability</small>
+              <small style={{opacity: 0.8}}>Click the button to check if your username is available</small>
             </p>
           </div>
         ) : (
