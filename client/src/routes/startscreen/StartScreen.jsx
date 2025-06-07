@@ -87,7 +87,12 @@ function useUsernameValidation() {
     }
   };
 
-  return { status, validateUsername };
+  // Expose setStatus for direct manipulation
+  const setValidationStatus = (newStatus) => {
+    setStatus(newStatus);
+  };
+
+  return { status, validateUsername, setValidationStatus };
 }
 
 function StartScreen() {
@@ -96,7 +101,7 @@ function StartScreen() {
   const [usernameInput, setUsernameInput] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
   const [showButtons, setShowButtons] = useState(false);
-  const { status: validationStatus, validateUsername } = useUsernameValidation();
+  const { status: validationStatus, validateUsername, setValidationStatus } = useUsernameValidation();
 
   useEffect(() => {
     // Check if user already has a username
@@ -122,21 +127,47 @@ function StartScreen() {
       return;
     }
 
-    // Always check availability when button is clicked (if not already valid)
-    if (!validationStatus.isValid) {
-      console.log('Validating username before submit:', usernameInput.trim());
-      await validateUsername(usernameInput.trim(), true);
-      return; // Let the user see the result, they'll need to click again to proceed
+    // Format validation first (synchronous)
+    const formatError = UsernameValidator.validateFormat(usernameInput.trim());
+    if (formatError) {
+      setValidationStatus({ isChecking: false, message: formatError, isValid: false, type: 'error' });
+      return;
     }
 
-    // If we get here, username is valid and available
+    // If already validated and valid, proceed
+    if (validationStatus.isValid && validationStatus.type === 'success') {
+      try {
+        playSFX(clickSFX);
+        setUsername(usernameInput.trim());
+        setCurrentUsername(usernameInput.trim());
+        setShowButtons(true);
+      } catch (error) {
+        alert(error.message);
+      }
+      return;
+    }
+
+    // Need to check availability - do it here synchronously
+    setValidationStatus({ isChecking: true, message: 'Checking availability...', isValid: false, type: 'checking' });
+    
     try {
-      playSFX(clickSFX);
-      setUsername(usernameInput.trim());
-      setCurrentUsername(usernameInput.trim());
-      setShowButtons(true);
+      const availabilityError = await UsernameValidator.checkAvailability(usernameInput.trim());
+      
+      if (availabilityError) {
+        // Set error state and stop here
+        setValidationStatus({ isChecking: false, message: availabilityError, isValid: false, type: 'error' });
+        console.log('Username taken, showing error:', availabilityError);
+        return;
+      } else {
+        // Username is available
+        setValidationStatus({ isChecking: false, message: '✓ Username is available!', isValid: true, type: 'success' });
+        console.log('Username available, but not proceeding yet - user needs to click again');
+        return;
+      }
     } catch (error) {
-      alert(error.message);
+      console.error('Error during validation:', error);
+      setValidationStatus({ isChecking: false, message: 'Error checking username. Please try again.', isValid: false, type: 'error' });
+      return;
     }
   };
 
