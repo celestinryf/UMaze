@@ -1,5 +1,7 @@
 // src/services/api.js
-const API_BASE_URL = 'http://localhost:8080/api';
+
+// For Vercel deployment - both frontend and backend on same domain
+const API_BASE_URL = '/api';
 
 // Generate a unique username with timestamp and random suffix
 const generateUniqueUsername = (baseUsername) => {
