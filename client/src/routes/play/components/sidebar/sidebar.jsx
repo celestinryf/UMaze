@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styles from './sidebar.module.css';
 
 // Constants
@@ -17,67 +17,38 @@ const POTION_TYPES = {
 // Utility function
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
-// Reusable Components
-const StatBar = ({ current, max, label, className = '' }) => (
-  <div className={`${styles.statBar} ${className}`}>
-    <div
-      className={styles.statFill}
-      style={{ width: `${(current / max) * 100}%` }}
-    />
-    <span className={styles.statText}>
-      {label}: {current}{max > 100 ? `/${max}` : ''}
-    </span>
-  </div>
-);
-
 const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion }) => {
+  const [showLegend, setShowLegend] = useState(false);
+
   return (
     <div className={styles.sidebar}>
-      {/* Hero Stats - Grid Layout */}
+      {/* Hero Stats */}
       <div className={styles.heroPanel}>
         <div className={styles.panelHeader}>
           <h2>🗡️ {Hero.Name}</h2>
         </div>
-        <div className={styles.heroStatsGrid}>
-          {/* Health Section */}
+        <div className={styles.compactStats}>
           <div className={styles.healthSection}>
-            <div className={styles.statLabel}>Health</div>
-            <StatBar 
-              current={Hero.CurrHealth} 
-              max={Hero.TotalHealth} 
-              label="HP"
-              className={styles.healthBar}
-            />
+            <div className={styles.healthBarContainer}>
+              <div 
+                className={styles.healthBarFill} 
+                style={{ width: `${(Hero.CurrHealth / Hero.TotalHealth) * 100}%` }}
+              />
+              <div className={styles.healthText}>
+                HP: {Hero.CurrHealth} / {Hero.TotalHealth}
+              </div>
+            </div>
           </div>
           
-          {/* Attack Section */}
           <div className={styles.attackSection}>
-            <div className={styles.statLabel}>Attack</div>
-            <StatBar 
-              current={Hero.Attack} 
-              max={100} 
-              label="ATK"
-              className={styles.attackBar}
-            />
-          </div>
-          
-          {/* Pillar Progress */}
-          <div className={styles.pillarProgress}>
-            <div className={styles.statLabel}>Pillars Collected</div>
-            <div className={styles.pillarsMini}>
-              {Object.entries(PILLAR_TYPES).map(([id, name]) => {
-                const pillarId = parseInt(id);
-                const isCollected = collectedPillars.includes(pillarId);
-                return (
-                  <div
-                    key={pillarId}
-                    className={`${styles.pillarMini} ${isCollected ? styles.collected : ''}`}
-                    title={name}
-                  >
-                    {isCollected ? '✓' : '○'}
-                  </div>
-                );
-              })}
+            <div className={styles.attackBarContainer}>
+              <div 
+                className={styles.attackBarFill} 
+                style={{ width: `${Hero.Attack}%` }}
+              />
+              <div className={styles.attackText}>
+                ATK: {Hero.Attack}
+              </div>
             </div>
           </div>
         </div>
@@ -140,44 +111,50 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
         </div>
       </div>
 
-      {/* Map Legend */}
-      <div className={styles.legendPanel}>
-        <div className={styles.panelHeader}>
-          <h2>📍 Legend</h2>
+      {/* Legend Toggle Button */}
+      <div className={styles.legendToggle} onClick={() => setShowLegend(!showLegend)}>
+        <div className={styles.toggleIcon}>
+          {showLegend ? '▼' : '▲'} Legend
         </div>
-        <div className={styles.panelContent}>
-          <div className={styles.legendGrid}>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendSymbol} ${styles.wall}`}></div>
-              <span>Wall</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendSymbol} ${styles.entrance}`}></div>
-              <span>Entrance</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendSymbol} ${styles.exit}`}></div>
-              <span>Exit</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendSymbol} ${styles.pit}`}></div>
-              <span>Hidden Pit</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={`${styles.legendSymbol} ${styles.pitVisited}`}></div>
-              <span>Discovered Pit</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={styles.legendSymbol}>M</div>
-              <span>Monster</span>
-            </div>
-            <div className={styles.legendItem}>
-              <div className={styles.legendSymbol}>P</div>
-              <span>Pillar</span>
+      </div>
+
+      {/* Collapsible Legend */}
+      {showLegend && (
+        <div className={styles.legendPanel}>
+          <div className={styles.panelContent}>
+            <div className={styles.legendGrid}>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendSymbol} ${styles.wall}`}></div>
+                <span>Wall</span>
+              </div>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendSymbol} ${styles.entrance}`}></div>
+                <span>Entrance</span>
+              </div>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendSymbol} ${styles.exit}`}></div>
+                <span>Exit</span>
+              </div>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendSymbol} ${styles.pit}`}></div>
+                <span>Hidden Pit</span>
+              </div>
+              <div className={styles.legendItem}>
+                <div className={`${styles.legendSymbol} ${styles.pitVisited}`}></div>
+                <span>Discovered Pit</span>
+              </div>
+              <div className={styles.legendItem}>
+                <div className={styles.legendSymbol}>M</div>
+                <span>Monster</span>
+              </div>
+              <div className={styles.legendItem}>
+                <div className={styles.legendSymbol}>P</div>
+                <span>Pillar</span>
+              </div>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </div>
   );
 };
