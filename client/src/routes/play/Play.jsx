@@ -45,10 +45,10 @@ const DIRECTIONS = {
 };
 
 const heroImages = {
-  'Nick': nickImg,
-  'Matthew': matthewImg,
-  'Celestin': celestinImg,
-  'Primo': primoImg
+  'NICK': nickImg,
+  'MATTHEW': matthewImg,
+  'CELESTIN': celestinImg,
+  'PRIMO': primoImg
 };
 
 // Utility functions
@@ -516,7 +516,52 @@ const Play = () => {
 
             {/* Controls Info */}
             <div className={styles.controlsInfo}>
-              <p>Use arrow keys to move</p>
+              <p>Use WASD or Arrow Keys for keyboard control</p>
+            </div>
+
+            {/* Movement Controls */}
+            <div className={styles.movementControls}>
+              <div className={styles.controlsTitle}>Movement</div>
+              <div className={styles.controlsGrid}>
+                <div className={styles.controlRow}>
+                  <div className={styles.controlSpacer}></div>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(-1, 0)}
+                    disabled={inBattle}
+                    title="Move Up"
+                  >
+                    ↑
+                  </button>
+                  <div className={styles.controlSpacer}></div>
+                </div>
+                <div className={styles.controlRow}>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(0, -1)}
+                    disabled={inBattle}
+                    title="Move Left"
+                  >
+                    ←
+                  </button>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(1, 0)}
+                    disabled={inBattle}
+                    title="Move Down"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(0, 1)}
+                    disabled={inBattle}
+                    title="Move Right"
+                  >
+                    →
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
 
