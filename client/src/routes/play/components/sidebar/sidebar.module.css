@@ -75,7 +75,7 @@
 
 /* TALLER HERO STATS */
 .heroPanel {
-    min-height: 220px; /* Increased height */
+    min-height: 160px; /* Increased height */
 }
 
 .compactStats {
@@ -94,7 +94,7 @@
 .healthBarContainer {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    height: 32px; /* Taller bar */
+    height: 24px; /* Taller bar */
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -121,7 +121,7 @@
 .attackBarContainer {
     background: rgba(255, 255, 255, 0.1);
     border-radius: 10px;
-    height: 32px; /* Taller bar */
+    height: 24px; /* Taller bar */
     position: relative;
     overflow: hidden;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
@@ -144,11 +144,7 @@
     color: white;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
     letter-spacing: 0.5px;
-}
-
-.pillarProgress {
-    margin-top: 10px;
-}
+} 
 
 .statLabel {
     font-size: 0.9rem;
@@ -157,39 +153,6 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
-}
-
-.pillarsMini {
-    display: flex;
-    justify-content: space-between;
-    gap: 8px;
-}
-
-.pillarMini {
-    flex: 1;
-    height: 36px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: rgba(255, 255, 255, 0.05);
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    font-weight: bold;
-    font-size: 1.1rem;
-    color: #a0aec0;
-    transition: all 0.3s ease;
-}
-
-.pillarMini.collected {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    border-color: #9b59b6;
-    color: #fff;
-    box-shadow: 0 0 10px rgba(155, 89, 182, 0.6);
-}
-
-.pillarMini:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
 /* SMALLER INVENTORY PANEL */
