@@ -17,98 +17,41 @@ const POTION_TYPES = {
 // Utility function
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
-// Reusable Components
 const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion }) => {
   return (
     <div className={styles.sidebar}>
-      {/* Hero Stats - Redesigned */}
+      {/* Hero Stats - Compact Design */}
       <div className={styles.heroPanel}>
         <div className={styles.panelHeader}>
           <h2>🗡️ {Hero.Name}</h2>
         </div>
-        <div className={styles.heroStatsGrid}>
-          {/* Health Card */}
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div className={styles.statIcon}>❤️</div>
-              <h3>Health</h3>
+        <div className={styles.compactStats}>
+          <div className={styles.healthSection}>
+            <div className={styles.healthHeader}>
+              <span className={styles.healthIcon}>❤️</span>
+              <span>Health</span>
             </div>
-            <div className={styles.statProgress}>
+            <div className={styles.healthBarContainer}>
               <div 
-                className={styles.progressBar} 
+                className={styles.healthBarFill} 
                 style={{ width: `${(Hero.CurrHealth / Hero.TotalHealth) * 100}%` }}
-              >
-                <div className={styles.progressGradient}></div>
-              </div>
-              <div className={styles.statValue}>
-                {Hero.CurrHealth}/{Hero.TotalHealth}
+              />
+              <div className={styles.healthText}>
+                {Hero.CurrHealth} / {Hero.TotalHealth}
               </div>
             </div>
           </div>
           
-          {/* Attack Card */}
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div className={styles.statIcon}>⚔️</div>
-              <h3>Attack</h3>
+          <div className={styles.attackSection}>
+            <div className={styles.attackHeader}>
+              <span className={styles.attackIcon}>⚔️</span>
+              <span>Attack: {Hero.Attack}</span>
             </div>
-            <div className={styles.statValueLarge}>
-              {Hero.Attack}
-              <span className={styles.statSubtext}>/100</span>
-            </div>
-            <div className={styles.statProgress}>
+            <div className={styles.attackBarContainer}>
               <div 
-                className={styles.progressBarAttack} 
+                className={styles.attackBarFill} 
                 style={{ width: `${Hero.Attack}%` }}
-              >
-                <div className={styles.progressGradientAttack}></div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Level Card */}
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div className={styles.statIcon}>⭐</div>
-              <h3>Level</h3>
-            </div>
-            <div className={styles.statValueLarge}>
-              {Hero.Level || 1}
-            </div>
-            <div className={styles.xpContainer}>
-              <div className={styles.xpLabel}>XP: {Hero.XP || 0}/{Hero.NextLevelXP || 100}</div>
-              <div className={styles.xpBar}>
-                <div 
-                  className={styles.xpFill} 
-                  style={{ width: `${((Hero.XP || 0) / (Hero.NextLevelXP || 100)) * 100}%` }}
-                ></div>
-              </div>
-            </div>
-          </div>
-          
-          {/* Pillars Card */}
-          <div className={styles.statCard}>
-            <div className={styles.statHeader}>
-              <div className={styles.statIcon}>🏆</div>
-              <h3>Pillars Found</h3>
-            </div>
-            <div className={styles.pillarsCount}>
-              {collectedPillars.length}/{Object.keys(PILLAR_TYPES).length}
-            </div>
-            <div className={styles.pillarsProgress}>
-              {Object.entries(PILLAR_TYPES).map(([id, name]) => {
-                const pillarId = parseInt(id);
-                const isCollected = collectedPillars.includes(pillarId);
-                return (
-                  <div 
-                    key={pillarId} 
-                    className={`${styles.pillarIndicator} ${isCollected ? styles.collected : ''}`}
-                    title={name}
-                  >
-                    {isCollected ? '✓' : '○'}
-                  </div>
-                );
-              })}
+              />
             </div>
           </div>
         </div>
