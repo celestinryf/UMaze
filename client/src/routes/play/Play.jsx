@@ -1,12 +1,11 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
-import styles from './play.module.css';
-
-/*
- * Maze Adventure Game Component - Updated for new API service layer
- * Uses centralized API service with automatic username handling
- */
+import styles from './Play.module.css';
+import nickImg from '../../assets/nick.png';
+import matthewImg from '../../assets/matthew.png';
+import celestinImg from '../../assets/celestin.png';
+import primoImg from '../../assets/primo.png';
 
 // Constants
 const ROOM_TYPES = {
@@ -45,6 +44,13 @@ const DIRECTIONS = {
   D: [0, 1]
 };
 
+const heroImages = {
+  'Nick': nickImg,
+  'Matthew': matthewImg,
+  'Celestin': celestinImg,
+  'Primo': primoImg
+};
+
 // Utility functions
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
@@ -62,27 +68,6 @@ const HealthBar = ({ current, total, label, showLabel = true, className = '' }) 
   </div>
 );
 
-const StatCard = ({ title, stats, children }) => (
-  <div className={styles[`${title.toLowerCase()}Card`]}>
-    <h2>{title}</h2>
-    <div className={styles[`${title.toLowerCase()}Stats`]}>
-      {stats}
-      {children}
-    </div>
-  </div>
-);
-
-const LegendItem = ({ colorClass, icon, label }) => (
-  <div className={styles.legendItem}>
-    {colorClass ? (
-      <div className={`${styles.legendColor} ${styles[colorClass]}`} />
-    ) : (
-      <div className={styles.legendIcon}>{icon}</div>
-    )}
-    {label}
-  </div>
-);
-
 const GameEndScreen = ({ status, message }) => (
   <div className={styles.endgameContainer}>
     <h1 className={styles.gameTitle}>Maze Adventure</h1>
@@ -92,92 +77,6 @@ const GameEndScreen = ({ status, message }) => (
     <p>{message}</p>
   </div>
 );
-
-// Movement Controls Component
-const MovementControls = ({ onMove, disabled }) => {
-  const buttonStyle = {
-    padding: '10px 15px',
-    margin: '2px',
-    backgroundColor: disabled ? '#ccc' : '#4CAF50',
-    color: disabled ? '#666' : 'white',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    fontSize: '16px',
-    fontWeight: 'bold',
-    minWidth: '50px',
-    userSelect: 'none'
-  };
-
-  const containerStyle = {
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-    gap: '5px',
-    padding: '15px',
-    backgroundColor: '#f5f5f5',
-    borderRadius: '10px',
-    border: '2px solid #ddd',
-    marginBottom: '20px'
-  };
-
-  const rowStyle = {
-    display: 'flex',
-    gap: '5px'
-  };
-
-  return (
-    <div style={containerStyle}>
-      <h3 style={{ margin: '0 0 10px 0', color: '#333' }}>Movement Controls</h3>
-      <div style={{ display: 'flex', flexDirection: 'column', gap: '5px' }}>
-        {/* Top row - Up button */}
-        <div style={rowStyle}>
-          <div style={{ width: '62px' }}></div>
-          <button
-            style={buttonStyle}
-            onClick={() => onMove(-1, 0)}
-            disabled={disabled}
-            title="Move Up (W or Arrow Up)"
-          >
-            ↑
-          </button>
-          <div style={{ width: '62px' }}></div>
-        </div>
-        
-        {/* Middle row - Left, Down, Right buttons */}
-        <div style={rowStyle}>
-          <button
-            style={buttonStyle}
-            onClick={() => onMove(0, -1)}
-            disabled={disabled}
-            title="Move Left (A or Arrow Left)"
-          >
-            ←
-          </button>
-          <button
-            style={buttonStyle}
-            onClick={() => onMove(1, 0)}
-            disabled={disabled}
-            title="Move Down (S or Arrow Down)"
-          >
-            ↓
-          </button>
-          <button
-            style={buttonStyle}
-            onClick={() => onMove(0, 1)}
-            disabled={disabled}
-            title="Move Right (D or Arrow Right)"
-          >
-            →
-          </button>
-        </div>
-      </div>
-      <p style={{ margin: '10px 0 0 0', fontSize: '12px', color: '#666', textAlign: 'center' }}>
-        Use WASD or Arrow Keys for keyboard control
-      </p>
-    </div>
-  );
-};
 
 // Battle Overlay Component
 const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, onUsePotion, battleMessage, collectedPotions }) => (
@@ -206,7 +105,11 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
         {/* Hero Section */}
         <div className={styles.battleHeroSection}>
           <div className={styles.battleHeroSprite}>
-            <span className={styles.heroEmoji}>🗡️</span>
+            {heroImages[hero.Name] ? (
+              <img src={heroImages[hero.Name]} alt={hero.Name} />
+            ) : (
+              <span className={styles.heroEmoji}>🗡️</span>
+            )}
           </div>
           <div className={styles.battleCharacterInfo}>
             <h3>{hero.Name}</h3>
@@ -246,7 +149,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
           
           {/* Potion Actions */}
           {[1, 2].map(potion => {
-            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
+            const count = collectedPotions.has ? (collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0) : collectedPotions.filter(p => p === potion).length;
             const canUse = count > 0;
             const potionName = getName(potion, POTION_TYPES);
 
@@ -516,14 +419,7 @@ const Play = () => {
   };
 
   return (
-    <div className={styles.mazeGame}>
-      <h1 className={styles.gameTitle}>
-        Maze Adventure - {username}
-        {gameData.Status === "Lost" && bypassGameOver && (
-          <span className={styles.debugStatus}> [DEBUG: Playing as Ghost]</span>
-        )}
-      </h1>
-
+    <div className={styles.gameContainer}>
       {/* Battle Overlay - Renders on top when in battle */}
       {inBattle && currentRoom.RoomMonster && (
         <BattleOverlay
@@ -538,170 +434,225 @@ const Play = () => {
         />
       )}
 
-      {/* Main Game Content - Dimmed when in battle */}
-      <div className={inBattle ? styles.dimmedContent : ''}>
-        {/* Save Game Section */}
-        <div className={styles.saveSection}>
-          <label htmlFor="gameName">Save Game As: </label>
-          <input
-            type="text"
-            id="gameName"
-            value={gName}
-            onChange={e => setgName(e.target.value)}
-            disabled={inBattle}
-            placeholder="Enter save name..."
-          />
-          <button onClick={saveGame} disabled={inBattle || !gName.trim()}>Save to Database</button>
-          <p className={styles.saveMessage}>{gMessage}</p>
-          <small style={{ color: '#666' }}>Your game is auto-saved to the cloud every action</small>
+      {/* Main Game Content */}
+      <div className={`${styles.gameContent} ${inBattle ? styles.dimmedContent : ''}`}>
+        {/* Game Header */}
+        <div className={styles.gameHeader}>
+          <h1 className={styles.gameTitle}>
+            Maze Adventure
+            {gameData.Status === "Lost" && bypassGameOver && (
+              <span className={styles.debugStatus}> [DEBUG: Playing as Ghost]</span>
+            )}
+          </h1>
+          
+          {/* Save Game Section */}
+          <div className={styles.saveGameSection}>
+            <input
+              type="text"
+              placeholder="Enter save name..."
+              value={gName}
+              onChange={e => setgName(e.target.value)}
+              disabled={inBattle}
+              className={styles.saveInput}
+            />
+            <button onClick={saveGame} disabled={inBattle} className={styles.saveButton}>
+              💾 Save
+            </button>
+          </div>
         </div>
 
-        {/* Hero Stats */}
-        <StatCard 
-          title="Hero"
-          stats={
-            <>
-              <HealthBar current={Hero.CurrHealth} total={Hero.TotalHealth} label="Health" />
-              <div className={styles.statItem}>
-                <span className={styles.statLabel}>Attack:</span> {Hero.Attack}
-              </div>
-            </>
-          }
-        />
+        {/* Game Message */}
+        {gMessage && (
+          <div className={styles.gameMessage}>
+            <p>{gMessage}</p>
+          </div>
+        )}
 
-      {/* Pillars Collection */}
-      <div className={styles.collectionSection}>
-        <h2>Pillars Collected</h2>
-        <div className={styles.pillarsContainer}>
-          {Object.entries(PILLAR_TYPES).map(([id, name]) => {
-            const pillarId = parseInt(id);
-            const isCollected = collectedPillars.includes(pillarId);
-            return (
-              <div
-                key={pillarId}
-                className={`${styles.pillarItem} ${isCollected ? styles.collected : styles.missing}`}
-              >
-                <div className={styles.pillarIcon}>P</div>
-                <span>{name}</span>
-                <span className={isCollected ? styles.checkmark : styles.crossmark}>
-                  {isCollected ? '✓' : '✗'}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
+        {/* Main Game Layout */}
+        <div className={styles.mainGameLayout}>
+          {/* Maze Display */}
+          <div className={styles.mazeContainer}>
+            <div className={styles.mazeWrapper}>
+              <div className={styles.mazeGrid}>
+                {Grid.map((row, rowIndex) => (
+                  <div key={rowIndex} className={styles.mazeRow}>
+                    {row.map((cell, colIndex) => {
+                      const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
+                      const isWall = cell.RoomType === 0;
 
-      {/* Potions Collection */}
-      <div className={styles.collectionSection}>
-        <h2>Potions Collected</h2>
-        <div className={styles.potionsContainer}>
-          {[1, 2].map(potion => {
-            const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
-            const canUse = count > 0;
+                      return (
+                        <div
+                          key={`${rowIndex}-${colIndex}`}
+                          className={getCellClasses(cell, rowIndex, colIndex)}
+                        >
+                          {isCurrent && (
+                            <div className={styles.player}>
+                              {heroImages[Hero.Name] ? (
+                                <img src={heroImages[Hero.Name]} alt={Hero.Name} />
+                              ) : (
+                                '☺'
+                              )}
+                            </div>
+                          )}
 
-            return (
-              <div key={potion} className={styles.potionItem}>
-                <div className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
-                  {count}
-                </div>
-                <span
-                  className={styles.potionName}
-                  onClick={() => canUse && usePotion(potion)}
-                  style={{ 
-                    cursor: canUse ? 'pointer' : 'not-allowed', 
-                    textDecoration: 'underline'
-                  }}
-                  title={canUse ? 'Click to use potion' : 'No potions available'}
-                >
-                  {getName(potion, POTION_TYPES)} Potions: {count}
-                </span>
-              </div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Movement Controls */}
-      <MovementControls 
-        onMove={handleButtonMove} 
-        disabled={inBattle}
-      />
-
-      {/* Maze Grid */}
-      <div className={styles.mazeSection}>
-        <h2>Maze Map</h2>
-        <div className={styles.mazeGrid}>
-          {Grid.map((row, rowIndex) => (
-            <div key={rowIndex} className={styles.mazeRow}>
-              {row.map((cell, colIndex) => {
-                const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
-                const isWall = cell.RoomType === 0;
-
-                return (
-                  <div
-                    key={`${rowIndex}-${colIndex}`}
-                    className={getCellClasses(cell, rowIndex, colIndex)}
-                  >
-                    {isCurrent && <div className={styles.player}>☺</div>}
-
-                    {!isWall && (
-                      <div className={styles.cellContents}>
-                        {cell.RoomMonster && <div className={styles.monsterIndicator}>M</div>}
-                        {cell.PillarType > 0 && <div className={styles.pillarIndicator}>P{cell.PillarType}</div>}
-                        {cell.PotionType > 0 && (
-                          <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
-                            {cell.PotionType}
-                          </div>
-                        )}
-                      </div>
-                    )}
+                          {!isWall && (
+                            <div className={styles.cellContents}>
+                              {cell.RoomMonster && <div className={styles.monsterIndicator}>M</div>}
+                              {cell.PillarType > 0 && <div className={styles.pillarIndicator}>P</div>}
+                              {cell.PotionType > 0 && (
+                                <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
+                                  ♦
+                                </div>
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
-                );
-              })}
+                ))}
+              </div>
             </div>
-          ))}
+
+            {/* Controls Info */}
+            <div className={styles.controlsInfo}>
+              <p>Use arrow keys to move</p>
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className={styles.sidebar}>
+            {/* Hero Stats */}
+            <div className={styles.heroPanel}>
+              <div className={styles.panelHeader}>
+                <h2>🗡️ {Hero.Name}</h2>
+              </div>
+              <div className={styles.panelContent}>
+                <HealthBar 
+                  current={Hero.CurrHealth} 
+                  total={Hero.TotalHealth} 
+                  label="HP" 
+                />
+                <div className={styles.heroStat}>
+                  <span className={styles.statIcon}>⚔️</span>
+                  <span className={styles.statLabel}>Attack:</span>
+                  <span className={styles.statValue}>{Hero.Attack}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Inventory */}
+            <div className={styles.inventoryPanel}>
+              <div className={styles.panelHeader}>
+                <h2>🎒 Inventory</h2>
+              </div>
+              <div className={styles.panelContent}>
+                {/* Pillars */}
+                <div className={styles.inventorySection}>
+                  <h3>Pillars of OOP</h3>
+                  <div className={styles.pillarsList}>
+                    {Object.entries(PILLAR_TYPES).map(([id, name]) => {
+                      const pillarId = parseInt(id);
+                      const isCollected = collectedPillars.includes(pillarId);
+                      return (
+                        <div
+                          key={pillarId}
+                          className={`${styles.pillarItem} ${isCollected ? styles.collected : ''}`}
+                        >
+                          <span className={styles.pillarIcon}>
+                            {isCollected ? '✓' : '○'}
+                          </span>
+                          <span className={styles.pillarName}>{name}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Potions */}
+                <div className={styles.inventorySection}>
+                  <h3>Potions</h3>
+                  <div className={styles.potionsList}>
+                    {[1, 2].map(potion => {
+                      const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
+                      const canUse = count > 0 && !inBattle;
+
+                      return (
+                        <div 
+                          key={potion} 
+                          className={`${styles.potionItem} ${canUse ? styles.canUse : ''}`}
+                          onClick={() => canUse && usePotion(potion)}
+                        >
+                          <span className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
+                            ♦
+                          </span>
+                          <span className={styles.potionName}>
+                            {getName(potion, POTION_TYPES)}
+                          </span>
+                          <span className={styles.potionCount}>{count}</span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Map Legend */}
+            <div className={styles.legendPanel}>
+              <div className={styles.panelHeader}>
+                <h2>📍 Legend</h2>
+              </div>
+              <div className={styles.panelContent}>
+                <div className={styles.legendGrid}>
+                  <div className={styles.legendItem}>
+                    <div className={`${styles.legendSymbol} ${styles.wall}`}></div>
+                    <span>Wall</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <div className={`${styles.legendSymbol} ${styles.entrance}`}></div>
+                    <span>Entrance</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <div className={`${styles.legendSymbol} ${styles.exit}`}></div>
+                    <span>Exit</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <div className={`${styles.legendSymbol} ${styles.pit}`}></div>
+                    <span>Pit</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <div className={styles.legendSymbol}>M</div>
+                    <span>Monster</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <div className={styles.legendSymbol}>P</div>
+                    <span>Pillar</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
 
-        {/* Map Legend */}
-        <div className={styles.mapLegend}>
-          <LegendItem colorClass="wall" label="Wall" />
-          <LegendItem colorClass="entrance" label="Entrance" />
-          <LegendItem colorClass="exit" label="Exit" />
-          <LegendItem colorClass="normal" label="Normal Room" />
-          <LegendItem colorClass="pit" label="Pit" />
-          <LegendItem icon="☺" label="Player" />
-          <LegendItem icon="M" label="Monster" />
-          <LegendItem icon="P#" label="Pillar" />
-          <LegendItem colorClass="potion1" label="Health Potion" />
-          <LegendItem colorClass="potion2" label="Attack Potion" />
-        </div>
-      </div>
-
-        {/* Debug Section */}
-        <div className={styles.debugToggle}>
+        {/* Debug Controls */}
+        <div className={styles.debugControls}>
           <button onClick={() => setShowDebug(!showDebug)} disabled={inBattle}>
-            {showDebug ? "Hide Debug Info" : "Show Debug Info"}
+            {showDebug ? "Hide Debug" : "Show Debug"}
           </button>
           <button 
             onClick={() => setBypassGameOver(!bypassGameOver)} 
             disabled={inBattle}
             className={bypassGameOver ? styles.debugActiveButton : ''}
-            title="When enabled, prevents the Game Over screen from appearing, allowing continued play after death"
           >
-            {bypassGameOver ? "Debug: Game Over Bypass ON" : "Debug: Game Over Bypass OFF"}
+            Game Over Bypass: {bypassGameOver ? "ON" : "OFF"}
           </button>
-          {gameData.Status === "Lost" && bypassGameOver && (
-            <p className={styles.debugWarning}>
-              ⚠️ DEBUG MODE: You are currently dead but can continue playing
-            </p>
-          )}
         </div>
 
         {showDebug && (
-          <div className={styles.debugSection}>
-            <h3>Game State JSON</h3>
-            <pre className={styles.jsonPre}>{JSON.stringify(gameData, null, 2)}</pre>
+          <div className={styles.debugPanel}>
+            <h3>Game State</h3>
+            <pre>{JSON.stringify(gameData, null, 2)}</pre>
           </div>
         )}
       </div>
