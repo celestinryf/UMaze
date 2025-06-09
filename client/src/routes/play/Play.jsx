@@ -14,14 +14,14 @@ const ROOM_TYPES = {
   1: 'Entrance',
   2: 'Exit',
   3: 'Normal',
-  4: 'Pit'
+  4: 'Poop'
 };
 
 const PILLAR_TYPES = {
-  1: 'Abstraction',
-  2: 'Encapsulation',
-  3: 'Inheritance',
-  4: 'Polymorphism'
+  1: 'Apple',
+  2: 'Saddle',
+  3: 'Horn',
+  4: 'Wings'
 };
 
 const POTION_TYPES = {
