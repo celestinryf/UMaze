@@ -8,6 +8,22 @@ import matthewImg from '../../assets/matthew.png';
 import celestinImg from '../../assets/celestin.png';
 import primoImg from '../../assets/primo.png';
 
+import apple from '../../assets/sprites/apple.png';
+import horn from '../../assets/sprites/horn.png';
+import saddle from '../../assets/sprites/saddle.png';
+import wings from '../../assets/sprites/wings.png';
+import salmon from '../../assets/sprites/salmon.png';
+
+import bee_hive from '../../assets/sprites/bee_hive.png';
+import anthill from '../../assets/sprites/anthill.png';
+
+import heal_potion from '../../assets/sprites/heal_potion.png';
+import attack_potion from '../../assets/sprites/attack_potion.png';
+
+import path from '../../assets/sprites/path.png';
+import poop from '../../assets/sprites/poop.png';
+import tree from '../../assets/sprites/tree.png';
+
 // Constants
 const ROOM_TYPES = {
   0: 'Wall',
