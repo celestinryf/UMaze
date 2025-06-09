@@ -59,15 +59,6 @@ function Options() {
             className={styles.slider}
           />
         </div>
-
-        <div className={styles.settingGroup}>
-          <label>Difficulty</label>
-          <select className={styles.dropdown}>
-            <option>Easy</option>
-            <option>Normal</option>
-            <option>Hard</option>
-          </select>
-        </div>
       </div>
 
       <button
