@@ -70,11 +70,42 @@
   
   .panelContent {
     padding: 1.5rem;
+    max-height: 400px;
+    overflow-y: auto;
+  }
+  
+  /* Custom scrollbar for panel content */
+  .panelContent::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .panelContent::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+  
+  .panelContent::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+  
+  .panelContent::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
   
   /* Hero Stats */
   .statItem {
     margin-bottom: 1rem;
+  }
+  
+  .statLabel {
+    color: #a0aec0;
+    font-size: 0.875rem;
+    margin-bottom: 0.5rem;
+    display: block;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
   }
   
   .healthBar {
@@ -135,6 +166,8 @@
   /* Inventory */
   .inventorySection {
     margin-bottom: 1.5rem;
+    max-height: 200px;
+    overflow-y: auto;
   }
   
   .inventorySection h3 {
@@ -144,6 +177,25 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: 600;
+  }
+  
+  /* Custom scrollbar for inventory sections */
+  .inventorySection::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .inventorySection::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+  
+  .inventorySection::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+  
+  .inventorySection::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
   
   .pillarsList {
@@ -277,6 +329,27 @@
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 0.75rem;
+    max-height: 250px;
+    overflow-y: auto;
+  }
+  
+  /* Custom scrollbar for legend */
+  .legendGrid::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .legendGrid::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+  
+  .legendGrid::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+  }
+  
+  .legendGrid::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
   }
   
   .legendItem {
