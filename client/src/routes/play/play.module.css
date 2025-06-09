@@ -1146,24 +1146,8 @@
   }
 }
 
-/* Hidden pit - looks like normal room to fool the player */
-.pit {
-  background-color: #f0f0f0; /* Same as normal walkable areas */
-  border: 1px solid #ddd;
-}
-
 /* Discovered pit - clearly dangerous looking */
 .pitVisited {
-  background-color: #8B0000; /* Dark red */
-  border: 1px solid #660000;
-  position: relative;
-}
-
-.pitVisited::after {
-  content: "⚠️";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 12px;
+  background-color: #f0f0f0; /* Same as normal walkable areas */
+  border: 1px solid #ddd;
 }
