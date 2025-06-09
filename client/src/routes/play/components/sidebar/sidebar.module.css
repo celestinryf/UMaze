@@ -3,7 +3,7 @@
     width: 350px;
     display: flex;
     flex-direction: column;
-    gap: 1.5rem;
+    gap: 1.2rem;
     padding-right: 10px;
 }
 
@@ -73,15 +73,19 @@
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* COMPACT HERO STATS */
-.compactStats {
-    padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
+/* TALLER HERO STATS */
+.heroPanel {
+    min-height: 220px; /* Increased height */
 }
 
-.healthSection, .attackSection {
+.compactStats {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.statSection {
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -89,10 +93,11 @@
 
 .healthBarContainer {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    height: 24px;
+    border-radius: 10px;
+    height: 32px; /* Taller bar */
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .healthBarFill {
@@ -106,23 +111,26 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: bold;
     color: white;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
 }
 
 .attackBarContainer {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    height: 24px;
+    border-radius: 10px;
+    height: 32px; /* Taller bar */
     position: relative;
     overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
 .attackBarFill {
     height: 100%;
-    background: linear-gradient(90deg, #ffd166, #ef476f);
+    /* Blue/Purple gradient as requested */
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
     transition: width 0.5s ease;
 }
 
@@ -131,10 +139,201 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 0.85rem;
+    font-size: 1rem;
     font-weight: bold;
     color: white;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+.pillarProgress {
+    margin-top: 10px;
+}
+
+.statLabel {
+    font-size: 0.9rem;
+    color: #a0aec0;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.pillarsMini {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+}
+
+.pillarMini {
+    flex: 1;
+    height: 36px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    font-weight: bold;
+    font-size: 1.1rem;
+    color: #a0aec0;
+    transition: all 0.3s ease;
+}
+
+.pillarMini.collected {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-color: #9b59b6;
+    color: #fff;
+    box-shadow: 0 0 10px rgba(155, 89, 182, 0.6);
+}
+
+.pillarMini:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* SMALLER INVENTORY PANEL */
+.smallerInventory {
+    min-height: 320px; /* Reduced height */
+}
+
+.inventorySection {
+    margin-bottom: 1.2rem; /* Slightly less spacing */
+}
+
+.inventorySection h3 {
+    margin: 0 0 0.8rem 0; /* Reduced margin */
+    font-size: 0.95rem; /* Slightly smaller */
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.pillarsList {
+    display: flex;
+    flex-direction: column;
+    gap: 0.6rem; /* Reduced gap */
+}
+
+.pillarItem {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Slightly less gap */
+    padding: 0.6rem; /* Less padding */
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem; /* Slightly smaller text */
+}
+
+.pillarItem.collected {
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
+    border-color: rgba(155, 89, 182, 0.3);
+}
+
+.pillarIcon {
+    width: 22px; /* Smaller */
+    height: 22px; /* Smaller */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem; /* Smaller */
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+}
+
+.pillarItem.collected .pillarIcon {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-color: #9b59b6;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(155, 89, 182, 0.6);
+    animation: collectPulse 0.5s ease;
+}
+
+@keyframes collectPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pillarName {
+    flex: 1;
+    font-weight: 500;
+    color: #fff;
+}
+
+.potionsList {
+    display: flex;
+    gap: 0.6rem; /* Reduced gap */
+}
+
+.potionItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem; /* Reduced gap */
+    padding: 0.8rem; /* Less padding */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.potionItem.canUse:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.potionItem:not(.canUse) {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.potionIcon {
+    width: 32px; /* Slightly smaller */
+    height: 32px; /* Slightly smaller */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem; /* Slightly smaller */
+    color: #fff;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.potion1 .potionIcon,
+.potion1 { 
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.potion2 .potionIcon,
+.potion2 { 
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.potionName {
+    font-size: 0.7rem; /* Slightly smaller */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a0aec0;
+}
+
+.potionCount {
+    font-size: 1.1rem; /* Slightly smaller */
+    font-weight: bold;
+    color: #00d4ff;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
 }
 
 /* LEGEND TOGGLE */
@@ -148,6 +347,7 @@
     transition: all 0.3s ease;
     display: flex;
     justify-content: center;
+    margin-top: -5px;
 }
 
 .legendToggle:hover {
@@ -177,6 +377,7 @@
     border-radius: 16px;
     overflow: hidden;
     animation: fadeIn 0.3s ease;
+    margin-top: -10px;
 }
 
 @keyframes fadeIn {
@@ -248,146 +449,6 @@
     border: 1px solid #8B0000;
     position: relative;
     color: #fff;
-}
-
-/* Inventory */
-.inventorySection {
-    margin-bottom: 1.5rem;
-}
-
-.inventorySection h3 {
-    margin: 0 0 1rem 0;
-    font-size: 1rem;
-    color: #a0aec0;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    font-weight: 600;
-}
-
-.pillarsList {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-}
-
-.pillarItem {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pillarItem.collected {
-    background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
-    border-color: rgba(155, 89, 182, 0.3);
-}
-
-.pillarIcon {
-    width: 24px;
-    height: 24px;
-    border: 2px solid rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: bold;
-    font-size: 0.875rem;
-    transition: all 0.3s ease;
-    background: rgba(255, 255, 255, 0.05);
-    color: #a0aec0;
-}
-
-.pillarItem.collected .pillarIcon {
-    background: linear-gradient(135deg, #9b59b6, #8e44ad);
-    border-color: #9b59b6;
-    color: #fff;
-    box-shadow: 0 0 15px rgba(155, 89, 182, 0.6);
-    animation: collectPulse 0.5s ease;
-}
-
-@keyframes collectPulse {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-}
-
-.pillarName {
-    flex: 1;
-    font-size: 0.875rem;
-    font-weight: 500;
-    color: #fff;
-}
-
-.potionsList {
-    display: flex;
-    gap: 0.75rem;
-}
-
-.potionItem {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    cursor: pointer;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.potionItem.canUse:hover {
-    background: rgba(255, 255, 255, 0.1);
-    transform: translateY(-3px);
-    border-color: rgba(0, 212, 255, 0.3);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.potionItem:not(.canUse) {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-.potionIcon {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.25rem;
-    color: #fff;
-    box-shadow: 0 0 15px currentColor;
-}
-
-.potion1 .potionIcon,
-.potion1 { 
-    background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-
-.potion2 .potionIcon,
-.potion2 { 
-    background: linear-gradient(135deg, #3498db, #2980b9);
-}
-
-.potionName {
-    font-size: 0.75rem;
-    text-align: center;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #a0aec0;
-}
-
-.potionCount {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #00d4ff;
-    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
 }
 
 /* Responsive Design */

@@ -22,13 +22,14 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
 
   return (
     <div className={styles.sidebar}>
-      {/* Hero Stats */}
+      {/* Hero Stats - Taller Panel */}
       <div className={styles.heroPanel}>
         <div className={styles.panelHeader}>
           <h2>🗡️ {Hero.Name}</h2>
         </div>
         <div className={styles.compactStats}>
-          <div className={styles.healthSection}>
+          {/* Health Bar */}
+          <div className={styles.statSection}>
             <div className={styles.healthBarContainer}>
               <div 
                 className={styles.healthBarFill} 
@@ -40,7 +41,8 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
             </div>
           </div>
           
-          <div className={styles.attackSection}>
+          {/* Attack Bar - Blue/Purple */}
+          <div className={styles.statSection}>
             <div className={styles.attackBarContainer}>
               <div 
                 className={styles.attackBarFill} 
@@ -51,11 +53,31 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
               </div>
             </div>
           </div>
+          
+          {/* Pillar Progress */}
+          <div className={styles.pillarProgress}>
+            <div className={styles.statLabel}>Pillars Collected</div>
+            <div className={styles.pillarsMini}>
+              {Object.entries(PILLAR_TYPES).map(([id, name]) => {
+                const pillarId = parseInt(id);
+                const isCollected = collectedPillars.includes(pillarId);
+                return (
+                  <div
+                    key={pillarId}
+                    className={`${styles.pillarMini} ${isCollected ? styles.collected : ''}`}
+                    title={name}
+                  >
+                    {isCollected ? '✓' : '○'}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 
-      {/* Inventory */}
-      <div className={styles.inventoryPanel}>
+      {/* Inventory - Slightly Smaller Panel */}
+      <div className={`${styles.inventoryPanel} ${styles.smallerInventory}`}>
         <div className={styles.panelHeader}>
           <h2>🎒 Inventory</h2>
         </div>
