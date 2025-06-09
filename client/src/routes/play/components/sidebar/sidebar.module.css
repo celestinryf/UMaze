@@ -74,75 +74,94 @@
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* COMPACT HERO STATS */
-.compactStats {
+/* HERO STATS GRID LAYOUT */
+.heroStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto;
+    gap: 12px;
     padding: 16px;
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
 }
 
-.healthSection, .attackSection {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
+.healthSection {
+    grid-column: 1 / -1;
 }
 
-.healthHeader, .attackHeader {
-    display: flex;
-    align-items: center;
-    gap: 8px;
+.statLabel {
     font-size: 0.9rem;
     color: #a0aec0;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
 }
 
-.healthIcon {
-    font-size: 1.1rem;
-    color: #ff6b6b;
-}
-
-.attackIcon {
-    font-size: 1.1rem;
-    color: #ff9e7d;
-}
-
-.healthBarContainer {
+.statBar {
     background: rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    height: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 28px;
     position: relative;
     overflow: hidden;
 }
 
-.healthBarFill {
+.statFill {
     height: 100%;
-    background: linear-gradient(90deg, #ff6b6b, #ff9e7d);
-    transition: width 0.5s ease;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-.healthText {
+.statText {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 0.85rem;
+    font-size: 0.9rem;
     font-weight: bold;
-    color: white;
+    color: #fff;
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    z-index: 1;
 }
 
-.attackBarContainer {
-    background: rgba(255, 255, 255, 0.1);
+.healthBar .statFill {
+    background: linear-gradient(90deg, #2ed573, #00d4ff);
+}
+
+.attackBar .statFill {
+    background: linear-gradient(90deg, #ff0080, #ff00bf);
+}
+
+.pillarProgress {
+    grid-column: 1 / -1;
+    margin-top: 8px;
+}
+
+.pillarsMini {
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+    margin-top: 6px;
+}
+
+.pillarMini {
+    flex: 1;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.2);
     border-radius: 8px;
-    height: 12px;
-    position: relative;
-    overflow: hidden;
+    font-weight: bold;
+    font-size: 1rem;
+    color: #a0aec0;
 }
 
-.attackBarFill {
-    height: 100%;
-    background: linear-gradient(90deg, #ffd166, #ef476f);
-    transition: width 0.5s ease;
+.pillarMini.collected {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-color: #9b59b6;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
 }
 
 /* Inventory */
@@ -377,5 +396,9 @@
     .inventoryPanel,
     .legendPanel {
         min-width: auto;
+    }
+    
+    .heroStatsGrid {
+        grid-template-columns: 1fr;
     }
 }

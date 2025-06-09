@@ -17,41 +17,67 @@ const POTION_TYPES = {
 // Utility function
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
+// Reusable Components
+const StatBar = ({ current, max, label, className = '' }) => (
+  <div className={`${styles.statBar} ${className}`}>
+    <div
+      className={styles.statFill}
+      style={{ width: `${(current / max) * 100}%` }}
+    />
+    <span className={styles.statText}>
+      {label}: {current}{max > 100 ? `/${max}` : ''}
+    </span>
+  </div>
+);
+
 const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion }) => {
   return (
     <div className={styles.sidebar}>
-      {/* Hero Stats - Compact Design */}
+      {/* Hero Stats - Grid Layout */}
       <div className={styles.heroPanel}>
         <div className={styles.panelHeader}>
           <h2>🗡️ {Hero.Name}</h2>
         </div>
-        <div className={styles.compactStats}>
+        <div className={styles.heroStatsGrid}>
+          {/* Health Section */}
           <div className={styles.healthSection}>
-            <div className={styles.healthHeader}>
-              <span className={styles.healthIcon}>❤️</span>
-              <span>Health</span>
-            </div>
-            <div className={styles.healthBarContainer}>
-              <div 
-                className={styles.healthBarFill} 
-                style={{ width: `${(Hero.CurrHealth / Hero.TotalHealth) * 100}%` }}
-              />
-              <div className={styles.healthText}>
-                {Hero.CurrHealth} / {Hero.TotalHealth}
-              </div>
-            </div>
+            <div className={styles.statLabel}>Health</div>
+            <StatBar 
+              current={Hero.CurrHealth} 
+              max={Hero.TotalHealth} 
+              label="HP"
+              className={styles.healthBar}
+            />
           </div>
           
+          {/* Attack Section */}
           <div className={styles.attackSection}>
-            <div className={styles.attackHeader}>
-              <span className={styles.attackIcon}>⚔️</span>
-              <span>Attack: {Hero.Attack}</span>
-            </div>
-            <div className={styles.attackBarContainer}>
-              <div 
-                className={styles.attackBarFill} 
-                style={{ width: `${Hero.Attack}%` }}
-              />
+            <div className={styles.statLabel}>Attack</div>
+            <StatBar 
+              current={Hero.Attack} 
+              max={100} 
+              label="ATK"
+              className={styles.attackBar}
+            />
+          </div>
+          
+          {/* Pillar Progress */}
+          <div className={styles.pillarProgress}>
+            <div className={styles.statLabel}>Pillars Collected</div>
+            <div className={styles.pillarsMini}>
+              {Object.entries(PILLAR_TYPES).map(([id, name]) => {
+                const pillarId = parseInt(id);
+                const isCollected = collectedPillars.includes(pillarId);
+                return (
+                  <div
+                    key={pillarId}
+                    className={`${styles.pillarMini} ${isCollected ? styles.collected : ''}`}
+                    title={name}
+                  >
+                    {isCollected ? '✓' : '○'}
+                  </div>
+                );
+              })}
             </div>
           </div>
         </div>
