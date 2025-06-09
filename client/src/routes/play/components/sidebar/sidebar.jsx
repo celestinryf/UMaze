@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './sidebar.module.css';
 
-// Constants (copied from original)
+// Constants
 const PILLAR_TYPES = {
   1: 'Abstraction',
   2: 'Encapsulation', 
@@ -14,57 +14,103 @@ const POTION_TYPES = {
   2: 'Attack'
 };
 
-// Utility function (copied from original)
+// Utility function
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
-// Reusable Components (copied from original)
-const HealthBar = ({ current, total, label, showLabel = true, className = '' }) => (
-  <div className={`${styles.statItem} ${className}`}>
-    <div className={styles.healthBar}>
-      <div
-        className={styles.healthFill}
-        style={{ width: `${(current / total) * 100}%` }}
-      />
-      <span className={styles.healthText}>
-        {showLabel && `${label}: `}{current} / {total}
-      </span>
-    </div>
-  </div>
-);
-
-const StatBar = ({ current, max, label, className = '' }) => (
-  <div className={`${styles.statItem} ${className}`}>
-    <div className={styles.statBar}>
-      <div
-        className={styles.statFill}
-        style={{ width: `${(current / max) * 100}%` }}
-      />
-      <span className={styles.statText}>
-        {label}: {current}
-      </span>
-    </div>
-  </div>
-);
-
+// Reusable Components
 const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion }) => {
   return (
     <div className={styles.sidebar}>
-      {/* Hero Stats */}
+      {/* Hero Stats - Redesigned */}
       <div className={styles.heroPanel}>
         <div className={styles.panelHeader}>
           <h2>🗡️ {Hero.Name}</h2>
         </div>
-        <div className={styles.panelContent}>
-          <HealthBar 
-            current={Hero.CurrHealth} 
-            total={Hero.TotalHealth} 
-            label="HP" 
-          />
-          <StatBar 
-            current={Hero.Attack} 
-            max={100} 
-            label="ATK" 
-          />
+        <div className={styles.heroStatsGrid}>
+          {/* Health Card */}
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div className={styles.statIcon}>❤️</div>
+              <h3>Health</h3>
+            </div>
+            <div className={styles.statProgress}>
+              <div 
+                className={styles.progressBar} 
+                style={{ width: `${(Hero.CurrHealth / Hero.TotalHealth) * 100}%` }}
+              >
+                <div className={styles.progressGradient}></div>
+              </div>
+              <div className={styles.statValue}>
+                {Hero.CurrHealth}/{Hero.TotalHealth}
+              </div>
+            </div>
+          </div>
+          
+          {/* Attack Card */}
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div className={styles.statIcon}>⚔️</div>
+              <h3>Attack</h3>
+            </div>
+            <div className={styles.statValueLarge}>
+              {Hero.Attack}
+              <span className={styles.statSubtext}>/100</span>
+            </div>
+            <div className={styles.statProgress}>
+              <div 
+                className={styles.progressBarAttack} 
+                style={{ width: `${Hero.Attack}%` }}
+              >
+                <div className={styles.progressGradientAttack}></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Level Card */}
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div className={styles.statIcon}>⭐</div>
+              <h3>Level</h3>
+            </div>
+            <div className={styles.statValueLarge}>
+              {Hero.Level || 1}
+            </div>
+            <div className={styles.xpContainer}>
+              <div className={styles.xpLabel}>XP: {Hero.XP || 0}/{Hero.NextLevelXP || 100}</div>
+              <div className={styles.xpBar}>
+                <div 
+                  className={styles.xpFill} 
+                  style={{ width: `${((Hero.XP || 0) / (Hero.NextLevelXP || 100)) * 100}%` }}
+                ></div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Pillars Card */}
+          <div className={styles.statCard}>
+            <div className={styles.statHeader}>
+              <div className={styles.statIcon}>🏆</div>
+              <h3>Pillars Found</h3>
+            </div>
+            <div className={styles.pillarsCount}>
+              {collectedPillars.length}/{Object.keys(PILLAR_TYPES).length}
+            </div>
+            <div className={styles.pillarsProgress}>
+              {Object.entries(PILLAR_TYPES).map(([id, name]) => {
+                const pillarId = parseInt(id);
+                const isCollected = collectedPillars.includes(pillarId);
+                return (
+                  <div 
+                    key={pillarId} 
+                    className={`${styles.pillarIndicator} ${isCollected ? styles.collected : ''}`}
+                    title={name}
+                  >
+                    {isCollected ? '✓' : '○'}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
         </div>
       </div>
 

@@ -74,64 +74,167 @@
     background: rgba(255, 255, 255, 0.3);
 }
 
-/* Hero Stats */
-.statItem {
-    margin-bottom: 1rem;
+/* NEW HERO STATS LAYOUT */
+.heroStatsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 16px;
 }
 
-.healthBar {
+.statCard {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 12px;
+    padding: 12px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s ease;
+}
+
+.statCard:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+}
+
+.statHeader {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+
+.statIcon {
+    font-size: 1.2rem;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
-    height: 24px;
-    position: relative;
-    overflow: hidden;
+    border-radius: 8px;
 }
 
-.healthFill {
+.statCard h3 {
+    margin: 0;
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.statValue {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    margin: 8px 0;
+}
+
+.statValueLarge {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    margin: 10px 0;
+    position: relative;
+}
+
+.statSubtext {
+    font-size: 0.8rem;
+    color: #a0aec0;
+    margin-left: 4px;
+}
+
+.statProgress {
+    margin-top: 8px;
+}
+
+.progressBar {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progressBarAttack {
+    height: 8px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    overflow: hidden;
+    position: relative;
+}
+
+.progressGradient {
+    height: 100%;
     background: linear-gradient(90deg, #2ed573, #00d4ff);
-    height: 100%;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
     box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-.healthText {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+.progressGradientAttack {
+    height: 100%;
+    background: linear-gradient(90deg, #ff0080, #ff00bf);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
 }
 
-/* Stat Bar (for attack stats) */
-.statBar {
-    background: rgba(255, 255, 255, 0.1);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-radius: 10px;
+.pillarsCount {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #9b59b6;
+    text-align: center;
+    margin: 10px 0;
+    text-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
+}
+
+.pillarsProgress {
+    display: flex;
+    justify-content: space-around;
+    margin-top: 8px;
+}
+
+.pillarIndicator {
+    width: 24px;
     height: 24px;
-    position: relative;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.875rem;
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+}
+
+.pillarIndicator.collected {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-color: #9b59b6;
+    color: #fff;
+    box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
+}
+
+.xpContainer {
+    margin-top: 8px;
+}
+
+.xpLabel {
+    font-size: 0.75rem;
+    color: #a0aec0;
+    text-align: center;
+    margin-bottom: 4px;
+}
+
+.xpBar {
+    height: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
     overflow: hidden;
 }
 
-.statFill {
-    background: linear-gradient(90deg, #ff0080, #ff00bf);
+.xpFill {
     height: 100%;
-    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
-}
-
-.statText {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 0.875rem;
-    font-weight: bold;
-    color: #fff;
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    background: linear-gradient(90deg, #f1c40f, #f39c12);
 }
 
 /* Inventory */
@@ -366,5 +469,9 @@
     .inventoryPanel,
     .legendPanel {
         min-width: auto;
+    }
+    
+    .heroStatsGrid {
+        grid-template-columns: 1fr;
     }
 }
