@@ -1,5 +1,5 @@
 import React from 'react';
-import styles from './Sidebar.module.css';
+import styles from './sidebar.module.css';
 
 // Constants (copied from original)
 const PILLAR_TYPES = {
