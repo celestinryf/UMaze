@@ -1,164 +1,376 @@
+/* Main Game Container */
+.gameContainer {
+  display: flex;
+  flex-direction: column;
+  background-color: #1a1a2e;
+  border-radius: 10px;
+  padding: 20px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5);
+  font-family: 'Arial', sans-serif;
+  color: #fff;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Game Board Section */
+.gameBoardSection {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #16213e;
+  border-radius: 8px;
+  box-shadow: inset 0 2px 10px rgba(0, 0, 0, 0.3);
+}
+
 .mazeContainer {
-    display: inline-block;
-    border: 2px solid #333;
-    margin-bottom: 20px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-    border-radius: 5px;
-    overflow: hidden;
-  }
-  
-  .mazeRow {
-    display: flex;
-    flex-direction: row;
-    flex-wrap: nowrap;
-    width: fit-content;
+  display: inline-block;
+  border: 3px solid #0f3460;
+  box-shadow: 0 0 20px rgba(94, 84, 142, 0.5);
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #000;
+}
+
+.mazeRow {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.cell {
+  width: 35px;
+  height: 35px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 18px;
+  border: 1px solid #333;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+/* Cell Types */
+.wall {
+  background-color: #2c3e50;
+  color: #7f8c8d;
+  border-color: #34495e;
+}
+
+.path {
+  background-color: #0f0f0f;
+  color: #444;
+}
+
+.start {
+  background-color: #27ae60;
+  color: white;
+  box-shadow: inset 0 0 10px rgba(39, 174, 96, 0.5);
+}
+
+.exit {
+  background-color: #16a085;
+  color: white;
+  animation: exitPulse 2s infinite;
+}
+
+.player {
+  background-color: #3498db;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 0 15px rgba(52, 152, 219, 0.8);
+  z-index: 2;
+  animation: playerGlow 1s infinite alternate;
+}
+
+.monster {
+  background-color: #e74c3c;
+  color: white;
+  animation: monsterPulse 1.5s infinite;
+}
+
+.pillar {
+  background-color: #9b59b6;
+  color: white;
+  box-shadow: inset 0 0 10px rgba(155, 89, 182, 0.5);
+}
+
+.potion {
+  background-color: #95a5a6;
+  color: white;
+}
+
+.potion1 { background-color: #e74c3c; } /* Health - Red */
+.potion2 { background-color: #3498db; } /* Vision - Blue */
+.potion3 { background-color: #f39c12; } /* Strength - Orange */
+
+/* Hero Section */
+.heroSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  background-color: #16213e;
+  padding: 20px;
+  border-radius: 8px;
+}
+
+/* Hero Stats */
+.heroStats {
+  background-color: #0f3460;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #5e548e;
+}
+
+.heroTitle {
+  margin-top: 0;
+  color: #e94560;
+  text-align: center;
+  font-size: 24px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.statGroup {
+  margin-bottom: 15px;
+}
+
+.statLabel {
+  font-size: 14px;
+  color: #95a5a6;
+  margin-bottom: 5px;
+}
+
+.statValue {
+  font-size: 20px;
+  font-weight: bold;
+  color: #f39c12;
+}
+
+/* Health Bar */
+.healthBarContainer {
+  position: relative;
+  background-color: #2c3e50;
+  height: 30px;
+  border-radius: 15px;
+  overflow: hidden;
+  border: 2px solid #34495e;
+}
+
+.healthBar {
+  height: 100%;
+  background: linear-gradient(90deg, #e74c3c, #c0392b);
+  transition: width 0.3s ease;
+  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+}
+
+.healthText {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-weight: bold;
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+/* Inventory */
+.inventory {
+  background-color: #0f3460;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #5e548e;
+}
+
+.inventoryTitle {
+  margin-top: 0;
+  color: #e94560;
+  text-align: center;
+  font-size: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.inventorySection {
+  margin-bottom: 20px;
+}
+
+.inventorySection h4 {
+  color: #f39c12;
+  margin-bottom: 10px;
+}
+
+.pillarGrid, .potionGrid {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pillarSlot, .potionSlot {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 18px;
+  transition: all 0.3s ease;
+}
+
+.pillarSlot {
+  border: 2px solid #5e548e;
+  background-color: #2c3e50;
+  color: #7f8c8d;
+}
+
+.pillarSlot.collected {
+  background-color: #9b59b6;
+  color: white;
+  box-shadow: 0 0 10px rgba(155, 89, 182, 0.6);
+  animation: collectPulse 0.5s ease;
+}
+
+.potionSlot {
+  border: 2px solid #34495e;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+/* Controls Section */
+.controlsSection {
+  background-color: #0f3460;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #5e548e;
+}
+
+.controlsTitle {
+  margin-top: 0;
+  color: #e94560;
+  text-align: center;
+  font-size: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.horizontalControls {
+  display: flex;
+  gap: 5px;
+}
+
+.controlButton {
+  width: 50px;
+  height: 50px;
+  background-color: #e94560;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 24px;
+  font-weight: bold;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+.controlButton:hover {
+  background-color: #c0392b;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.4);
+}
+
+.controlButton:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+.disabledButton {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  background-color: #7f8c8d !important;
+}
+
+/* Legend */
+.legend {
+  background-color: #0f3460;
+  padding: 20px;
+  border-radius: 8px;
+  border: 2px solid #5e548e;
+}
+
+.legend h3 {
+  margin-top: 0;
+  color: #e94560;
+  text-align: center;
+  font-size: 20px;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5);
+}
+
+.legendGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cellSample {
+  width: 25px;
+  height: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 14px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+
+/* Animations */
+@keyframes exitPulse {
+  0%, 100% { box-shadow: 0 0 5px #16a085; }
+  50% { box-shadow: 0 0 20px #16a085, 0 0 30px #16a085; }
+}
+
+@keyframes playerGlow {
+  from { box-shadow: 0 0 10px rgba(52, 152, 219, 0.6); }
+  to { box-shadow: 0 0 20px rgba(52, 152, 219, 0.9); }
+}
+
+@keyframes monsterPulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+}
+
+@keyframes collectPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .heroSection {
+    grid-template-columns: 1fr;
   }
   
   .cell {
+    width: 25px;
+    height: 25px;
+    font-size: 14px;
+  }
+  
+  .controlButton {
     width: 40px;
     height: 40px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
     font-size: 20px;
-    border: 1px solid #ccc;
-    flex-shrink: 0;
-    transition: all 0.2s ease;
   }
-  
-  .wall {
-    background-color: #333;
-    color: white;
-  }
-  
-  .path {
-    background-color: #f8f8f8;
-    color: #666;
-  }
-  
-  .start {
-    background-color: #81c784;
-    color: white;
-  }
-  
-  .exit {
-    background-color: #4caf50;
-    color: white;
-    animation: glow 1.5s infinite alternate;
-  }
-  
-  .player {
-    background-color: #2196f3;
-    color: white;
-    transform: scale(1.05);
-    box-shadow: 0 0 10px rgba(33, 150, 243, 0.7);
-    z-index: 2;
-  }
-  
-  .monster {
-    background-color: #f44336;
-    color: white;
-  }
-  
-  .pillar {
-    background-color: #9c27b0;
-    color: white;
-  }
-  
-  .potion {
-    background-color: #9c27b0;
-    color: white;
-  }
-  
-  .potion1 {
-    background-color: #f44336; /* Health - Red */
-  }
-  
-  .potion2 {
-    background-color: #2196f3; /* Vision - Blue */
-  }
-  
-  .potion3 {
-    background-color: #ff9800; /* Strength - Orange */
-  }
-  
-  .controls {
-    margin: 20px 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-  }
-  
-  .horizontalControls {
-    display: flex;
-    margin: 5px 0;
-  }
-  
-  .controls button {
-    margin: 0 5px;
-    padding: 10px 15px;
-    background-color: #4caf50;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: all 0.2s ease;
-  }
-  
-  .controls button:hover {
-    background-color: #45a049;
-    transform: translateY(-2px);
-    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
-  }
-  
-  .controls button:active {
-    transform: translateY(0);
-  }
-  
-  .legend {
-    text-align: left;
-    margin-top: 20px;
-    border: 1px solid #ccc;
-    padding: 10px;
-    border-radius: 4px;
-  }
-  
-  .legend h3 {
-    margin-top: 0;
-    border-bottom: 1px solid #eee;
-    padding-bottom: 5px;
-  }
-  
-  .legendItem {
-    display: flex;
-    align-items: center;
-    margin-bottom: 5px;
-  }
-  
-  .cellSample {
-    width: 30px;
-    height: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-right: 10px;
-    font-weight: bold;
-    border-radius: 4px;
-  }
-  
-  @keyframes glow {
-    from {
-      box-shadow: 0 0 5px #4caf50;
-    }
-    to {
-      box-shadow: 0 0 20px #4caf50;
-    }
-  }
-
-  .disabledButton {
-    opacity: 0.5;
-    cursor: not-allowed !important;
-    background-color: #666 !important;
-  }
+}
