@@ -3,10 +3,10 @@ import styles from './sidebar.module.css';
 
 // Constants
 const PILLAR_TYPES = {
-  1: 'Abstraction',
-  2: 'Encapsulation', 
-  3: 'Inheritance',
-  4: 'Polymorphism'
+  1: 'Apple',
+  2: 'Saddle', 
+  3: 'Horn',
+  4: 'Wings'
 };
 
 const POTION_TYPES = {
@@ -64,7 +64,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
         <div className={styles.panelContent}>
           {/* Pillars */}
           <div className={styles.inventorySection}>
-            <h3>Pillars of OOP</h3>
+            <h3>Tools of Escape</h3>
             <div className={styles.pillarsList}>
               {Object.entries(PILLAR_TYPES).map(([id, name]) => {
                 const pillarId = parseInt(id);
