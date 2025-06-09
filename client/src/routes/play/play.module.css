@@ -1,4 +1,4 @@
-/* Main Play.module.css - Using teammate's design with main's features */
+/* Main Play.module.css - Sidebar styles moved to Sidebar.module.css */
 .gameContainer {
   width: 100%;
   height: 100vh;
@@ -220,7 +220,7 @@
 }
 
 .pitVisited {
-  background: white;
+  background: rgba(0, 0, 0, 0.3);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -408,91 +408,9 @@
   box-shadow: none;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 350px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-  padding-right: 10px;
-}
-
-/* Custom scrollbar for sidebar */
-.sidebar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.sidebar::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Panel Styles */
-.heroPanel,
-.inventoryPanel,
-.legendPanel {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  overflow: hidden;
-  animation: slideInRight 0.4s ease-out;
-}
-
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.inventoryPanel { animation-delay: 0.1s; }
-.legendPanel { animation-delay: 0.2s; }
-
-.panelHeader {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 191, 0.05));
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.panelHeader h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: bold;
-  background: linear-gradient(45deg, #fff, #00d4ff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.panelContent {
-  padding: 1.5rem;
-}
-
-/* Hero Stats */
+/* Health Bar for battle overlay */
 .statItem {
   margin-bottom: 1rem;
-}
-
-.statLabel {
-  color: #a0aec0;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-  display: block;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
 }
 
 .healthBar {
@@ -520,234 +438,6 @@
   font-weight: bold;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-/* Stat Bar (for attack stats) */
-.statBar {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 10px;
-  height: 24px;
-  position: relative;
-  overflow: hidden;
-}
-
-.statFill {
-  background: linear-gradient(90deg, #ff0080, #ff00bf);
-  height: 100%;
-  transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-  box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
-}
-
-.statText {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  font-size: 0.875rem;
-  font-weight: bold;
-  color: #fff;
-  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-.heroStat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
-}
-
-.heroStat:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(0, 212, 255, 0.2);
-}
-
-.statIcon {
-  font-size: 1.25rem;
-  color: #00d4ff;
-}
-
-.statValue {
-  margin-left: auto;
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #00d4ff;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-}
-
-/* Inventory */
-.inventorySection {
-  margin-bottom: 1.5rem;
-}
-
-.inventorySection h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-  color: #a0aec0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-.pillarsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.pillarItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pillarItem.collected {
-  background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
-  border-color: rgba(155, 89, 182, 0.3);
-}
-
-.pillarIcon {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.pillarItem.collected .pillarIcon {
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
-  border-color: #9b59b6;
-  color: #fff;
-  box-shadow: 0 0 15px rgba(155, 89, 182, 0.6);
-  animation: collectPulse 0.5s ease;
-}
-
-@keyframes collectPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.pillarName {
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.potionsList {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.potionItem {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.potionItem.canUse:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-3px);
-  border-color: rgba(0, 212, 255, 0.3);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.potionItem:not(.canUse) {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.potionIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: #fff;
-  box-shadow: 0 0 15px currentColor;
-}
-
-.potion1 .potionIcon { 
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-.potion2 .potionIcon { 
-  background: linear-gradient(135deg, #3498db, #2980b9);
-}
-
-.potionName {
-  font-size: 0.75rem;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #a0aec0;
-}
-
-.potionCount {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #00d4ff;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-}
-
-/* Legend */
-.legendGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.legendItem:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.legendSymbol {
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  flex-shrink: 0;
 }
 
 /* Debug Controls */
@@ -1128,6 +818,7 @@
   font-size: 1rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(55, 66, 250, 0.3);
+  margin: 0.5rem;
 }
 
 .retryButton:hover {
@@ -1179,20 +870,6 @@
   .mainGameLayout {
     flex-direction: column;
     gap: 1rem;
-  }
-  
-  .sidebar {
-    width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 1rem;
-  }
-  
-  .heroPanel,
-  .inventoryPanel,
-  .legendPanel {
-    min-width: 300px;
   }
 }
 
