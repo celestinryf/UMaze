@@ -57,13 +57,28 @@ const getName = (type, mapping) => mapping[type] || 'Unknown';
 // Reusable Components
 const HealthBar = ({ current, total, label, showLabel = true, className = '' }) => (
   <div className={`${styles.statItem} ${className}`}>
-    {showLabel && <span className={styles.statLabel}>{label}:</span>}
     <div className={styles.healthBar}>
       <div
         className={styles.healthFill}
         style={{ width: `${(current / total) * 100}%` }}
       />
-      <span className={styles.healthText}>{current} / {total}</span>
+      <span className={styles.healthText}>
+        {showLabel && `${label}: `}{current} / {total}
+      </span>
+    </div>
+  </div>
+);
+
+const StatBar = ({ current, max, label, className = '' }) => (
+  <div className={`${styles.statItem} ${className}`}>
+    <div className={styles.statBar}>
+      <div
+        className={styles.statFill}
+        style={{ width: `${(current / max) * 100}%` }}
+      />
+      <span className={styles.statText}>
+        {label}: {current}
+      </span>
     </div>
   </div>
 );
@@ -92,7 +107,8 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             <HealthBar 
               current={monster.CurrHealth} 
               total={monster.TotalHealth} 
-              showLabel={false}
+              label="HP"
+              showLabel={true}
               className={styles.battleHealthBar}
             />
             <p className={styles.battleStats}>ATK: {monster.Attack}</p>
@@ -116,7 +132,8 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             <HealthBar 
               current={hero.CurrHealth} 
               total={hero.TotalHealth} 
-              showLabel={false}
+              label="HP"
+              showLabel={true}
               className={styles.battleHealthBar}
             />
             <p className={styles.battleStats}>ATK: {hero.Attack}</p>
@@ -591,11 +608,11 @@ const Play = () => {
                   total={Hero.TotalHealth} 
                   label="HP" 
                 />
-                <div className={styles.heroStat}>
-                  <span className={styles.statIcon}>⚔️</span>
-                  <span className={styles.statLabel}>Attack:</span>
-                  <span className={styles.statValue}>{Hero.Attack}</span>
-                </div>
+                <StatBar 
+                  current={Hero.Attack} 
+                  max={100} 
+                  label="ATK" 
+                />
               </div>
             </div>
 
