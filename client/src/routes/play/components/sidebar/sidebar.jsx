@@ -53,26 +53,6 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
               </div>
             </div>
           </div>
-          
-          {/* Pillar Progress */}
-          <div className={styles.pillarProgress}>
-            <div className={styles.statLabel}>Pillars Collected</div>
-            <div className={styles.pillarsMini}>
-              {Object.entries(PILLAR_TYPES).map(([id, name]) => {
-                const pillarId = parseInt(id);
-                const isCollected = collectedPillars.includes(pillarId);
-                return (
-                  <div
-                    key={pillarId}
-                    className={`${styles.pillarMini} ${isCollected ? styles.collected : ''}`}
-                    title={name}
-                  >
-                    {isCollected ? '✓' : '○'}
-                  </div>
-                );
-              })}
-            </div>
-          </div>
         </div>
       </div>
 
