@@ -13,7 +13,7 @@ const ROOM_TYPES = {
   0: 'Wall',
   1: 'Entrance',
   2: 'Exit',
-  3: 'Normal',
+  3: 'Path',
   4: 'Poop'
 };
 
