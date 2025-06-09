@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import styles from './play.module.css';
-import Sidebar from './components/sidebar'; // Added import for Sidebar component
+import Sidebar from './components/sidebar/sidebar.jsx'; // Added import for Sidebar component
 import nickImg from '../../assets/nick.png';
 import matthewImg from '../../assets/matthew.png';
 import celestinImg from '../../assets/celestin.png';
