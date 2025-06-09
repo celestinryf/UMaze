@@ -189,6 +189,7 @@ const Play = () => {
   const [gMessage, setGMessage] = useState("");
   const [inBattle, setInBattle] = useState(false);
   const [battleMessage, setBattleMessage] = useState("");
+  const [visitedPits, setVisitedPits] = useState(new Set());
 
   // Get username from API service
   const username = hasUsername() ? getDisplayUsername() : null;
@@ -324,8 +325,13 @@ const Play = () => {
       setGameData(updatedData);
       setGMessage(`Moved to row ${newX + 1}, col ${newY + 1}`);
       
-      // Check if new room has a monster
+      // Check if new room is a pit and mark it as visited
       const newRoom = updatedData.Maze.Grid[newX][newY];
+      if (newRoom.RoomType === 4) { // Pit
+        setVisitedPits(prev => new Set(prev).add(`${newX}-${newY}`));
+      }
+      
+      // Check if new room has a monster
       if (newRoom.RoomMonster) {
         setInBattle(true);
         setBattleMessage(`A wild ${newRoom.RoomMonster.Name} appears!`);
@@ -404,12 +410,19 @@ const Play = () => {
   // Cell class helper
   const getCellClasses = (cell, rowIndex, colIndex) => {
     const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
-    const roomTypeClass = {
-      0: styles.wall,
-      1: styles.entrance,
-      2: styles.exit,
-      4: styles.pit
-    }[cell.RoomType];
+    const isPit = cell.RoomType === 4;
+    const isVisitedPit = isPit && visitedPits.has(`${rowIndex}-${colIndex}`);
+    
+    let roomTypeClass;
+    if (isPit) {
+      roomTypeClass = isVisitedPit ? styles.pitVisited : styles.pit;
+    } else {
+      roomTypeClass = {
+        0: styles.wall,
+        1: styles.entrance,
+        2: styles.exit
+      }[cell.RoomType];
+    }
 
     return [
       styles.mazeCell,
@@ -664,7 +677,11 @@ const Play = () => {
                   </div>
                   <div className={styles.legendItem}>
                     <div className={`${styles.legendSymbol} ${styles.pit}`}></div>
-                    <span>Pit</span>
+                    <span>Hidden Pit</span>
+                  </div>
+                  <div className={styles.legendItem}>
+                    <div className={`${styles.legendSymbol} ${styles.pitVisited}`}></div>
+                    <span>Discovered Pit</span>
                   </div>
                   <div className={styles.legendItem}>
                     <div className={styles.legendSymbol}>M</div>
