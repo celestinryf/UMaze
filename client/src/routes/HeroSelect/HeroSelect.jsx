@@ -17,40 +17,37 @@ const myHeroes = [
     name: "Nick",
     img: nickImg,
     desc: "A powerful warrior with high power.",
-    skills: ["Starts with 2 buzz balls", "Has powerful, but reckless special attack"],
+    spec: "DUI: Powerful, but reckless attack",
+    pass: "Pregame: Starts with 2 Buzz Ballz",
     stats: {
-      attack: 8,
-      defense: 7,
-      health: 9,
-      magic: 2
+      attack: 30,
+      health: 200,
     },
-    class: "Warrior"
+    class: "Drunk Warrior"
   },
   {
     id: 4,
     name: "Matthew",
     img: matthewImg,
-    desc: "A nerdy fella, who is always prepared.",
-    skills: ["Immune to Pits", "Has a life steal special attack"],
+    desc: "Bulky, who can take this guy down?.",
+    pass: "Stinky: Immune to Poos",
+    spec: "Always Hungry: Life Steal",
     stats: {
-      attack: 3,
-      defense: 4,
-      health: 5,
-      magic: 10
+      attack: 25,
+      health: 250,
     },
-    class: "Collecter"
+    class: "Tank"
   },
   {
     id: 7,
     name: "Celestin",
     img: celestinImg,
     desc: "No matter the damage, he always gets back up.",
-    skills: ["Gets a second chance", "Has a special attack that halves oppenents health"],
+    spec: "Great at Math: Halves Opponenents HP",
+    pass: "Clutch: Gets a second life",
     stats: {
-      attack: 7,
-      defense: 5,
-      health: 6,
-      magic: 4
+      attack: 20,
+      health: 150,
     },
     class: "Pheonix"
   },
@@ -59,12 +56,11 @@ const myHeroes = [
     name: "Primo",
     img: primoImg,
     desc: "Crafty Mage that can make the best of what he has.",
-    skills: ["Better Utilize Buzz Balls", "Can take a turn to increase attack with costs"],
+    pass: "Crafty: Better Utilizes Buzz Ballz",
+    spec: "Gambler: Take a turn to increase attack, at the cost of health",
     stats: {
-      attack: 2,
-      defense: 6,
-      health: 7,
-      magic: 9
+      attack: 15,
+      health: 220,
     },
     class: "Mage"
   }
@@ -108,24 +104,40 @@ const HeroSelect = () => {
     }
   };
 
-  const StatBar = ({ label, value, color }) => (
+  const AttackBar = ({ label, value, color }) => (
     <div className={styles.statItem}>
       <div className={styles.statHeader}>
         <span className={styles.statLabel}>{label}</span>
-        <span className={styles.statValue}>{value}/10</span>
+        <span className={styles.statValue}>{value}/30</span>
       </div>
       <div className={styles.statBarBg}>
         <div 
           className={styles.statBarFill} 
           style={{ 
-            width: `${value * 10}%`,
+            width: `${value * 3.5}%`,
             backgroundColor: color
           }}
         />
       </div>
     </div>
   );
-
+  const HealthBar = ({ label, value, color }) => (
+    <div className={styles.statItem}>
+      <div className={styles.statHeader}>
+        <span className={styles.statLabel}>{label}</span>
+        <span className={styles.statValue}>{value}/250</span>
+      </div>
+      <div className={styles.statBarBg}>
+        <div 
+          className={styles.statBarFill} 
+          style={{ 
+            width: `${value * 0.4}%`,
+            backgroundColor: color
+          }}
+        />
+      </div>
+    </div>
+  );
   return (
     <div 
       className={styles.heroSelectContainer} 
@@ -202,24 +214,30 @@ const HeroSelect = () => {
             <div className={styles.statsSection}>
               <h3 className={styles.sectionTitle}>COMBAT STATS</h3>
               <div className={styles.statsGrid}>
-                <StatBar label="ATK" value={mySelectedHero.stats.attack} color="#ff4757" />
-                <StatBar label="DEF" value={mySelectedHero.stats.defense} color="#3742fa" />
-                <StatBar label="HP" value={mySelectedHero.stats.health} color="#2ed573" />
-                <StatBar label="MAG" value={mySelectedHero.stats.magic} color="#a55eea" />
+                <HealthBar label="HP" value={mySelectedHero.stats.health} color="#00bfff" />
+                <AttackBar label="ATK" value={mySelectedHero.stats.attack} color="#ff4757" />
               </div>
             </div>
 
             <div className={styles.skillsSection}>
-              <h3 className={styles.sectionTitle}>SPECIAL ABILITIES</h3>
+              <h3 className={styles.sectionTitle}>Special Attack</h3>
               <div className={styles.skillsList}>
-                {mySelectedHero.skills.map((theSkill, theIndex) => (
-                  <div key={theIndex} className={styles.skillItem}>
-                    <div className={styles.skillIcon}>⚡</div>
-                    <span className={styles.skillName}>{theSkill}</span>
-                  </div>
-                ))}
+                <div className={styles.skillItem}>
+                  <div className={styles.skillIcon}>🗡</div>
+                  <span className={styles.skillName}>{mySelectedHero.spec}</span>
+                </div>
               </div>
             </div>
+            <div className={styles.skillsSection}>
+              <h3 className={styles.sectionTitle}>Passive Ability</h3>
+              <div className={styles.skillsList}>
+                <div className={styles.skillItem}>
+                  <div className={styles.skillIcon}>⚡</div>
+                  <span className={styles.skillName}>{mySelectedHero.pass}</span>
+                </div>
+              </div>
+            </div>
+
           </div>
         )}
 
