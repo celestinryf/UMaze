@@ -1,16 +1,16 @@
-/* Main Play.module.css - Using teammate's design with main's features */
+/* Main Play.module.css - Sidebar styles moved to Sidebar.module.css */
 .gameContainer {
   width: 100%;
-  height: 100vh;
+  min-height: 100vh;
   background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
   color: #fff;
   font-family: 'Arial', sans-serif;
-  overflow: hidden;
+  overflow-x: hidden;
   position: relative;
 }
 
 .gameContent {
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   transition: filter 0.3s ease;
@@ -136,7 +136,8 @@
   display: flex;
   gap: 2rem;
   padding: 2rem;
-  overflow: hidden;
+  overflow: visible;
+  min-height: 0;
 }
 
 /* Maze Container */
@@ -148,8 +149,9 @@
   backdrop-filter: blur(20px);
   border: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 16px;
-  padding: 2rem;
+  padding: 1.5rem;
   animation: slideIn 0.4s ease-out;
+  min-height: 400px;
 }
 
 @keyframes slideIn {
@@ -163,6 +165,8 @@
   align-items: center;
   justify-content: center;
   overflow: auto;
+  -webkit-overflow-scrolling: touch;
+  padding: 10px;
 }
 
 .mazeGrid {
@@ -220,9 +224,15 @@
 }
 
 .pit {
-  background: radial-gradient(circle, transparent 30%, #000 70%);
-  border-color: #000;
-  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.8);
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pitVisited {
+  background: linear-gradient(135deg, rgba(139, 0, 0, 0.8), rgba(102, 0, 0, 0.6));
+  border: 1px solid #8B0000;
+  position: relative;
+  color: #fff;
 }
 
 .currentCell {
@@ -335,91 +345,97 @@
   letter-spacing: 0.05em;
 }
 
-/* Sidebar */
-.sidebar {
-  width: 350px;
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-  overflow-y: auto;
-  max-height: calc(100vh - 200px);
-  padding-right: 10px;
-}
-
-/* Custom scrollbar for sidebar */
-.sidebar::-webkit-scrollbar {
-  width: 8px;
-}
-
-.sidebar::-webkit-scrollbar-track {
+/* Movement Controls */
+.movementControls {
   background: rgba(255, 255, 255, 0.05);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb {
-  background: rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-}
-
-.sidebar::-webkit-scrollbar-thumb:hover {
-  background: rgba(255, 255, 255, 0.3);
-}
-
-/* Panel Styles */
-.heroPanel,
-.inventoryPanel,
-.legendPanel {
-  background: rgba(0, 0, 0, 0.4);
-  backdrop-filter: blur(20px);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  padding: 12px;
+  margin-top: 1rem;
+  text-align: center;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 16px;
-  overflow: hidden;
-  animation: slideInRight 0.4s ease-out;
 }
 
-@keyframes slideInRight {
-  from { opacity: 0; transform: translateX(20px); }
-  to { opacity: 1; transform: translateX(0); }
-}
-
-.inventoryPanel { animation-delay: 0.1s; }
-.legendPanel { animation-delay: 0.2s; }
-
-.panelHeader {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 191, 0.05));
-  padding: 16px 20px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.panelHeader h2 {
-  margin: 0;
-  font-size: 1.25rem;
-  font-weight: bold;
-  background: linear-gradient(45deg, #fff, #00d4ff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-
-.panelContent {
-  padding: 1.5rem;
-}
-
-/* Hero Stats */
-.statItem {
-  margin-bottom: 1rem;
-}
-
-.statLabel {
-  color: #a0aec0;
-  font-size: 0.875rem;
-  margin-bottom: 0.5rem;
-  display: block;
+.controlsTitle {
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #00d4ff;
+  font-size: 0.9rem;
   text-transform: uppercase;
   letter-spacing: 0.05em;
-  font-weight: 600;
+}
+
+.controlsGrid {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.controlRow {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.controlSpacer {
+  width: 35px;
+}
+
+.moveButton {
+  width: 35px;
+  height: 35px;
+  border: none;
+  border-radius: 6px;
+  background: linear-gradient(135deg, #00d4ff, #48e5f0);
+  color: #fff;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.moveButton:hover:not(:disabled) {
+  background: linear-gradient(135deg, #48e5f0, #ff00bf);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0, 212, 255, 0.4);
+}
+
+.moveButton:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+}
+
+.moveButton:disabled {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.3);
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+/* Touch device optimization */
+@media (hover: none) {
+  .moveButton {
+    width: 45px;
+    height: 45px;
+    font-size: 16px;
+  }
+  
+  .moveButton:active:not(:disabled) {
+    background: linear-gradient(135deg, #48e5f0, #ff00bf);
+    box-shadow: 0 4px 16px rgba(0, 212, 255, 0.4);
+  }
+}
+
+/* Health Bar for battle overlay */
+.statItem {
+  margin-bottom: 1rem;
 }
 
 .healthBar {
@@ -447,206 +463,6 @@
   font-weight: bold;
   color: #fff;
   text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
-}
-
-.heroStat {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-top: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  padding: 0.75rem;
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.2s ease;
-}
-
-.heroStat:hover {
-  background: rgba(255, 255, 255, 0.08);
-  border-color: rgba(0, 212, 255, 0.2);
-}
-
-.statIcon {
-  font-size: 1.25rem;
-  color: #00d4ff;
-}
-
-.statValue {
-  margin-left: auto;
-  font-weight: bold;
-  font-size: 1.1rem;
-  color: #00d4ff;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-}
-
-/* Inventory */
-.inventorySection {
-  margin-bottom: 1.5rem;
-}
-
-.inventorySection h3 {
-  margin: 0 0 1rem 0;
-  font-size: 1rem;
-  color: #a0aec0;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  font-weight: 600;
-}
-
-.pillarsList {
-  display: flex;
-  flex-direction: column;
-  gap: 0.75rem;
-}
-
-.pillarItem {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0.75rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 8px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.pillarItem.collected {
-  background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
-  border-color: rgba(155, 89, 182, 0.3);
-}
-
-.pillarIcon {
-  width: 24px;
-  height: 24px;
-  border: 2px solid rgba(255, 255, 255, 0.2);
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  font-size: 0.875rem;
-  transition: all 0.3s ease;
-  background: rgba(255, 255, 255, 0.05);
-}
-
-.pillarItem.collected .pillarIcon {
-  background: linear-gradient(135deg, #9b59b6, #8e44ad);
-  border-color: #9b59b6;
-  color: #fff;
-  box-shadow: 0 0 15px rgba(155, 89, 182, 0.6);
-  animation: collectPulse 0.5s ease;
-}
-
-@keyframes collectPulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
-
-.pillarName {
-  flex: 1;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.potionsList {
-  display: flex;
-  gap: 0.75rem;
-}
-
-.potionItem {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: 8px;
-  cursor: pointer;
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.potionItem.canUse:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: translateY(-3px);
-  border-color: rgba(0, 212, 255, 0.3);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-}
-
-.potionItem:not(.canUse) {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.potionIcon {
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.25rem;
-  color: #fff;
-  box-shadow: 0 0 15px currentColor;
-}
-
-.potion1 .potionIcon { 
-  background: linear-gradient(135deg, #e74c3c, #c0392b);
-}
-.potion2 .potionIcon { 
-  background: linear-gradient(135deg, #3498db, #2980b9);
-}
-
-.potionName {
-  font-size: 0.75rem;
-  text-align: center;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  color: #a0aec0;
-}
-
-.potionCount {
-  font-size: 1.25rem;
-  font-weight: bold;
-  color: #00d4ff;
-  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
-}
-
-/* Legend */
-.legendGrid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 0.75rem;
-}
-
-.legendItem {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  font-size: 0.875rem;
-  padding: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 6px;
-  transition: all 0.2s ease;
-}
-
-.legendItem:hover {
-  background: rgba(255, 255, 255, 0.08);
-}
-
-.legendSymbol {
-  width: 24px;
-  height: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  border-radius: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  font-weight: bold;
-  flex-shrink: 0;
 }
 
 /* Debug Controls */
@@ -755,7 +571,7 @@
   border-radius: 20px;
   padding: 40px;
   width: 90%;
-  max-width: 800px;
+  /* max-width: 800px; */
   box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
   animation: slideUp 0.4s ease-out;
   position: relative;
@@ -1027,6 +843,7 @@
   font-size: 1rem;
   transition: all 0.3s ease;
   box-shadow: 0 4px 15px rgba(55, 66, 250, 0.3);
+  margin: 0.5rem;
 }
 
 .retryButton:hover {
@@ -1049,7 +866,7 @@
   to { transform: rotate(360deg); }
 }
 
-.winMessage {
+.wonMessage {
   font-size: 3.5rem;
   font-weight: 900;
   margin-bottom: 1.5rem;
@@ -1073,29 +890,120 @@
   animation: titlePulse 2s infinite;
 }
 
-/* Responsive Design */
-@media (max-width: 1024px) {
+/* Responsive Design - Mobile First Approach */
+/* Mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+  .gameHeader {
+    flex-direction: column;
+    gap: 10px;
+    padding: 10px;
+  }
+
+  .gameTitle {
+    font-size: 1.5rem;
+  }
+  
+  .saveGameSection {
+    width: 100%;
+    flex-direction: column;
+  }
+  
+  .saveInput {
+    width: 100%;
+  }
+  
+  .saveButton {
+    width: 100%;
+  }
+  
   .mainGameLayout {
     flex-direction: column;
+    padding: 1rem;
     gap: 1rem;
   }
   
-  .sidebar {
+  .mazeContainer {
+    padding: 1rem;
+    min-height: 350px;
+  }
+  
+  .mazeCell {
+    width: 25px;
+    height: 25px;
+    font-size: 10px;
+  }
+  
+  .player img {
+    width: 20px;
+    height: 20px;
+  }
+  
+  .cellContents {
+    top: 1px;
+    right: 1px;
+  }
+  
+  .monsterIndicator,
+  .pillarIndicator,
+  .potionIndicator {
+    width: 10px;
+    height: 10px;
+    font-size: 7px;
+  }
+  
+  .controlsInfo {
+    font-size: 12px;
+  }
+  
+  .battleContainer {
+    width: 95%;
+    padding: 20px;
+  }
+  
+  .battleTitle {
+    font-size: 2rem;
+  }
+  
+  .battleArena {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+    min-height: auto;
+  }
+  
+  .battleMonsterSprite,
+  .battleHeroSprite {
+    font-size: 50px;
+    margin: 1rem 0;
+  }
+  
+  .battleHeroSprite img {
+    width: 50px;
+    height: 50px;
+  }
+  
+  .battleActions {
+    flex-direction: column;
     width: 100%;
-    flex-direction: row;
-    overflow-x: auto;
-    overflow-y: hidden;
-    gap: 1rem;
   }
   
-  .heroPanel,
-  .inventoryPanel,
-  .legendPanel {
-    min-width: 300px;
+  .battleButton {
+    width: 100%;
+    padding: 0.75rem 1.5rem;
+    font-size: 0.9rem;
+  }
+  
+  .debugControls {
+    flex-direction: column;
+    padding: 10px;
+  }
+  
+  .debugControls button {
+    width: 100%;
   }
 }
 
-@media (max-width: 768px) {
+/* Small tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
   .gameHeader {
     flex-direction: column;
     gap: 12px;
@@ -1106,14 +1014,28 @@
     font-size: 1.75rem;
   }
   
+  .mainGameLayout {
+    flex-direction: column;
+    padding: 1.5rem;
+    gap: 1.5rem;
+  }
+  
   .mazeCell {
-    width: 28px;
-    height: 28px;
+    width: 30px;
+    height: 30px;
   }
   
   .player img {
-    width: 22px;
-    height: 22px;
+    width: 24px;
+    height: 24px;
+  }
+  
+  .monsterIndicator,
+  .pillarIndicator,
+  .potionIndicator {
+    width: 12px;
+    height: 12px;
+    font-size: 8px;
   }
   
   .battleContainer {
@@ -1136,12 +1058,124 @@
   }
   
   .battleActions {
-    flex-direction: column;
-    width: 100%;
+    flex-wrap: wrap;
+    justify-content: center;
   }
   
   .battleButton {
-    width: 100%;
+    min-width: 45%;
     padding: 0.875rem 2rem;
+  }
+}
+
+/* Large tablets and small laptops (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .mainGameLayout {
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+  
+  .mazeCell {
+    width: 32px;
+    height: 32px;
+  }
+  
+  .player img {
+    width: 26px;
+    height: 26px;
+  }
+  
+  .battleArena {
+    gap: 2rem;
+  }
+}
+
+/* Desktop (1025px - 1440px) - Default styles apply */
+
+/* Large desktop (1441px+) */
+@media (min-width: 1441px) {
+  .gameContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .gameContent {
+    width: 100%;
+    margin: 0 auto;
+  }
+  
+  .mazeCell {
+    width: 40px;
+    height: 40px;
+  }
+  
+  .player img {
+    width: 32px;
+    height: 32px;
+  }
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+  .gameHeader {
+    padding: 8px 16px;
+  }
+  
+  .gameTitle {
+    font-size: 1.5rem;
+  }
+  
+  .mainGameLayout {
+    padding: 1rem;
+  }
+  
+  .mazeContainer {
+    min-height: 300px;
+  }
+  
+  .controlsInfo {
+    display: none;
+  }
+  
+  .movementControls {
+    position: fixed;
+    right: 1rem;
+    bottom: 1rem;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 100;
+  }
+}
+
+/* High resolution displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .mazeCell,
+  .moveButton,
+  .battleButton {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
+}
+
+/* Accessibility - Reduced Motion */
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .gameContainer {
+    background: white;
+    color: black;
+  }
+  
+  .debugControls,
+  .movementControls,
+  .saveGameSection {
+    display: none;
   }
 }

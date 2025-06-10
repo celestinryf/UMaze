@@ -15,8 +15,7 @@ require (
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/coder/websocket v1.8.12 // indirect
 	github.com/dgryski/go-rendezvous v0.0.0-20200823014737-9f7001d12a5f // indirect
-	github.com/jfeliu007/goplantuml v1.6.2 // indirect
-	github.com/spf13/afero v1.8.2 // indirect
+	github.com/joho/godotenv v1.5.1 // indirect
 	golang.org/x/exp v0.0.0-20240325151524-a685a6edb6d8 // indirect
 	golang.org/x/text v0.3.7 // indirect
 )

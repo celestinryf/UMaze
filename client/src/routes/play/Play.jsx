@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import styles from './play.module.css';
+import Sidebar from './components/sidebar/sidebar.jsx'; // Added import for Sidebar component
 import nickImg from '../../assets/nick.png';
 import matthewImg from '../../assets/matthew.png';
 import celestinImg from '../../assets/celestin.png';
@@ -12,15 +13,15 @@ const ROOM_TYPES = {
   0: 'Wall',
   1: 'Entrance',
   2: 'Exit',
-  3: 'Normal',
-  4: 'Pit'
+  3: 'Path',
+  4: 'Poop'
 };
 
 const PILLAR_TYPES = {
-  1: 'Abstraction',
-  2: 'Encapsulation',
-  3: 'Inheritance',
-  4: 'Polymorphism'
+  1: 'Apple',
+  2: 'Saddle',
+  3: 'Horn',
+  4: 'Wings'
 };
 
 const POTION_TYPES = {
@@ -45,10 +46,10 @@ const DIRECTIONS = {
 };
 
 const heroImages = {
-  'Nick': nickImg,
-  'Matthew': matthewImg,
-  'Celestin': celestinImg,
-  'Primo': primoImg
+  'NICK': nickImg,
+  'MATTHEW': matthewImg,
+  'CELESTIN': celestinImg,
+  'PRIMO': primoImg
 };
 
 // Utility functions
@@ -57,13 +58,14 @@ const getName = (type, mapping) => mapping[type] || 'Unknown';
 // Reusable Components
 const HealthBar = ({ current, total, label, showLabel = true, className = '' }) => (
   <div className={`${styles.statItem} ${className}`}>
-    {showLabel && <span className={styles.statLabel}>{label}:</span>}
     <div className={styles.healthBar}>
       <div
         className={styles.healthFill}
         style={{ width: `${(current / total) * 100}%` }}
       />
-      <span className={styles.healthText}>{current} / {total}</span>
+      <span className={styles.healthText}>
+        {showLabel && `${label}: `}{current} / {total}
+      </span>
     </div>
   </div>
 );
@@ -92,7 +94,8 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             <HealthBar 
               current={monster.CurrHealth} 
               total={monster.TotalHealth} 
-              showLabel={false}
+              label="HP"
+              showLabel={true}
               className={styles.battleHealthBar}
             />
             <p className={styles.battleStats}>ATK: {monster.Attack}</p>
@@ -116,7 +119,8 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             <HealthBar 
               current={hero.CurrHealth} 
               total={hero.TotalHealth} 
-              showLabel={false}
+              label="HP"
+              showLabel={true}
               className={styles.battleHealthBar}
             />
             <p className={styles.battleStats}>ATK: {hero.Attack}</p>
@@ -189,6 +193,7 @@ const Play = () => {
   const [gMessage, setGMessage] = useState("");
   const [inBattle, setInBattle] = useState(false);
   const [battleMessage, setBattleMessage] = useState("");
+  const [visitedPits, setVisitedPits] = useState(new Set());
 
   // Get username from API service
   const username = hasUsername() ? getDisplayUsername() : null;
@@ -324,8 +329,13 @@ const Play = () => {
       setGameData(updatedData);
       setGMessage(`Moved to row ${newX + 1}, col ${newY + 1}`);
       
-      // Check if new room has a monster
+      // Check if new room is a pit and mark it as visited
       const newRoom = updatedData.Maze.Grid[newX][newY];
+      if (newRoom.RoomType === 4) { // Pit
+        setVisitedPits(prev => new Set(prev).add(`${newX}-${newY}`));
+      }
+      
+      // Check if new room has a monster
       if (newRoom.RoomMonster) {
         setInBattle(true);
         setBattleMessage(`A wild ${newRoom.RoomMonster.Name} appears!`);
@@ -404,12 +414,19 @@ const Play = () => {
   // Cell class helper
   const getCellClasses = (cell, rowIndex, colIndex) => {
     const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
-    const roomTypeClass = {
-      0: styles.wall,
-      1: styles.entrance,
-      2: styles.exit,
-      4: styles.pit
-    }[cell.RoomType];
+    const isPit = cell.RoomType === 4;
+    const isVisitedPit = isPit && visitedPits.has(`${rowIndex}-${colIndex}`);
+    
+    let roomTypeClass;
+    if (isPit) {
+      roomTypeClass = isVisitedPit ? styles.pitVisited : styles.pit;
+    } else {
+      roomTypeClass = {
+        0: styles.wall,
+        1: styles.entrance,
+        2: styles.exit
+      }[cell.RoomType];
+    }
 
     return [
       styles.mazeCell,
@@ -516,123 +533,63 @@ const Play = () => {
 
             {/* Controls Info */}
             <div className={styles.controlsInfo}>
-              <p>Use arrow keys to move</p>
-            </div>
-          </div>
-
-          {/* Sidebar */}
-          <div className={styles.sidebar}>
-            {/* Hero Stats */}
-            <div className={styles.heroPanel}>
-              <div className={styles.panelHeader}>
-                <h2>🗡️ {Hero.Name}</h2>
-              </div>
-              <div className={styles.panelContent}>
-                <HealthBar 
-                  current={Hero.CurrHealth} 
-                  total={Hero.TotalHealth} 
-                  label="HP" 
-                />
-                <div className={styles.heroStat}>
-                  <span className={styles.statIcon}>⚔️</span>
-                  <span className={styles.statLabel}>Attack:</span>
-                  <span className={styles.statValue}>{Hero.Attack}</span>
-                </div>
-              </div>
+              <p>Use WASD or Arrow Keys for keyboard control</p>
             </div>
 
-            {/* Inventory */}
-            <div className={styles.inventoryPanel}>
-              <div className={styles.panelHeader}>
-                <h2>🎒 Inventory</h2>
-              </div>
-              <div className={styles.panelContent}>
-                {/* Pillars */}
-                <div className={styles.inventorySection}>
-                  <h3>Pillars of OOP</h3>
-                  <div className={styles.pillarsList}>
-                    {Object.entries(PILLAR_TYPES).map(([id, name]) => {
-                      const pillarId = parseInt(id);
-                      const isCollected = collectedPillars.includes(pillarId);
-                      return (
-                        <div
-                          key={pillarId}
-                          className={`${styles.pillarItem} ${isCollected ? styles.collected : ''}`}
-                        >
-                          <span className={styles.pillarIcon}>
-                            {isCollected ? '✓' : '○'}
-                          </span>
-                          <span className={styles.pillarName}>{name}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
+            {/* Movement Controls */}
+            <div className={styles.movementControls}>
+              <div className={styles.controlsTitle}>Movement</div>
+              <div className={styles.controlsGrid}>
+                <div className={styles.controlRow}>
+                  <div className={styles.controlSpacer}></div>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(-1, 0)}
+                    disabled={inBattle}
+                    title="Move Up"
+                  >
+                    ↑
+                  </button>
+                  <div className={styles.controlSpacer}></div>
                 </div>
-
-                {/* Potions */}
-                <div className={styles.inventorySection}>
-                  <h3>Potions</h3>
-                  <div className={styles.potionsList}>
-                    {[1, 2].map(potion => {
-                      const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
-                      const canUse = count > 0 && !inBattle;
-
-                      return (
-                        <div 
-                          key={potion} 
-                          className={`${styles.potionItem} ${canUse ? styles.canUse : ''}`}
-                          onClick={() => canUse && usePotion(potion)}
-                        >
-                          <span className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
-                            ♦
-                          </span>
-                          <span className={styles.potionName}>
-                            {getName(potion, POTION_TYPES)}
-                          </span>
-                          <span className={styles.potionCount}>{count}</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Map Legend */}
-            <div className={styles.legendPanel}>
-              <div className={styles.panelHeader}>
-                <h2>📍 Legend</h2>
-              </div>
-              <div className={styles.panelContent}>
-                <div className={styles.legendGrid}>
-                  <div className={styles.legendItem}>
-                    <div className={`${styles.legendSymbol} ${styles.wall}`}></div>
-                    <span>Wall</span>
-                  </div>
-                  <div className={styles.legendItem}>
-                    <div className={`${styles.legendSymbol} ${styles.entrance}`}></div>
-                    <span>Entrance</span>
-                  </div>
-                  <div className={styles.legendItem}>
-                    <div className={`${styles.legendSymbol} ${styles.exit}`}></div>
-                    <span>Exit</span>
-                  </div>
-                  <div className={styles.legendItem}>
-                    <div className={`${styles.legendSymbol} ${styles.pit}`}></div>
-                    <span>Pit</span>
-                  </div>
-                  <div className={styles.legendItem}>
-                    <div className={styles.legendSymbol}>M</div>
-                    <span>Monster</span>
-                  </div>
-                  <div className={styles.legendItem}>
-                    <div className={styles.legendSymbol}>P</div>
-                    <span>Pillar</span>
-                  </div>
+                <div className={styles.controlRow}>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(0, -1)}
+                    disabled={inBattle}
+                    title="Move Left"
+                  >
+                    ←
+                  </button>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(1, 0)}
+                    disabled={inBattle}
+                    title="Move Down"
+                  >
+                    ↓
+                  </button>
+                  <button
+                    className={styles.moveButton}
+                    onClick={() => handleButtonMove(0, 1)}
+                    disabled={inBattle}
+                    title="Move Right"
+                  >
+                    →
+                  </button>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Sidebar - REPLACED WITH COMPONENT */}
+          <Sidebar 
+            Hero={Hero}
+            collectedPillars={collectedPillars}
+            collectedPotions={collectedPotions}
+            inBattle={inBattle}
+            usePotion={usePotion}
+          />
         </div>
 
         {/* Debug Controls */}

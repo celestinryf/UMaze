@@ -1,0 +1,661 @@
+/* Sidebar */
+.sidebar {
+    width: 350px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    padding-right: 10px;
+}
+
+/* Panel Styles */
+.heroPanel,
+.inventoryPanel,
+.legendPanel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: slideInRight 0.4s ease-out;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(20px); }
+    to { opacity: 1; transform: translateX(0); }
+}
+
+.inventoryPanel { animation-delay: 0.1s; }
+
+.panelHeader {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.1), rgba(255, 0, 191, 0.05));
+    padding: 16px 20px;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+}
+
+.panelHeader h2 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #fff, #00d4ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.panelContent {
+    padding: 1.5rem;
+    flex-grow: 1;
+    overflow-y: auto;
+}
+
+/* Custom scrollbar for panel content */
+.panelContent::-webkit-scrollbar {
+    width: 6px;
+}
+
+.panelContent::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+.panelContent::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 3px;
+}
+
+.panelContent::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+}
+
+/* TALLER HERO STATS */
+.heroPanel {
+    min-height: 170px;
+}
+
+.compactStats {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.statSection {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.healthBarContainer {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 24px; /* Taller bar */
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.healthBarFill {
+    height: 100%;
+    background: linear-gradient(90deg, #ff6b6b, #ff9e7d);
+    transition: width 0.5s ease;
+}
+
+.healthText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+}
+
+.attackBarContainer {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 24px; /* Taller bar */
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.attackBarFill {
+    height: 100%;
+    /* Blue/Purple gradient as requested */
+    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    transition: width 0.5s ease;
+}
+
+.attackText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 1rem;
+    font-weight: bold;
+    color: white;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+    letter-spacing: 0.5px;
+} 
+
+.statLabel {
+    font-size: 0.9rem;
+    color: #a0aec0;
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+/* SMALLER INVENTORY PANEL */
+.smallerInventory {
+    min-height: 320px; /* Reduced height */
+}
+
+.inventorySection {
+    margin-bottom: 1.2rem; /* Slightly less spacing */
+}
+
+.inventorySection h3 {
+    margin: 0 0 0.8rem 0; /* Reduced margin */
+    font-size: 0.95rem; /* Slightly smaller */
+    color: #a0aec0;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    font-weight: 600;
+}
+
+.pillarsList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.6rem; /* Reduced gap */
+}
+
+.pillarItem {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Slightly less gap */
+    padding: 0.6rem; /* Less padding */
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    font-size: 0.9rem; /* Slightly smaller text */
+}
+
+.pillarItem.collected {
+    background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
+    border-color: rgba(155, 89, 182, 0.3);
+}
+
+.pillarIcon {
+    width: 22px; /* Smaller */
+    height: 22px; /* Smaller */
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 0.8rem; /* Smaller */
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.05);
+    color: #a0aec0;
+}
+
+.pillarItem.collected .pillarIcon {
+    background: linear-gradient(135deg, #9b59b6, #8e44ad);
+    border-color: #9b59b6;
+    color: #fff;
+    box-shadow: 0 0 12px rgba(155, 89, 182, 0.6);
+    animation: collectPulse 0.5s ease;
+}
+
+@keyframes collectPulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); }
+}
+
+.pillarName {
+    flex: 1;
+    font-weight: 500;
+    color: #fff;
+}
+
+.potionsList {
+    display: flex;
+    gap: 0.6rem; /* Reduced gap */
+}
+
+.potionItem {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.4rem; /* Reduced gap */
+    padding: 0.8rem; /* Less padding */
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.potionItem.canUse:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-3px);
+    border-color: rgba(0, 212, 255, 0.3);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+.potionItem:not(.canUse) {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.potionIcon {
+    width: 32px; /* Slightly smaller */
+    height: 32px; /* Slightly smaller */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.1rem; /* Slightly smaller */
+    color: #fff;
+    box-shadow: 0 0 12px currentColor;
+}
+
+.potion1 .potionIcon,
+.potion1 { 
+    background: linear-gradient(135deg, #e74c3c, #c0392b);
+}
+
+.potion2 .potionIcon,
+.potion2 { 
+    background: linear-gradient(135deg, #3498db, #2980b9);
+}
+
+.potionName {
+    font-size: 0.7rem; /* Slightly smaller */
+    text-align: center;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #a0aec0;
+}
+
+.potionCount {
+    font-size: 1.1rem; /* Slightly smaller */
+    font-weight: bold;
+    color: #00d4ff;
+    text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
+}
+
+/* LEGEND TOGGLE */
+.legendToggle {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    padding: 12px 20px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    justify-content: center;
+    margin-top: -5px;
+}
+
+.legendToggle:hover {
+    background: rgba(0, 212, 255, 0.1);
+    border-color: rgba(0, 212, 255, 0.3);
+}
+
+.toggleIcon {
+    font-size: 1rem;
+    font-weight: bold;
+    background: linear-gradient(45deg, #fff, #00d4ff);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* LEGEND PANEL */
+.legendPanel {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 16px;
+    overflow: hidden;
+    animation: fadeIn 0.3s ease;
+    margin-top: -10px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.legendGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0.75rem;
+    padding: 1.5rem;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 0.875rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    transition: all 0.2s ease;
+    color: #fff;
+}
+
+.legendItem:hover {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+.legendSymbol {
+    width: 24px;
+    height: 24px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+/* Legend Symbol Styles */
+.wall {
+    background: rgba(45, 55, 72, 0.8);
+    border-color: rgba(255, 255, 255, 0.1);
+}
+
+.entrance {
+    background: linear-gradient(135deg, rgba(46, 204, 113, 0.3), rgba(39, 174, 96, 0.3));
+    border-color: #2ecc71;
+    box-shadow: inset 0 0 15px rgba(46, 204, 113, 0.3);
+}
+
+.exit {
+    background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 153, 204, 0.3));
+    border-color: #00d4ff;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+}
+
+.pit {
+    background: rgba(0, 0, 0, 0.3);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.pitVisited {
+    background: linear-gradient(135deg, rgba(139, 0, 0, 0.8), rgba(102, 0, 0, 0.6));
+    border: 1px solid #8B0000;
+    position: relative;
+    color: #fff;
+}
+
+/* Responsive Design */
+/* Mobile devices (320px - 480px) */
+@media (max-width: 480px) {
+    .sidebar {
+        width: 100%;
+        padding-right: 0;
+        gap: 0.8rem;
+    }
+    
+    .heroPanel {
+        min-height: 140px;
+    }
+    
+    .smallerInventory {
+        min-height: 280px;
+    }
+    
+    .panelHeader {
+        padding: 12px 16px;
+    }
+    
+    .panelHeader h2 {
+        font-size: 1.1rem;
+    }
+    
+    .panelContent {
+        padding: 1rem;
+    }
+    
+    .compactStats {
+        padding: 16px;
+        gap: 16px;
+    }
+    
+    .healthBarContainer,
+    .attackBarContainer {
+        height: 20px;
+    }
+    
+    .healthText,
+    .attackText {
+        font-size: 0.875rem;
+    }
+    
+    .pillarsList {
+        gap: 0.5rem;
+    }
+    
+    .pillarItem {
+        padding: 0.5rem;
+        font-size: 0.85rem;
+    }
+    
+    .pillarIcon {
+        width: 20px;
+        height: 20px;
+        font-size: 0.75rem;
+    }
+    
+    .potionItem {
+        padding: 0.6rem;
+    }
+    
+    .potionIcon {
+        width: 28px;
+        height: 28px;
+        font-size: 1rem;
+    }
+    
+    .legendToggle {
+        margin-top: -5px;
+        padding: 10px 16px;
+        font-size: 0.9rem;
+    }
+    
+    .toggleIcon {
+        font-size: 0.9rem;
+        gap: 6px;
+    }
+    
+    .legendPanel {
+        margin-top: -8px;
+    }
+    
+    .legendGrid {
+        grid-template-columns: 1fr;
+        gap: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .legendItem {
+        font-size: 0.8rem;
+        padding: 0.4rem;
+        gap: 8px;
+    }
+    
+    .legendSymbol {
+        width: 20px;
+        height: 20px;
+        font-size: 10px;
+    }
+}
+
+/* Small tablets (481px - 768px) */
+@media (min-width: 481px) and (max-width: 768px) {
+    .sidebar {
+        width: 100%;
+        padding-right: 0;
+    }
+    
+    .heroPanel {
+        min-height: 150px;
+    }
+    
+    .smallerInventory {
+        min-height: 300px;
+    }
+    
+    .panelHeader h2 {
+        font-size: 1.15rem;
+    }
+    
+    .legendToggle {
+        margin-top: -5px;
+    }
+    
+    .legendPanel {
+        margin-top: -10px;
+    }
+    
+    .legendGrid {
+        gap: 0.6rem;
+        padding: 1.2rem;
+    }
+    
+    .legendItem {
+        font-size: 0.85rem;
+        padding: 0.45rem;
+    }
+    
+    .legendSymbol {
+        width: 22px;
+        height: 22px;
+        font-size: 11px;
+    }
+}
+
+/* Large tablets (769px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+    .sidebar {
+        width: 100%;
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        gap: 1rem;
+        padding-right: 0;
+        flex-wrap: wrap;
+    }
+    
+    .heroPanel,
+    .inventoryPanel {
+        min-width: 300px;
+        min-height: auto;
+        flex: 1;
+    }
+    
+    .legendToggle {
+        width: 100%;
+        margin-top: 0;
+    }
+    
+    .legendPanel {
+        width: 100%;
+        margin-top: 0;
+    }
+    
+    .legendGrid {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.75rem;
+        padding: 1.25rem;
+    }
+    
+    .legendItem {
+        font-size: 0.85rem;
+    }
+}
+
+/* Landscape orientation for mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .sidebar {
+        position: fixed;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        width: 300px;
+        max-width: 40vw;
+        overflow-y: auto;
+        z-index: 50;
+        background: rgba(0, 0, 0, 0.9);
+        padding: 1rem;
+    }
+    
+    .heroPanel {
+        min-height: 120px;
+    }
+    
+    .smallerInventory {
+        min-height: 200px;
+    }
+    
+    .compactStats {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .legendToggle {
+        padding: 8px 12px;
+        margin-top: -3px;
+    }
+    
+    .toggleIcon {
+        font-size: 0.8rem;
+    }
+    
+    .legendPanel {
+        margin-top: -5px;
+    }
+    
+    .legendGrid {
+        grid-template-columns: 1fr;
+        gap: 0.4rem;
+        padding: 0.8rem;
+    }
+    
+    .legendItem {
+        font-size: 0.75rem;
+        padding: 0.3rem;
+    }
+    
+    .legendSymbol {
+        width: 18px;
+        height: 18px;
+        font-size: 9px;
+    }
+}
