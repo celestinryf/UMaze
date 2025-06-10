@@ -71,9 +71,9 @@ const myHeroes = [
 ];
 
 const DIFFICULTY_OPTIONS = [
-  { label: 'Easy', value: 9 },
-  { label: 'Medium', value: 11 },
-  { label: 'Hard', value: 13 }
+  { label: 'Easy', value: 11 },
+  { label: 'Medium', value: 15 },
+  { label: 'Hard', value: 21 }
 ];
 
 const HeroSelect = () => {

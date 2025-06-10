@@ -191,11 +191,11 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: rgba(0, 0, 0, 0.3);
+  background: #654E2C;
 }
 
 .wall {
-  background: rgba(45, 55, 72, 0.8);
+  background: rgb(2, 61, 2);
   border-color: rgba(255, 255, 255, 0.1);
 }
 
@@ -223,16 +223,12 @@
   }
 }
 
-.pit {
-  background: rgba(0, 0, 0, 0.3);
-  border: 1px solid rgba(255, 255, 255, 0.05);
+.pitVisited {
+  background: #2e2211;
 }
 
-.pitVisited {
-  background: linear-gradient(135deg, rgba(139, 0, 0, 0.8), rgba(102, 0, 0, 0.6));
-  border: 1px solid #8B0000;
-  position: relative;
-  color: #fff;
+.poopImage {
+  width: 50px;
 }
 
 .currentCell {
@@ -295,6 +291,10 @@
   animation: monsterPulse 1.5s infinite;
 }
 
+.monsterImage {
+  height: 50px;
+}
+
 @keyframes monsterPulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.1); }
@@ -314,6 +314,10 @@
   box-shadow: 0 0 8px rgba(155, 89, 182, 0.6);
 }
 
+.pillarImage {
+  width: 80px;
+}
+
 .potionIndicator {
   width: 14px;
   height: 14px;
@@ -325,6 +329,11 @@
   font-weight: bold;
   color: #fff;
   box-shadow: 0 0 8px currentColor;
+}
+
+.potionImage {
+  width: 80px;
+  height: 80px;
 }
 
 .potion1 { 
@@ -1178,4 +1187,13 @@
   .saveGameSection {
     display: none;
   }
+}
+
+.TreeWall {
+  /* top: 50%; */
+  /* left: 50%; */
+  width: 110%;
+  height: 110%;
+  /* transform: translate(-50%, -50%); */
+  /* object-fit: contain; */
 }

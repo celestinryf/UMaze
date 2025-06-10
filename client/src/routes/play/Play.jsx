@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import styles from './play.module.css';
-import Sidebar from './components/sidebar/sidebar.jsx'; // Added import for Sidebar component
+import Sidebar from './components/sidebar/sidebar.jsx';
 import nickImg from '../../assets/nick.png';
 import matthewImg from '../../assets/matthew.png';
 import celestinImg from '../../assets/celestin.png';
@@ -12,8 +12,8 @@ import apple from '../../assets/sprites/apple.png';
 import horn from '../../assets/sprites/horn.png';
 import saddle from '../../assets/sprites/saddle.png';
 import wings from '../../assets/sprites/wings.png';
-import salmon from '../../assets/sprites/salmon.png';
 
+import salmon from '../../assets/sprites/salmon.png';
 import bee_hive from '../../assets/sprites/bee_hive.png';
 import anthill from '../../assets/sprites/anthill.png';
 
@@ -68,6 +68,30 @@ const heroImages = {
   'PRIMO': primoImg
 };
 
+const ToolsOfEscapeImages = {
+  'APPLE': apple,
+  'HORN': horn,
+  'SADDLE': saddle,
+  'WINGS': wings
+};
+
+const EnemyImages = {
+  'SALMON': salmon,
+  'BEEHIVE': bee_hive,
+  'ANTHILL': anthill
+};
+
+const EnvironmentImages = {
+  'PATH': path,
+  'POOP': poop,
+  'TREE_WALL': tree
+};
+
+const PotionImages = {
+  1: heal_potion,
+  2: attack_potion
+};
+
 // Utility functions
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
@@ -96,14 +120,14 @@ const GameEndScreen = ({ status, message }) => (
   </div>
 );
 
-// Battle Overlay Component
+// Battle Overlay Component - UPDATED with monster images
 const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, onUsePotion, battleMessage, collectedPotions }) => (
   <div className={styles.battleOverlay}>
     <div className={styles.battleContainer}>
       <h2 className={styles.battleTitle}>⚔️ BATTLE ⚔️</h2>
       
       <div className={styles.battleArena}>
-        {/* Monster Section */}
+        {/* Monster Section - UPDATED with image */}
         <div className={styles.battleMonsterSection}>
           <div className={styles.battleCharacterInfo}>
             <h3>{monster.Name}</h3>
@@ -117,7 +141,15 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             <p className={styles.battleStats}>ATK: {monster.Attack}</p>
           </div>
           <div className={styles.battleMonsterSprite}>
-            <span className={styles.monsterEmoji}>👹</span>
+            {EnemyImages[monster.Name] ? (
+              <img 
+                src={EnemyImages[monster.Name]} 
+                alt={monster.Name} 
+                className={styles.battleMonsterImage}
+              />
+            ) : (
+              <span className={styles.monsterEmoji}>👹</span>
+            )}
           </div>
         </div>
 
@@ -494,13 +526,6 @@ const Play = () => {
           </div>
         </div>
 
-        {/* Game Message */}
-        {gMessage && (
-          <div className={styles.gameMessage}>
-            <p>{gMessage}</p>
-          </div>
-        )}
-
         {/* Main Game Layout */}
         <div className={styles.mainGameLayout}>
           {/* Maze Display */}
@@ -512,6 +537,7 @@ const Play = () => {
                     {row.map((cell, colIndex) => {
                       const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
                       const isWall = cell.RoomType === 0;
+                      const isPath = cell.RoomType === 3;
 
                       return (
                         <div
@@ -521,20 +547,107 @@ const Play = () => {
                           {isCurrent && (
                             <div className={styles.player}>
                               {heroImages[Hero.Name] ? (
-                                <img src={heroImages[Hero.Name]} alt={Hero.Name} />
+                                <img 
+                                  src={heroImages[Hero.Name]} 
+                                  alt={Hero.Name} 
+                                  className={styles.playerImage}
+                                />
                               ) : (
                                 '☺'
                               )}
                             </div>
                           )}
 
+                          {isWall && (
+                            <div className={styles.cellContents}>
+                              {/* UPDATED: Wall image */}
+                                <div className={styles.TreeWall}>
+                                  {EnvironmentImages['TREE_WALL'] ? (
+                                    <img 
+                                      src={EnvironmentImages['TREE_WALL']} 
+                                      alt={'Tree'}
+                                      className={styles.TreeWall}
+                                    />
+                                  ) : (
+                                    <span>W</span>
+                                  )}
+                                </div>
+                            </div>
+                          )}
+
                           {!isWall && (
                             <div className={styles.cellContents}>
-                              {cell.RoomMonster && <div className={styles.monsterIndicator}>M</div>}
-                              {cell.PillarType > 0 && <div className={styles.pillarIndicator}>P</div>}
+                              {/* UPDATED: Monster image */}
+                              {cell.RoomMonster && (
+                                <div className={styles.monsterIndicator}>
+                                  {EnemyImages[cell.RoomMonster.Name] ? (
+                                    <img 
+                                      src={EnemyImages[cell.RoomMonster.Name]} 
+                                      alt={cell.RoomMonster.Name}
+                                      className={styles.monsterImage}
+                                    />
+                                  ) : (
+                                    <span>M</span>
+                                  )}
+                                </div>
+                              )}
+
+                              {/* UPDATED: Path image */}
+                              {/* <div className={styles.TreeWall}>
+                                {EnvironmentImages['TREE_WALL'] ? (
+                                  <img 
+                                    src={EnvironmentImages['TREE_WALL']} 
+                                    alt={'Tree'}
+                                    className={styles.TreeWall}
+                                  />
+                                ) : (
+                                  <span>W</span>
+                                )}
+                              </div> */}
+                              
+                              {(cell.RoomType == 4) && (
+                                <div className={styles.pitIndicator}>
+                                  {visitedPits.has(`${rowIndex}-${colIndex}`) ? (
+                                    EnvironmentImages['POOP'] ? (
+                                      <img 
+                                        src={EnvironmentImages['POOP']} 
+                                        alt={'poop'}
+                                        className={styles.poopImage}
+                                      />
+                                    ) : (
+                                      <span>P</span>
+                                    )
+                                  ) : null}
+                                </div>
+                              )}
+                              
+                              {/* UPDATED: Pillar image */}
+                              {cell.PillarType > 0 && (
+                                <div className={styles.pillarIndicator}>
+                                  {ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()] ? (
+                                    <img 
+                                      src={ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()]} 
+                                      alt={PILLAR_TYPES[cell.PillarType]}
+                                      className={styles.pillarImage}
+                                    />
+                                  ) : (
+                                    <span>P</span>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* UPDATED: Potion image */}
                               {cell.PotionType > 0 && (
                                 <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
-                                  ♦
+                                  {PotionImages[cell.PotionType] ? (
+                                    <img 
+                                      src={PotionImages[cell.PotionType]} 
+                                      alt={`${getName(cell.PotionType, POTION_TYPES)} Potion`}
+                                      className={styles.potionImage}
+                                    />
+                                  ) : (
+                                    <span>♦</span>
+                                  )}
                                 </div>
                               )}
                             </div>
