@@ -23,6 +23,7 @@ import attack_potion from '../../assets/sprites/attack_potion.png';
 import path from '../../assets/sprites/path.png';
 import poop from '../../assets/sprites/poop.png';
 import tree from '../../assets/sprites/tree.png';
+import background from '../../assets/background.jpg';
 
 // Constants
 const ROOM_TYPES = {
@@ -41,8 +42,8 @@ const PILLAR_TYPES = {
 };
 
 const POTION_TYPES = {
-  1: 'Health',
-  2: 'Attack'
+  1: 'Health Buzz Ball',
+  2: 'Attack Buzz Ball'
 };
 
 // Extended directions to include both arrow keys and WASD
@@ -110,13 +111,37 @@ const HealthBar = ({ current, total, label, showLabel = true, className = '' }) 
   </div>
 );
 
-const GameEndScreen = ({ status, message }) => (
-  <div className={styles.endgameContainer}>
-    <h1 className={styles.gameTitle}>Maze Adventure</h1>
+const GameEndScreen = ({ status, message, navigate }) => (
+  <div 
+    className={styles.endgameContainer}
+    style={{
+      backgroundImage: `url(${background})`,
+      backgroundSize: 'cover',
+      backgroundPosition: 'center',
+      backgroundRepeat: 'no-repeat',
+      minHeight: '100vh'
+    }}
+  >
+    <h1 
+      className={styles.gameTitle}
+      onClick={() => navigate('/')}
+      style={{ cursor: 'pointer' }}
+      title="Return to Home"
+    >
+      Maze Adventure
+    </h1>
     <h2 className={styles[`${status.toLowerCase()}Message`]}>
       {status === 'Won' ? '🎉 You Win! 🎉' : '💀 Game Over 💀'}
     </h2>
     <p>{message}</p>
+    <div className={styles.endgameButtons}>
+      <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
+        Start New Game
+      </button>
+      <button onClick={() => navigate('/')} className={styles.retryButton}>
+        Back to Home
+      </button>
+    </div>
   </div>
 );
 
@@ -199,7 +224,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             Special Attack
           </button>
           
-          {/* Potion Actions */}
+          {/* Buzz Ball Actions */}
           {[1, 2].map(potion => {
             const count = collectedPotions.has ? (collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0) : collectedPotions.filter(p => p === potion).length;
             const canUse = count > 0;
@@ -211,7 +236,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
                 onClick={() => canUse && onUsePotion(potion)}
                 className={`${styles.battleButton} ${styles.battlePotionButton}`}
                 disabled={!canUse}
-                title={canUse ? `Use ${potionName} Potion` : `No ${potionName} potions available`}
+                title={canUse ? `Use ${potionName}` : `No ${potionName}s available`}
               >
                 Use {potionName} ({count})
               </button>
@@ -242,6 +267,7 @@ const Play = () => {
   const [inBattle, setInBattle] = useState(false);
   const [battleMessage, setBattleMessage] = useState("");
   const [visitedPits, setVisitedPits] = useState(new Set());
+  const [visitedExits, setVisitedExits] = useState(new Set());
 
   // Get username from API service
   const username = hasUsername() ? getDisplayUsername() : null;
@@ -260,8 +286,17 @@ const Play = () => {
     gameAPI.getGame()
       .then(data => {
         setGameData(data);
+        
+        // Check if current room is an exit and mark it as visited
+        const currentX = data.Maze.CurrCoords.X;
+        const currentY = data.Maze.CurrCoords.Y;
+        const currentRoom = data?.Maze?.Grid?.[currentX]?.[currentY];
+        
+        if (currentRoom?.RoomType === 2) {
+          setVisitedExits(prev => new Set(prev).add(`${currentX}-${currentY}`));
+        }
+        
         // Check if we should be in battle on load
-        const currentRoom = data?.Maze?.Grid?.[data.Maze.CurrCoords.X]?.[data.Maze.CurrCoords.Y];
         if (currentRoom?.RoomMonster) {
           setInBattle(true);
           setBattleMessage(`A wild ${currentRoom.RoomMonster.Name} appears!`);
@@ -345,9 +380,9 @@ const Play = () => {
     try {
       const result = await gameAPI.usePotion(potionType);
       setGameData(result);
-      setGMessage(`Used ${getName(potionType, POTION_TYPES)} Potion!`);
+      setGMessage(`Used ${getName(potionType, POTION_TYPES)}!`);
     } catch (err) {
-      setGMessage(`Potion use failed: ${err.message}`);
+      setGMessage(`Buzz Ball use failed: ${err.message}`);
     }
   };
 
@@ -381,6 +416,11 @@ const Play = () => {
       const newRoom = updatedData.Maze.Grid[newX][newY];
       if (newRoom.RoomType === 4) { // Pit
         setVisitedPits(prev => new Set(prev).add(`${newX}-${newY}`));
+      }
+      
+      // Check if new room is an exit and mark it as visited
+      if (newRoom.RoomType === 2) { // Exit
+        setVisitedExits(prev => new Set(prev).add(`${newX}-${newY}`));
       }
       
       // Check if new room has a monster
@@ -418,15 +458,31 @@ const Play = () => {
   // Loading and error states
   if (error) {
     return (
-      <div className={styles.errorContainer}>
-        <h1 className={styles.gameTitle}>Maze Adventure</h1>
+      <div 
+        className={styles.errorContainer}
+        style={{
+          backgroundImage: `url(${background})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '100vh'
+        }}
+      >
+        <h1 
+          className={styles.gameTitle}
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer' }}
+          title="Return to Home"
+        >
+          Maze Adventure
+        </h1>
         <h2>Error</h2>
         <p className={styles.errorMessage}>{error}</p>
         <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
           Start New Game
         </button>
         <button onClick={() => navigate('/')} className={styles.retryButton}>
-          Back to Menu
+          Back to Home
         </button>
       </div>
     );
@@ -434,8 +490,24 @@ const Play = () => {
 
   if (!gameData) {
     return (
-      <div className={styles.loadingContainer}>
-        <h1 className={styles.gameTitle}>Maze Adventure</h1>
+      <div 
+        className={styles.loadingContainer}
+        style={{
+          backgroundImage: `url(${background})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
+          minHeight: '100vh'
+        }}
+      >
+        <h1 
+          className={styles.gameTitle}
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer' }}
+          title="Return to Home"
+        >
+          Maze Adventure
+        </h1>
         <h2>Loading Maze...</h2>
         <p>Player: {username}</p>
         <div className={styles.loadingSpinner}></div>
@@ -445,11 +517,11 @@ const Play = () => {
 
   // Game end states
   if (gameData.Status === "Won") {
-    return <GameEndScreen status="Won" message="Congratulations! You have collected all pillars and reached the exit." />;
+    return <GameEndScreen status="Won" message="Congratulations! You have collected all pillars and reached the exit." navigate={navigate} />;
   }
 
   if (gameData.Status === "Lost" && !bypassGameOver) {
-    return <GameEndScreen status="Lost" message="You have perished in the maze. Better luck next time!" />;
+    return <GameEndScreen status="Lost" message="You have perished in the maze. Better luck next time!" navigate={navigate} />;
   }
 
   // Game state
@@ -463,17 +535,21 @@ const Play = () => {
   const getCellClasses = (cell, rowIndex, colIndex) => {
     const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
     const isPit = cell.RoomType === 4;
+    const isExit = cell.RoomType === 2;
     const isVisitedPit = isPit && visitedPits.has(`${rowIndex}-${colIndex}`);
+    const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
     
     let roomTypeClass;
     if (isPit) {
       roomTypeClass = isVisitedPit ? styles.pitVisited : styles.pit;
+    } else if (isExit) {
+      roomTypeClass = isVisitedExit ? styles.exit : styles.path; // Hide exit until visited
     } else {
       roomTypeClass = {
         0: styles.wall,
         1: styles.entrance,
-        2: styles.exit
-      }[cell.RoomType];
+        3: styles.path
+      }[cell.RoomType] || '';
     }
 
     return [
@@ -484,7 +560,16 @@ const Play = () => {
   };
 
   return (
-    <div className={styles.gameContainer}>
+    <div 
+      className={styles.gameContainer}
+      style={{
+        backgroundImage: `url(${background})`,
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
+        minHeight: '100vh'
+      }}
+    >
       {/* Battle Overlay - Renders on top when in battle */}
       {inBattle && currentRoom.RoomMonster && (
         <BattleOverlay
@@ -503,7 +588,12 @@ const Play = () => {
       <div className={`${styles.gameContent} ${inBattle ? styles.dimmedContent : ''}`}>
         {/* Game Header */}
         <div className={styles.gameHeader}>
-          <h1 className={styles.gameTitle}>
+          <h1 
+            className={styles.gameTitle}
+            onClick={() => navigate('/')}
+            style={{ cursor: 'pointer' }}
+            title="Return to Home"
+          >
             Maze Adventure
             {gameData.Status === "Lost" && bypassGameOver && (
               <span className={styles.debugStatus}> [DEBUG: Playing as Ghost]</span>
@@ -537,7 +627,8 @@ const Play = () => {
                     {row.map((cell, colIndex) => {
                       const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
                       const isWall = cell.RoomType === 0;
-                      const isPath = cell.RoomType === 3;
+                      const isExit = cell.RoomType === 2;
+                      const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
 
                       return (
                         <div
@@ -592,32 +683,25 @@ const Play = () => {
                                 </div>
                               )}
 
-                              {/* UPDATED: Path image */}
-                              {/* <div className={styles.TreeWall}>
-                                {EnvironmentImages['TREE_WALL'] ? (
-                                  <img 
-                                    src={EnvironmentImages['TREE_WALL']} 
-                                    alt={'Tree'}
-                                    className={styles.TreeWall}
-                                  />
-                                ) : (
-                                  <span>W</span>
-                                )}
-                              </div> */}
-                              
-                              {(cell.RoomType == 4) && (
+                              {/* Pit image - only shown after being visited */}
+                              {(cell.RoomType == 4) && visitedPits.has(`${rowIndex}-${colIndex}`) && (
                                 <div className={styles.pitIndicator}>
-                                  {visitedPits.has(`${rowIndex}-${colIndex}`) ? (
-                                    EnvironmentImages['POOP'] ? (
-                                      <img 
-                                        src={EnvironmentImages['POOP']} 
-                                        alt={'poop'}
-                                        className={styles.poopImage}
-                                      />
-                                    ) : (
-                                      <span>P</span>
-                                    )
-                                  ) : null}
+                                  {EnvironmentImages['POOP'] ? (
+                                    <img 
+                                      src={EnvironmentImages['POOP']} 
+                                      alt={'poop'}
+                                      className={styles.poopImage}
+                                    />
+                                  ) : (
+                                    <span>P</span>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Exit indicator - only shown after being visited */}
+                              {isExit && isVisitedExit && (
+                                <div className={styles.exitIndicator}>
+                                  <span>🚪</span>
                                 </div>
                               )}
                               
@@ -636,13 +720,13 @@ const Play = () => {
                                 </div>
                               )}
                               
-                              {/* UPDATED: Potion image */}
+                              {/* UPDATED: Buzz Ball image */}
                               {cell.PotionType > 0 && (
                                 <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
                                   {PotionImages[cell.PotionType] ? (
                                     <img 
                                       src={PotionImages[cell.PotionType]} 
-                                      alt={`${getName(cell.PotionType, POTION_TYPES)} Potion`}
+                                      alt={`${getName(cell.PotionType, POTION_TYPES)}`}
                                       className={styles.potionImage}
                                     />
                                   ) : (
