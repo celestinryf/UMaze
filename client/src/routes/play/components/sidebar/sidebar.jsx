@@ -86,7 +86,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
 
           {/* Potions */}
           <div className={styles.inventorySection}>
-            <h3>Buzz Balls</h3>
+            <h3>Buzz Ball</h3>
             <div className={styles.potionsList}>
               {[1, 2].map(potion => {
                 const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
