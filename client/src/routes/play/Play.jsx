@@ -63,7 +63,7 @@ const DIRECTIONS = {
 
 const heroImages = {
   'NICK': nickImg,
-  'MATT': matthewImg,
+  'MATTHEW': matthewImg,
   'CELESTIN': celestinImg,
   'PRIMO': primoImg
 };
@@ -242,6 +242,7 @@ const Play = () => {
   const [inBattle, setInBattle] = useState(false);
   const [battleMessage, setBattleMessage] = useState("");
   const [visitedPits, setVisitedPits] = useState(new Set());
+  const [visitedExits, setVisitedExits] = useState(new Set());
 
   // Get username from API service
   const username = hasUsername() ? getDisplayUsername() : null;
@@ -260,8 +261,17 @@ const Play = () => {
     gameAPI.getGame()
       .then(data => {
         setGameData(data);
+        
+        // Check if current room is an exit and mark it as visited
+        const currentX = data.Maze.CurrCoords.X;
+        const currentY = data.Maze.CurrCoords.Y;
+        const currentRoom = data?.Maze?.Grid?.[currentX]?.[currentY];
+        
+        if (currentRoom?.RoomType === 2) {
+          setVisitedExits(prev => new Set(prev).add(`${currentX}-${currentY}`));
+        }
+        
         // Check if we should be in battle on load
-        const currentRoom = data?.Maze?.Grid?.[data.Maze.CurrCoords.X]?.[data.Maze.CurrCoords.Y];
         if (currentRoom?.RoomMonster) {
           setInBattle(true);
           setBattleMessage(`A wild ${currentRoom.RoomMonster.Name} appears!`);
@@ -301,9 +311,9 @@ const Play = () => {
     }
   };
 
-  const attackMonster = async (isSpecial) => {
+  const attackMonster = async (isSpecial = false) => {
     try {
-      const result = await gameAPI.attack(isSpecial);
+      const result = await gameAPI.attack();
       setGameData(result);
       
       const monster = result?.Maze?.Grid?.[result.Maze.CurrCoords.X]?.[result.Maze.CurrCoords.Y]?.RoomMonster;
@@ -381,6 +391,11 @@ const Play = () => {
       const newRoom = updatedData.Maze.Grid[newX][newY];
       if (newRoom.RoomType === 4) { // Pit
         setVisitedPits(prev => new Set(prev).add(`${newX}-${newY}`));
+      }
+      
+      // Check if new room is an exit and mark it as visited
+      if (newRoom.RoomType === 2) { // Exit
+        setVisitedExits(prev => new Set(prev).add(`${newX}-${newY}`));
       }
       
       // Check if new room has a monster
@@ -463,17 +478,21 @@ const Play = () => {
   const getCellClasses = (cell, rowIndex, colIndex) => {
     const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
     const isPit = cell.RoomType === 4;
+    const isExit = cell.RoomType === 2;
     const isVisitedPit = isPit && visitedPits.has(`${rowIndex}-${colIndex}`);
+    const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
     
     let roomTypeClass;
     if (isPit) {
       roomTypeClass = isVisitedPit ? styles.pitVisited : styles.pit;
+    } else if (isExit) {
+      roomTypeClass = isVisitedExit ? styles.exit : styles.path; // Hide exit until visited
     } else {
       roomTypeClass = {
         0: styles.wall,
         1: styles.entrance,
-        2: styles.exit
-      }[cell.RoomType];
+        3: styles.path
+      }[cell.RoomType] || '';
     }
 
     return [
@@ -537,7 +556,8 @@ const Play = () => {
                     {row.map((cell, colIndex) => {
                       const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
                       const isWall = cell.RoomType === 0;
-                      const isPath = cell.RoomType === 3;
+                      const isExit = cell.RoomType === 2;
+                      const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
 
                       return (
                         <div
@@ -592,32 +612,25 @@ const Play = () => {
                                 </div>
                               )}
 
-                              {/* UPDATED: Path image */}
-                              {/* <div className={styles.TreeWall}>
-                                {EnvironmentImages['TREE_WALL'] ? (
-                                  <img 
-                                    src={EnvironmentImages['TREE_WALL']} 
-                                    alt={'Tree'}
-                                    className={styles.TreeWall}
-                                  />
-                                ) : (
-                                  <span>W</span>
-                                )}
-                              </div> */}
-                              
-                              {(cell.RoomType == 4) && (
+                              {/* Pit image - only shown after being visited */}
+                              {(cell.RoomType == 4) && visitedPits.has(`${rowIndex}-${colIndex}`) && (
                                 <div className={styles.pitIndicator}>
-                                  {visitedPits.has(`${rowIndex}-${colIndex}`) ? (
-                                    EnvironmentImages['POOP'] ? (
-                                      <img 
-                                        src={EnvironmentImages['POOP']} 
-                                        alt={'poop'}
-                                        className={styles.poopImage}
-                                      />
-                                    ) : (
-                                      <span>P</span>
-                                    )
-                                  ) : null}
+                                  {EnvironmentImages['POOP'] ? (
+                                    <img 
+                                      src={EnvironmentImages['POOP']} 
+                                      alt={'poop'}
+                                      className={styles.poopImage}
+                                    />
+                                  ) : (
+                                    <span>P</span>
+                                  )}
+                                </div>
+                              )}
+                              
+                              {/* Exit indicator - only shown after being visited */}
+                              {isExit && isVisitedExit && (
+                                <div className={styles.exitIndicator}>
+                                  <span>🚪</span>
                                 </div>
                               )}
                               
