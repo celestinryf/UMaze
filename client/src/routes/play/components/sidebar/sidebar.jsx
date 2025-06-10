@@ -86,7 +86,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
 
           {/* Potions */}
           <div className={styles.inventorySection}>
-            <h3>Potions</h3>
+            <h3>Buzz Balls</h3>
             <div className={styles.potionsList}>
               {[1, 2].map(potion => {
                 const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
@@ -98,7 +98,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
                     className={`${styles.potionItem} ${canUse ? styles.canUse : ''}`}
                     onClick={() => canUse && usePotion(potion)}
                   >
-                    <span className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
+                    <span className={`${styles.potionIcon} ${styles[`Buzz Ball${potion}`]}`}>
                       ♦
                     </span>
                     <span className={styles.potionName}>

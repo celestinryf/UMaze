@@ -31,7 +31,7 @@ const myHeroes = [
     name: "Matthew",
     img: matthewImg,
     desc: "A nerdy fella, who is always prepared.",
-    skills: ["Starts with 2 potions", "Has a life steal special attack"],
+    skills: ["Starts with 2 buzz balls", "Has a life steal special attack"],
     stats: {
       attack: 3,
       defense: 4,
@@ -59,7 +59,7 @@ const myHeroes = [
     name: "Primo",
     img: primoImg,
     desc: "Crafty Mage that can make the best of what he has.",
-    skills: ["Better Utilize Potions", "Can take a turn to increase attack with costs"],
+    skills: ["Better Utilize Buzz Balls", "Can take a turn to increase attack with costs"],
     stats: {
       attack: 2,
       defense: 6,

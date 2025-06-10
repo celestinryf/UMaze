@@ -211,7 +211,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
                 onClick={() => canUse && onUsePotion(potion)}
                 className={`${styles.battleButton} ${styles.battlePotionButton}`}
                 disabled={!canUse}
-                title={canUse ? `Use ${potionName} Potion` : `No ${potionName} potions available`}
+                title={canUse ? `Use ${potionName} Buzz Ball` : `No ${potionName} Buzz Balls available`}
               >
                 Use {potionName} ({count})
               </button>
@@ -345,9 +345,9 @@ const Play = () => {
     try {
       const result = await gameAPI.usePotion(potionType);
       setGameData(result);
-      setGMessage(`Used ${getName(potionType, POTION_TYPES)} Potion!`);
+      setGMessage(`Used ${getName(potionType, POTION_TYPES)} Buzz Ball!`);
     } catch (err) {
-      setGMessage(`Potion use failed: ${err.message}`);
+      setGMessage(`Buzz Ball use failed: ${err.message}`);
     }
   };
 
@@ -638,11 +638,11 @@ const Play = () => {
                               
                               {/* UPDATED: Potion image */}
                               {cell.PotionType > 0 && (
-                                <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
+                                <div className={`${styles.potionIndicator} ${styles[`Buzz Ball${cell.PotionType}`]}`}>
                                   {PotionImages[cell.PotionType] ? (
                                     <img 
                                       src={PotionImages[cell.PotionType]} 
-                                      alt={`${getName(cell.PotionType, POTION_TYPES)} Potion`}
+                                      alt={`${getName(cell.PotionType, POTION_TYPES)} Buzz Ball`}
                                       className={styles.potionImage}
                                     />
                                   ) : (
