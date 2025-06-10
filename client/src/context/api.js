@@ -120,12 +120,10 @@ const gameAPI = {
 
   // Attack monster - FIXED: Changed to /battle with PUT method
   attack: async (isSpecial) => {
+    console.log(isSpecial)
     return apiRequest('battle', { 
       method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ SpecialAttack: isSpecial })
+      body: { SpecialAttack: isSpecial }
     });
   },
 
