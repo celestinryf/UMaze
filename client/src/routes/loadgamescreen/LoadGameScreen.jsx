@@ -140,7 +140,8 @@ const LoadGames = () => {
                             border: '1px solid #ddd',
                             borderRadius: '8px',
                             padding: '1rem',
-                            backgroundColor: '#f9f9f9',
+                            color: 'black', // changes the text color of save name
+                            backgroundColor: '#4f4ba3', // changes the back color
                             maxWidth: '500px',
                             width: '100%'
                         }}>
