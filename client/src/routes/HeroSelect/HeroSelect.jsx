@@ -16,8 +16,8 @@ const myHeroes = [
     id: 6,
     name: "Nick",
     img: nickImg,
-    desc: "A powerful warrior with high attack damage and strong defense capabilities.",
-    skills: ["Immune To Pits"],
+    desc: "A powerful warrior with high power.",
+    skills: ["Immune To Pits", "Has powerful, but reckless special attack"],
     stats: {
       attack: 8,
       defense: 7,
@@ -31,7 +31,7 @@ const myHeroes = [
     name: "Matthew",
     img: matthewImg,
     desc: "A nerdy fella, who is always prepared.",
-    skills: ["Starts with 2 potions"],
+    skills: ["Starts with 2 potions", "Has a life steal special attack"],
     stats: {
       attack: 3,
       defense: 4,
@@ -45,7 +45,7 @@ const myHeroes = [
     name: "Celestin",
     img: celestinImg,
     desc: "No matter the damage, he always gets back up.",
-    skills: ["Gets a second chance"],
+    skills: ["Gets a second chance", "Has a special attack that halves oppenents health"],
     stats: {
       attack: 7,
       defense: 5,
@@ -59,7 +59,7 @@ const myHeroes = [
     name: "Primo",
     img: primoImg,
     desc: "Crafty Mage that can make the best of what he has.",
-    skills: ["Better Utilize Potions"],
+    skills: ["Better Utilize Potions", "Can take a turn to increase attack with costs"],
     stats: {
       attack: 2,
       defense: 6,
