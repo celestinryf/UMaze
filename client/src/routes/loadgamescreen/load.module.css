@@ -323,6 +323,8 @@
     }
   }
   
+  /**/
+
   @media (max-width: 480px) {
     .gameContainer {
       padding: 1rem;
