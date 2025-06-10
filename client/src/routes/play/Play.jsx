@@ -24,6 +24,7 @@ import attack_potion from '../../assets/sprites/attack_potion.png';
 import path from '../../assets/sprites/path.png';
 import poop from '../../assets/sprites/poop.png';
 import tree from '../../assets/sprites/tree.png';
+import exit from '../../assets/sprites/exit.png';
 import background from '../../assets/background.jpg';
 
 // Constants
@@ -144,8 +145,8 @@ const GameEndScreen = ({ status, message, navigate }) => {
           </div>
           
           <div className={styles.victoryMessage}>
-            <p>Congratulations, brave adventurer!</p>
-            <p>You have successfully collected all the sacred pillars and escaped the treacherous maze!</p>
+            <p>Thank you, brave adventurer!</p>
+            <p>You have successfully collected everything I need to escape the treacherous forest!</p>
             <p>Your trusty steed awaits to carry you home in triumph!</p>
           </div>
         </div>
@@ -655,125 +656,109 @@ const Play = () => {
           <div className={styles.mazeContainer}>
             <div className={styles.mazeWrapper}>
               <div className={styles.mazeGrid}>
-                {Grid.map((row, rowIndex) => (
-                  <div key={rowIndex} className={styles.mazeRow}>
-                    {row.map((cell, colIndex) => {
-                      const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
-                      const isWall = cell.RoomType === 0;
-                      const isExit = cell.RoomType === 2;
-                      const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
+              // Find this section in your code and update the cellStyle logic:
+              {Grid.map((row, rowIndex) => (
+                <div key={rowIndex} className={styles.mazeRow}>
+                  {row.map((cell, colIndex) => {
+                    const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
+                    const isWall = cell.RoomType === 0;
+                    const isExit = cell.RoomType === 2;
+                    const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
 
-                      return (
-                        <div
-                          key={`${rowIndex}-${colIndex}`}
-                          className={getCellClasses(cell, rowIndex, colIndex)}
-                        >
-                          {isCurrent && (
-                            <div className={styles.player}>
-                              {heroImages[Hero.Name] ? (
-                                <img 
-                                  src={heroImages[Hero.Name]} 
-                                  alt={Hero.Name} 
-                                  className={styles.playerImage}
-                                />
-                              ) : (
-                                '☺'
-                              )}
-                            </div>
-                          )}
+                    let cellStyle = {};
+                    if (isWall) {
+                      cellStyle['--wall-background'] = `url(${EnvironmentImages['TREE_WALL'] || tree})`;
+                    } else if (isExit && isVisitedExit) {
+                      cellStyle['--exit-background'] = `url(${exit})`;
+                    }
 
-                          {isWall && (
-                            <div className={styles.cellContents}>
-                              {/* UPDATED: Wall image */}
-                                <div className={styles.TreeWall}>
-                                  {EnvironmentImages['TREE_WALL'] ? (
-                                    <img 
-                                      src={EnvironmentImages['TREE_WALL']} 
-                                      alt={'Tree'}
-                                      className={styles.TreeWall}
-                                    />
-                                  ) : (
-                                    <span>W</span>
-                                  )}
-                                </div>
-                            </div>
-                          )}
+                    return (
+                      <div
+                        key={`${rowIndex}-${colIndex}`}
+                        className={getCellClasses(cell, rowIndex, colIndex)}
+                        style={cellStyle}
+                      >
+                        {isCurrent && (
+                          <div className={styles.player}>
+                            {heroImages[Hero.Name] ? (
+                              <img 
+                                src={heroImages[Hero.Name]} 
+                                alt={Hero.Name} 
+                                className={styles.playerImage}
+                              />
+                            ) : (
+                              '☺'
+                            )}
+                          </div>
+                        )}
 
-                          {!isWall && (
-                            <div className={styles.cellContents}>
-                              {/* UPDATED: Monster image */}
-                              {cell.RoomMonster && (
-                                <div className={styles.monsterIndicator}>
-                                  {EnemyImages[cell.RoomMonster.Name] ? (
-                                    <img 
-                                      src={EnemyImages[cell.RoomMonster.Name]} 
-                                      alt={cell.RoomMonster.Name}
-                                      className={styles.monsterImage}
-                                    />
-                                  ) : (
-                                    <span>M</span>
-                                  )}
-                                </div>
-                              )}
+                        {!isWall && (
+                          <div className={styles.cellContents}>
+                            {/* Monster code stays the same */}
+                            {cell.RoomMonster && (
+                              <div className={styles.monsterIndicator}>
+                                {EnemyImages[cell.RoomMonster.Name] ? (
+                                  <img 
+                                    src={EnemyImages[cell.RoomMonster.Name]} 
+                                    alt={cell.RoomMonster.Name}
+                                    className={styles.monsterImage}
+                                  />
+                                ) : (
+                                  <span>M</span>
+                                )}
+                              </div>
+                            )}
 
-                              {/* Pit image - only shown after being visited */}
-                              {(cell.RoomType == 4) && visitedPits.has(`${rowIndex}-${colIndex}`) && (
-                                <div className={styles.pitIndicator}>
-                                  {EnvironmentImages['POOP'] ? (
-                                    <img 
-                                      src={EnvironmentImages['POOP']} 
-                                      alt={'poop'}
-                                      className={styles.poopImage}
-                                    />
-                                  ) : (
-                                    <span>P</span>
-                                  )}
-                                </div>
-                              )}
-                              
-                              {/* Exit indicator - only shown after being visited */}
-                              {isExit && isVisitedExit && (
-                                <div className={styles.exitIndicator}>
-                                  <span>🚪</span>
-                                </div>
-                              )}
-                              
-                              {/* UPDATED: Pillar image */}
-                              {cell.PillarType > 0 && (
-                                <div className={styles.pillarIndicator}>
-                                  {ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()] ? (
-                                    <img 
-                                      src={ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()]} 
-                                      alt={PILLAR_TYPES[cell.PillarType]}
-                                      className={styles.pillarImage}
-                                    />
-                                  ) : (
-                                    <span>P</span>
-                                  )}
-                                </div>
-                              )}
-                              
-                              {/* UPDATED: Buzz Ball image */}
-                              {cell.PotionType > 0 && (
-                                <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
-                                  {PotionImages[cell.PotionType] ? (
-                                    <img 
-                                      src={PotionImages[cell.PotionType]} 
-                                      alt={`${getName(cell.PotionType, POTION_TYPES)}`}
-                                      className={styles.potionImage}
-                                    />
-                                  ) : (
-                                    <span>♦</span>
-                                  )}
-                                </div>
-                              )}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
+                            {/* Pit code stays the same */}
+                            {(cell.RoomType == 4) && visitedPits.has(`${rowIndex}-${colIndex}`) && (
+                              <div className={styles.pitIndicator}>
+                                {EnvironmentImages['POOP'] ? (
+                                  <img 
+                                    src={EnvironmentImages['POOP']} 
+                                    alt={'poop'}
+                                    className={styles.poopImage}
+                                  />
+                                ) : (
+                                  <span>P</span>
+                                )}
+                              </div>
+                            )}
+                            
+                            {/* Pillar and potion code stays the same */}
+                            {cell.PillarType > 0 && (
+                              <div className={styles.pillarIndicator}>
+                                {ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()] ? (
+                                  <img 
+                                    src={ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()]} 
+                                    alt={PILLAR_TYPES[cell.PillarType]}
+                                    className={styles.pillarImage}
+                                  />
+                                ) : (
+                                  <span>P</span>
+                                )}
+                              </div>
+                            )}
+                            
+                            {cell.PotionType > 0 && (
+                              <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
+                                {PotionImages[cell.PotionType] ? (
+                                  <img 
+                                    src={PotionImages[cell.PotionType]} 
+                                    alt={`${getName(cell.PotionType, POTION_TYPES)}`}
+                                    className={styles.potionImage}
+                                  />
+                                ) : (
+                                  <span>♦</span>
+                                )}
+                              </div>
+                            )}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              ))}
               </div>
             </div>
 

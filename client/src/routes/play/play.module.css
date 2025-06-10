@@ -195,12 +195,28 @@
   align-items: center;
   justify-content: center;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  background: #654E2C;
+  background: #2c354b;
 }
 
 .wall {
-  background: rgb(2, 61, 2);
+  background-image: var(--wall-background);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
   border-color: rgba(255, 255, 255, 0.1);
+  position: relative;
+  overflow: hidden;
+}
+
+.wall::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.1);
+  pointer-events: none;
 }
 
 .entrance {
@@ -1200,15 +1216,6 @@
   .saveGameSection {
     display: none;
   }
-}
-
-.TreeWall {
-  /* top: 50%; */
-  /* left: 50%; */
-  width: 110%;
-  height: 110%;
-  /* transform: translate(-50%, -50%); */
-  /* object-fit: contain; */
 }
 
 /* Victory screen specific styles */
