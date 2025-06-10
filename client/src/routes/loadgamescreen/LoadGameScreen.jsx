@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import GameCard from '../../components/GameCard/GameCard';
-import styles from './loadgamescreen.module.css';
+import styles from './load.module.css';
 import backgroundImg from '../../assets/background.jpg';
 
 const LoadGames = () => {
