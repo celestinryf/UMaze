@@ -2,7 +2,8 @@ package model
 
 import "math/rand"
 
-// newGrid creates a grid of Rooms from the generated boolean maze
+// Given an ODD, positive maze size
+// Return a Maze Set up with rooms
 func newGrid(mazeSize int) [][]*Room {
 	modelGrid := make([][]bool, mazeSize)
 	for i := range modelGrid {
@@ -23,7 +24,8 @@ func newGrid(mazeSize int) [][]*Room {
 	return grid
 }
 
-// setupNewGrid recursively carves out paths in the maze
+// Sets up a new bool grid recursively into a maze
+// Must be passed an all false, odd maze
 func setupNewGrid(x, y, mazeSize int, grid [][]bool) {
 	directions := [][2]int{
 		{0, 2},

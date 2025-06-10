@@ -10,6 +10,7 @@ import (
 )
 
 func main() {
+
 	// Load .env file for local development
 	err := godotenv.Load()
 	if err != nil {

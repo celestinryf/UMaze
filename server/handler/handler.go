@@ -89,7 +89,6 @@ func initServer() {
 
 		log.Println("Successfully connected to Turso database")
 
-		// Initialize server with DB and Redis connections
 		srv = controller.InitServer(db, redisClient)
 	})
 }
