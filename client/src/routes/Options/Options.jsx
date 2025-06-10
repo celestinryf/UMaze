@@ -59,6 +59,16 @@ function Options() {
             className={styles.slider}
           />
         </div>
+
+        <a
+          href="https://github.com/celestinryf/UMaze"
+          target="_blank"
+          rel="noopener noreferrer"
+          className={styles.googleLink}
+        >
+          Check out the Project Repo!
+        </a>
+
       </div>
 
       <button
