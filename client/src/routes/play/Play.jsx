@@ -722,7 +722,7 @@ const Play = () => {
                               
                               {/* UPDATED: Buzz Ball image */}
                               {cell.PotionType > 0 && (
-                                <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
+                                <div className={`${styles.potionIndicator} ${styles[`Buzz Ball${cell.PotionType}`]}`}>
                                   {PotionImages[cell.PotionType] ? (
                                     <img 
                                       src={PotionImages[cell.PotionType]} 

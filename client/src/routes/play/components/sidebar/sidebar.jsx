@@ -98,7 +98,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
                     className={`${styles.potionItem} ${canUse ? styles.canUse : ''}`}
                     onClick={() => canUse && usePotion(potion)}
                   >
-                    <span className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
+                    <span className={`${styles.potionIcon} ${styles[`Buzz Ball${potion}`]}`}>
                       ♦
                     </span>
                     <span className={styles.potionName}>

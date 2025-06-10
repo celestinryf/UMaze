@@ -53,7 +53,7 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 	temp.AquiredPotions[AttackPotion] = 0
 	temp.AquiredPotions[HealingPotion] = 0
 
-	if temp.Name == "MATT" {
+	if temp.Name == "NICK" {
 		temp.AquiredPotions[AttackPotion]++
 		temp.AquiredPotions[HealingPotion]++
 	}
