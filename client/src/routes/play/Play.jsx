@@ -63,7 +63,7 @@ const DIRECTIONS = {
 
 const heroImages = {
   'NICK': nickImg,
-  'MATTHEW': matthewImg,
+  'MATT': matthewImg,
   'CELESTIN': celestinImg,
   'PRIMO': primoImg
 };
@@ -301,9 +301,9 @@ const Play = () => {
     }
   };
 
-  const attackMonster = async (isSpecial = false) => {
+  const attackMonster = async (isSpecial) => {
     try {
-      const result = await gameAPI.attack();
+      const result = await gameAPI.attack(isSpecial);
       setGameData(result);
       
       const monster = result?.Maze?.Grid?.[result.Maze.CurrCoords.X]?.[result.Maze.CurrCoords.Y]?.RoomMonster;

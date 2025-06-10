@@ -119,8 +119,12 @@ const gameAPI = {
   },
 
   // Attack monster - FIXED: Changed to /battle with PUT method
-  attack: async () => {
-    return apiRequest('battle', { method: 'PUT' });
+  attack: async (isSpecial) => {
+    console.log(isSpecial)
+    return apiRequest('battle', { 
+      method: 'PUT',
+      body: { SpecialAttack: isSpecial }
+    });
   },
 
   // Use potion - FIXED: Changed to PUT method and potion_type field

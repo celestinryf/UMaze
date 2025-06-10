@@ -5,6 +5,8 @@ import (
 	"log"
 )
 
+const CooldownTime = 4
+
 type HeroType int
 
 const (
@@ -20,6 +22,7 @@ type Hero struct {
 	TotalHealth    int            `json:"TotalHealth"`
 	CurrHealth     int            `json:"CurrHealth"`
 	Attack         int            `json:"Attack"`
+	CoolDown       int            `json:"CoolDown"`
 	AquiredPillars []Pillar       `json:"AquiredPillars"`
 	AquiredPotions map[Potion]int `json:"AquiredPotions"`
 }
@@ -42,6 +45,7 @@ func initHero(heroType HeroType, db *sql.DB) *Hero {
 		TotalHealth:    health,
 		CurrHealth:     health,
 		Attack:         attack_dmg,
+		CoolDown:       CooldownTime,
 		AquiredPillars: make([]Pillar, 0),
 		AquiredPotions: make(map[Potion]int, 0),
 	}
