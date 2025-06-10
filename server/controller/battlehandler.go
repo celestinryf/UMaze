@@ -19,10 +19,18 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPut:
+
+		var AttackJson struct {
+			SpecialAttack bool `json:"SpecialAttack"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&AttackJson); err != nil {
+			http.Error(w, "Invalid request body", http.StatusBadRequest)
+			return
+		}
 		// get game from redis
 		game := s.redisGetGame(username)
 		// update game
-		game.Attack()
+		game.Attack(AttackJson.SpecialAttack)
 		//  save to redis
 		s.redisSetGame(username, game)
 		// send to frontend
