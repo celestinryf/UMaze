@@ -84,7 +84,6 @@ const LoadGames = () => {
                 style={{ '--background-image': `url(${backgroundImg})` }}
             >
                 <h1 className={styles.gameTitle}>Load Saved Games</h1>
-                <div className={styles.titleUnderline}></div>
                 <p className={styles.loadingText}>Redirecting to login...</p>
             </div>
         );

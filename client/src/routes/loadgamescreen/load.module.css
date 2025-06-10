@@ -20,7 +20,7 @@
   }
   
   .gameTitle {
-    font-size: clamp(2.5rem, 6vw, 4rem);
+    font-size: clamp(1.5rem, 4vw, 3rem);
     font-weight: 900;
     letter-spacing: 0.2em;
     margin: 0;
@@ -33,15 +33,6 @@
     animation: titlePulse 3s ease-in-out infinite alternate;
     text-transform: uppercase;
     text-align: center;
-  }
-  
-  .titleUnderline {
-    width: 940px;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, #00d4ff, transparent);
-    margin: 1rem auto;
-    border-radius: 2px;
-    animation: underlineGlow 2s ease-in-out infinite alternate;
   }
   
   .errorMessage {

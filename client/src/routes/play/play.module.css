@@ -226,10 +226,37 @@
 }
 
 .exit {
-  background: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 153, 204, 0.3));
+  background-image: var(--exit-background);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-color: linear-gradient(135deg, rgba(0, 212, 255, 0.3), rgba(0, 153, 204, 0.3)); /* Fallback */
   border-color: #00d4ff;
   box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
   animation: exitPulse 2s infinite;
+  position: relative;
+  overflow: hidden;
+}
+
+.exit::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 212, 255, 0.2);
+  pointer-events: none;
+  animation: exitOverlayPulse 2s infinite;
+}
+
+@keyframes exitOverlayPulse {
+  0%, 100% { 
+    opacity: 0.2;
+  }
+  50% { 
+    opacity: 0.4;
+  }
 }
 
 @keyframes exitPulse {
