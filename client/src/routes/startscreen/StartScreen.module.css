@@ -5,9 +5,14 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+  background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: overlay;
   font-family: 'Arial', sans-serif;
   color: white;
+  position: relative;
 }
 
 .gameStartScreen {
@@ -22,12 +27,18 @@
 }
 
 .gameTitle {
-  font-size: 4rem;
-  margin-bottom: 4rem;
+  font-size: clamp(2.5rem, 6vw, 4rem);
+  font-weight: 900;
+  letter-spacing: 0.2em;
+  margin: 0;
+  margin-bottom: 1rem;
+  background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  animation: titlePulse 3s ease-in-out infinite alternate;
   text-transform: uppercase;
-  letter-spacing: 3px;
-  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-  animation: pulse 2s infinite;
 }
 
 /* Username Section Styles */
@@ -198,6 +209,24 @@
 }
 
 /* Animations */
+@keyframes titlePulse {
+  0% {
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 50px rgba(255, 255, 255, 0.6), 0 0 80px rgba(168, 237, 234, 0.4), 0 0 100px rgba(254, 214, 227, 0.3);
+  }
+}
+
+@keyframes underlineGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 40px rgba(0, 212, 255, 0.4);
+  }
+}
+
 @keyframes pulse {
   0% {
     text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
@@ -320,16 +349,17 @@
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
-  .gameTitle {
-    font-size: 3rem;
-  }
-  
   .usernamePrompt {
     font-size: 1.5rem;
   }
   
   .welcomeText {
     font-size: 1.6rem;
+  }
+  
+  .titleUnderline {
+    width: 80%;
+    max-width: 500px;
   }
   
   .usernameGuidelines {
@@ -343,16 +373,17 @@
 }
 
 @media (max-width: 480px) {
-  .gameTitle {
-    font-size: 2.5rem;
-  }
-  
   .usernamePrompt {
     font-size: 1.3rem;
   }
   
   .welcomeText {
     font-size: 1.4rem;
+  }
+  
+  .titleUnderline {
+    width: 90%;
+    max-width: 300px;
   }
   
   .usernameInput {

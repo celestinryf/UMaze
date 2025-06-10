@@ -12,6 +12,7 @@ import apple from '../../assets/sprites/apple.png';
 import horn from '../../assets/sprites/horn.png';
 import saddle from '../../assets/sprites/saddle.png';
 import wings from '../../assets/sprites/wings.png';
+import horse from '../../assets/sprites/horse.png';
 
 import salmon from '../../assets/sprites/salmon.png';
 import bee_hive from '../../assets/sprites/bee_hive.png';
@@ -111,39 +112,86 @@ const HealthBar = ({ current, total, label, showLabel = true, className = '' }) 
   </div>
 );
 
-const GameEndScreen = ({ status, message, navigate }) => (
-  <div 
-    className={styles.endgameContainer}
-    style={{
-      backgroundImage: `url(${background})`,
-      backgroundSize: 'cover',
-      backgroundPosition: 'center',
-      backgroundRepeat: 'no-repeat',
-      minHeight: '100vh'
-    }}
-  >
-    <h1 
-      className={styles.gameTitle}
-      onClick={() => navigate('/')}
-      style={{ cursor: 'pointer' }}
-      title="Return to Home"
+const GameEndScreen = ({ status, message, navigate }) => {
+  if (status === 'Won') {
+    return (
+      <div 
+        className={styles.endgameContainer}
+        style={{ '--background-image': `url(${background})` }}
+      >
+        {/* Title at very top */}
+        <h1 
+          className={styles.gameTitle}
+          onClick={() => navigate('/')}
+          style={{ cursor: 'pointer', marginTop: '20px' }}
+          title="Return to Home"
+        >
+          Maze Adventure
+        </h1>
+        
+        {/* Main content area with horse and message */}
+        <div className={styles.wonContentArea}>
+          <h2 className={styles.wonMessage}>
+            🎉 You Win! 🎉
+          </h2>
+          
+          <div className={styles.horseContainer}>
+            <img 
+              src={horse} 
+              alt="Victory Horse" 
+              className={styles.victoryHorse}
+            />
+          </div>
+          
+          <div className={styles.victoryMessage}>
+            <p>Congratulations, brave adventurer!</p>
+            <p>You have successfully collected all the sacred pillars and escaped the treacherous maze!</p>
+            <p>Your trusty steed awaits to carry you home in triumph!</p>
+          </div>
+        </div>
+
+        {/* Buttons at very bottom */}
+        <div className={styles.endgameButtons}>
+          <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
+            Start New Game
+          </button>
+          <button onClick={() => navigate('/')} className={styles.retryButton}>
+            Back to Home
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  // Original layout for Lost status
+  return (
+    <div 
+      className={styles.endgameContainer}
+      style={{ '--background-image': `url(${background})` }}
     >
-      Maze Adventure
-    </h1>
-    <h2 className={styles[`${status.toLowerCase()}Message`]}>
-      {status === 'Won' ? '🎉 You Win! 🎉' : '💀 Game Over 💀'}
-    </h2>
-    <p>{message}</p>
-    <div className={styles.endgameButtons}>
-      <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
-        Start New Game
-      </button>
-      <button onClick={() => navigate('/')} className={styles.retryButton}>
-        Back to Home
-      </button>
+      <h1 
+        className={styles.gameTitle}
+        onClick={() => navigate('/')}
+        style={{ cursor: 'pointer' }}
+        title="Return to Home"
+      >
+        Maze Adventure
+      </h1>
+      <h2 className={styles.lostMessage}>
+        💀 Game Over 💀
+      </h2>
+      <p>{message}</p>
+      <div className={styles.endgameButtons}>
+        <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
+          Start New Game
+        </button>
+        <button onClick={() => navigate('/')} className={styles.retryButton}>
+          Back to Home
+        </button>
+      </div>
     </div>
-  </div>
-);
+  );
+};
 
 // Battle Overlay Component - UPDATED with monster images
 const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, onUsePotion, battleMessage, collectedPotions }) => (
@@ -268,6 +316,7 @@ const Play = () => {
   const [battleMessage, setBattleMessage] = useState("");
   const [visitedPits, setVisitedPits] = useState(new Set());
   const [visitedExits, setVisitedExits] = useState(new Set());
+  const [isTyping, setIsTyping] = useState(false);
 
   // Get username from API service
   const username = hasUsername() ? getDisplayUsername() : null;
@@ -444,7 +493,7 @@ const Play = () => {
   // Keyboard controls (now supports both arrow keys and WASD)
   useEffect(() => {
     const handleKeyDown = (e) => {
-      if (!gameData || !DIRECTIONS[e.key] || inBattle) return;
+      if (!gameData || !DIRECTIONS[e.key] || inBattle || isTyping) return;
       
       const { CurrCoords } = gameData.Maze;
       const [dX, dY] = DIRECTIONS[e.key];
@@ -453,20 +502,14 @@ const Play = () => {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameData, movePlayer, inBattle]);
+  }, [gameData, movePlayer, inBattle, isTyping]);
 
   // Loading and error states
   if (error) {
     return (
       <div 
         className={styles.errorContainer}
-        style={{
-          backgroundImage: `url(${background})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          minHeight: '100vh'
-        }}
+        style={{ '--background-image': `url(${background})` }}
       >
         <h1 
           className={styles.gameTitle}
@@ -492,13 +535,7 @@ const Play = () => {
     return (
       <div 
         className={styles.loadingContainer}
-        style={{
-          backgroundImage: `url(${background})`,
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          minHeight: '100vh'
-        }}
+        style={{ '--background-image': `url(${background})` }}
       >
         <h1 
           className={styles.gameTitle}
@@ -562,13 +599,7 @@ const Play = () => {
   return (
     <div 
       className={styles.gameContainer}
-      style={{
-        backgroundImage: `url(${background})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        minHeight: '100vh'
-      }}
+      style={{ '--background-image': `url(${background})` }}
     >
       {/* Battle Overlay - Renders on top when in battle */}
       {inBattle && currentRoom.RoomMonster && (
@@ -607,6 +638,8 @@ const Play = () => {
               placeholder="Enter save name..."
               value={gName}
               onChange={e => setgName(e.target.value)}
+              onFocus={() => setIsTyping(true)}
+              onBlur={() => setIsTyping(false)}
               disabled={inBattle}
               className={styles.saveInput}
             />
@@ -722,7 +755,7 @@ const Play = () => {
                               
                               {/* UPDATED: Buzz Ball image */}
                               {cell.PotionType > 0 && (
-                                <div className={`${styles.potionIndicator} ${styles[`Buzz Ball${cell.PotionType}`]}`}>
+                                <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
                                   {PotionImages[cell.PotionType] ? (
                                     <img 
                                       src={PotionImages[cell.PotionType]} 

@@ -71,6 +71,7 @@ const myHeroes = [
 ];
 
 const DIFFICULTY_OPTIONS = [
+  { label: 'Ultra-Easy', value: 5 },
   { label: 'Easy', value: 11 },
   { label: 'Medium', value: 15 },
   { label: 'Hard', value: 21 }
@@ -128,12 +129,7 @@ const HeroSelect = () => {
   return (
     <div 
       className={styles.heroSelectContainer} 
-      style={{ 
-        backgroundImage: `url(${bgImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat'
-      }}
+      style={{ '--background-image': `url(${bgImage})` }}
     >
       <div className={styles.bgOverlay} />
       <div className={styles.header}>

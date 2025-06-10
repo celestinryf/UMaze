@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import GameCard from '../../components/GameCard/GameCard';
+import styles from './loadgamescreen.module.css';
+import backgroundImg from '../../assets/background.jpg';
 
 const LoadGames = () => {
     const [games, setGames] = useState([]);
@@ -77,99 +79,55 @@ const LoadGames = () => {
     // Show loading screen if no username yet
     if (!username) {
         return (
-            <div style={{ padding: '2rem', textAlign: 'center' }}>
-                <h1>Load Saved Games</h1>
-                <p>Redirecting to login...</p>
+            <div 
+                className={styles.gameContainer}
+                style={{ '--background-image': `url(${backgroundImg})` }}
+            >
+                <h1 className={styles.gameTitle}>Load Saved Games</h1>
+                <div className={styles.titleUnderline}></div>
+                <p className={styles.loadingText}>Redirecting to login...</p>
             </div>
         );
     }
 
     return (
-        <div style={{ padding: '2rem', textAlign: 'center' }}>
-            <h1>Load Saved Games - {username}</h1>
+        <div 
+            className={styles.gameContainer}
+            style={{ '--background-image': `url(${backgroundImg})` }}
+        >
+            <h1 className={styles.gameTitle}>Load Saved Games - {username}</h1>
+            <div className={styles.titleUnderline}></div>
             
             {error && (
-                <div style={{ 
-                    color: 'red', 
-                    backgroundColor: '#ffe6e6', 
-                    padding: '1rem', 
-                    borderRadius: '4px', 
-                    margin: '1rem 0',
-                    border: '1px solid #ffcccc'
-                }}>
+                <div className={styles.errorMessage}>
                     {error}
                 </div>
             )}
 
             {loading ? (
-                <div style={{ margin: '2rem 0' }}>
-                    <p>Loading your saved games...</p>
-                    <div style={{ 
-                        width: '50px', 
-                        height: '50px', 
-                        border: '3px solid #f3f3f3', 
-                        borderTop: '3px solid #3498db', 
-                        borderRadius: '50%', 
-                        animation: 'spin 1s linear infinite',
-                        margin: '1rem auto'
-                    }}></div>
+                <div className={styles.loadingContainer}>
+                    <p className={styles.loadingText}>Loading your saved games...</p>
+                    <div className={styles.loadingSpinner}></div>
                 </div>
             ) : games.length === 0 ? (
-                <div style={{ margin: '2rem 0' }}>
-                    <p>No saved games found.</p>
-                    <button 
-                        onClick={() => myNavigate('/heroselect')}
-                        style={{
-                            padding: '1rem 2rem',
-                            backgroundColor: '#4CAF50',
-                            color: 'white',
-                            border: 'none',
-                            borderRadius: '4px',
-                            cursor: 'pointer',
-                            fontSize: '1rem',
-                            marginTop: '1rem'
-                        }}
-                    >
-                        Start New Game
-                    </button>
+                <div className={styles.noGamesContainer}>
+                    <p className={styles.noGamesText}>No saved games found.</p>
                 </div>
             ) : (
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', alignItems: 'center' }}>
+                <div className={styles.gamesContainer}>
                     {games.map((game, index) => (
-                        <div key={game.Id || index} style={{
-                            border: '1px solid #ddd',
-                            borderRadius: '8px',
-                            padding: '1rem',
-                            color: 'black', // changes the text color of save name
-                            backgroundColor: '#4f4ba3', // changes the back color
-                            maxWidth: '500px',
-                            width: '100%'
-                        }}>
+                        <div key={game.Id || index} className={styles.gameCard}>
                             <GameCard name={game.Name} date={game.Date} />
-                            <div style={{ display: 'flex', gap: '1rem', justifyContent: 'center', marginTop: '1rem' }}>
+                            <div className={styles.gameButtons}>
                                 <button 
                                     onClick={() => loadGame(game.Id)}
-                                    style={{
-                                        padding: '0.5rem 1rem',
-                                        backgroundColor: '#4CAF50',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
-                                    }}
+                                    className={styles.loadButton}
                                 >
                                     Load Game
                                 </button>
                                 <button 
                                     onClick={() => removeGame(game.Id)}
-                                    style={{
-                                        padding: '0.5rem 1rem',
-                                        backgroundColor: '#f44336',
-                                        color: 'white',
-                                        border: 'none',
-                                        borderRadius: '4px',
-                                        cursor: 'pointer'
-                                    }}
+                                    className={styles.deleteButton}
                                 >
                                     Delete Game
                                 </button>
@@ -179,42 +137,20 @@ const LoadGames = () => {
                 </div>
             )}
 
-            <div style={{ marginTop: '2rem' }}>
+            <div className={styles.navigationButtons}>
                 <button 
                     onClick={() => myNavigate('/')}
-                    style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#6c757d',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer',
-                        marginRight: '1rem'
-                    }}
+                    className={styles.backButton}
                 >
                     ← Back to Menu
                 </button>
                 <button 
                     onClick={() => myNavigate('/heroselect')}
-                    style={{
-                        padding: '0.5rem 1rem',
-                        backgroundColor: '#007bff',
-                        color: 'white',
-                        border: 'none',
-                        borderRadius: '4px',
-                        cursor: 'pointer'
-                    }}
+                    className={styles.newGameButton}
                 >
                     Start New Game
                 </button>
             </div>
-
-            <style jsx>{`
-                @keyframes spin {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(360deg); }
-                }
-            `}</style>
         </div>
     );
 };

@@ -1,6 +1,10 @@
 .heroSelectContainer {
   min-height: 100vh;
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: overlay;
   color: white;
   font-family: 'Arial', sans-serif;
   position: relative;
@@ -43,6 +47,40 @@
   margin: 1rem auto;
   border-radius: 2px;
   animation: underlineGlow 2s ease-in-out infinite alternate;
+}
+
+/* Animations */
+@keyframes titlePulse {
+  0% {
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+  }
+  100% {
+    text-shadow: 0 0 50px rgba(255, 255, 255, 0.6), 0 0 80px rgba(168, 237, 234, 0.4), 0 0 100px rgba(254, 214, 227, 0.3);
+  }
+}
+
+@keyframes underlineGlow {
+  0% {
+    box-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+  }
+  100% {
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.8), 0 0 40px rgba(0, 212, 255, 0.4);
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .titleUnderline {
+    width: 80%;
+    max-width: 500px;
+  }
+}
+
+@media (max-width: 480px) {
+  .titleUnderline {
+    width: 90%;
+    max-width: 300px;
+  }
 }
 
 @keyframes titlePulse {

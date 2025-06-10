@@ -207,16 +207,11 @@ function StartScreen() {
   return (
     <div
       className={styles.gameContainer}
-      style={{
-        backgroundImage: `url(${backgroundImg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        minHeight: '100vh',
-      }}
+      style={{ '--background-image': `url(${backgroundImg})` }}
     >
       <div className={styles.gameStartScreen}>
-        <h1 className={styles.gameTitle}>Dungeon Maze</h1>
+        <h1 className={styles.gameTitle}>CHARLIE THE UNICORN</h1>
+        <div className={styles.titleUnderline}></div>
 
         {!showButtons ? (
           <div className={styles.usernameSection}>

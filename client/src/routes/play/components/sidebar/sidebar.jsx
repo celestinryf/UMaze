@@ -11,7 +11,7 @@ const PILLAR_TYPES = {
 
 const POTION_TYPES = {
   1: 'Health Straberry Rita',
-  2: 'Stength Forbidden Apple'
+  2: 'Stength Berry Cherry Limeade'
 };
 
 // Utility function
@@ -86,7 +86,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
 
           {/* Buzz Balls */}
           <div className={styles.inventorySection}>
-            <h3>Buzz Balls</h3>
+            <h3>Buzz Ballz</h3>
             <div className={styles.potionsList}>
               {[1, 2].map(potion => {
                 const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
@@ -98,7 +98,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
                     className={`${styles.potionItem} ${canUse ? styles.canUse : ''}`}
                     onClick={() => canUse && usePotion(potion)}
                   >
-                    <span className={`${styles.potionIcon} ${styles[`Buzz Ball${potion}`]}`}>
+                    <span className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
                       ♦
                     </span>
                     <span className={styles.potionName}>

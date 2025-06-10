@@ -2,7 +2,11 @@
 .gameContainer {
   width: 100%;
   min-height: 100vh;
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: overlay;
   color: #fff;
   font-family: 'Arial', sans-serif;
   overflow-x: hidden;
@@ -254,8 +258,8 @@
 }
 
 .player img {
-  width: 28px;
-  height: 28px;
+  width: 32px;
+  height: 32px;
   object-fit: cover;
   border-radius: 50%;
   box-shadow: 0 0 15px rgba(255, 255, 255, 0.6);
@@ -826,13 +830,22 @@
 .errorContainer,
 .loadingContainer,
 .endgameContainer {
+  width: 100%;
+  min-height: 100vh;
+  background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+  background-size: cover, cover;
+  background-position: center, center;
+  background-repeat: no-repeat, no-repeat;
+  background-blend-mode: overlay;
+  color: #fff;
+  font-family: 'Arial', sans-serif;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-  color: #fff;
+  text-align: center;
+  padding: 2rem;
+  position: relative;
 }
 
 .errorMessage {
@@ -1196,4 +1209,47 @@
   height: 110%;
   /* transform: translate(-50%, -50%); */
   /* object-fit: contain; */
+}
+
+/* Victory screen specific styles */
+.wonContentArea {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-grow: 1;
+}
+
+.horseContainer {
+  margin: -200px 0;
+}
+
+.victoryHorse {
+  width: 1000px;
+  height: 1000px;
+  /* object-fit: contain; */
+  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  animation: victoryGlow 2s ease-in-out infinite alternate;
+}
+
+.victoryMessage {
+  text-align: center;
+  font-size: 1.2rem;
+  line-height: 1.6;
+  max-width: 600px;
+  margin: 20px 0;
+  color: #fff;
+}
+
+.victoryMessage p {
+  margin: 10px 0;
+}
+
+@keyframes victoryGlow {
+  from {
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+  }
+  to {
+    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1));
+  }
 }

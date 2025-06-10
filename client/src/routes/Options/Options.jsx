@@ -23,15 +23,10 @@ function Options() {
   return (
     <div
       className={styles.optionsContainer}
-      style={{
-        backgroundImage: `url(${backgroundImg})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center',
-        backgroundRepeat: 'no-repeat',
-        height: '100vh',
-      }}
+      style={{ '--background-image': `url(${backgroundImg})` }}
     >
       <h1 className={styles.title}>Game Settings</h1>
+      <div className={styles.titleUnderline}></div>
 
       <div className={styles.settingsCard}>
         <div className={styles.settingGroup}>

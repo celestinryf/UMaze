@@ -130,7 +130,7 @@
 .attackBarFill {
     height: 100%;
     /* Blue/Purple gradient as requested */
-    background: linear-gradient(90deg, #4e54c8, #8f94fb);
+    background: linear-gradient(90deg, #3498db, #2980b9);
     transition: width 0.5s ease;
 }
 
@@ -281,7 +281,7 @@
 
 .potion2 .potionIcon,
 .potion2 { 
-    background: linear-gradient(135deg, #53db34, #3cb929);
+    background: linear-gradient(135deg, #3498db, #2980b9);
 }
 
 .potionName {
