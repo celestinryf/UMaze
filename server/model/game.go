@@ -46,7 +46,7 @@ func (g *Game) Move(newCoords *Coords) {
 		currRoom.PillarType = noPillar
 	}
 
-	if g.TheHero.Name != "NICK" && currRoom.RoomType == pit {
+	if g.TheHero.Name != "MATT" && currRoom.RoomType == pit {
 		g.TheHero.CurrHealth -= 20 // can change the pit damage
 	}
 

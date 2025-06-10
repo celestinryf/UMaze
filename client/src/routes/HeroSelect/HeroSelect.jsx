@@ -17,7 +17,7 @@ const myHeroes = [
     name: "Nick",
     img: nickImg,
     desc: "A powerful warrior with high power.",
-    skills: ["Immune To Pits", "Has powerful, but reckless special attack"],
+    skills: ["Starts with 2 buzz balls", "Has powerful, but reckless special attack"],
     stats: {
       attack: 8,
       defense: 7,
@@ -31,7 +31,7 @@ const myHeroes = [
     name: "Matthew",
     img: matthewImg,
     desc: "A nerdy fella, who is always prepared.",
-    skills: ["Starts with 2 buzz balls", "Has a life steal special attack"],
+    skills: ["Immune to Pits", "Has a life steal special attack"],
     stats: {
       attack: 3,
       defense: 4,
