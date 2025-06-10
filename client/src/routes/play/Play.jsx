@@ -63,7 +63,7 @@ const DIRECTIONS = {
 
 const heroImages = {
   'NICK': nickImg,
-  'MATTHEW': matthewImg,
+  'MATT': matthewImg,
   'CELESTIN': celestinImg,
   'PRIMO': primoImg
 };

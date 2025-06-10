@@ -10,13 +10,11 @@ import (
 func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	log.Printf("Recieved %s request to %s", r.Method, r.URL.Path)
-
 	username := r.URL.Query().Get("username")
 	if username == "" {
 		http.Error(w, "Username is required", http.StatusBadRequest)
 		return
 	}
-
 	switch r.Method {
 	case http.MethodPut:
 
