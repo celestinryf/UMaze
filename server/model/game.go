@@ -37,7 +37,13 @@ func (g *Game) Move(newCoords *Coords) {
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
 
 	if currRoom.PotionType != NoPotion {
-		g.TheHero.AquiredPotions[currRoom.PotionType]++
+
+		if currRoom.PotionType == HealingPotion {
+			g.TheHero.AquiredPotions["Health"]++
+		} else if currRoom.PotionType == AttackPotion {
+			g.TheHero.AquiredPotions["Attack"]++
+		}
+
 		currRoom.PotionType = NoPotion
 	}
 
