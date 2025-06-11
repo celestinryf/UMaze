@@ -37,13 +37,13 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 	validRooms := make([]*Room, 0)
 	for i := range newMaze.Grid {
 		for j := range newMaze.Grid[0] {
-			if newMaze.Grid[i][j].RoomType == path {
+			if newMaze.Grid[i][j].RoomType == "Path" {
 				validRooms = append(validRooms, newMaze.Grid[i][j])
 			}
 		}
 	}
 
-	room_list := []RoomTypes{start, end}
+	room_list := []string{"Entrance", "Exit"}
 	for _, roomType := range room_list {
 		randInt := rand.Intn(len(validRooms) - 1)
 		validRooms[randInt].RoomType = roomType
@@ -63,7 +63,7 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 
 	for i := range newMaze.Grid {
 		for j := range newMaze.Grid[0] {
-			if newMaze.Grid[i][j].RoomType == start {
+			if newMaze.Grid[i][j].RoomType == "Entrance" {
 				newMaze.CurrCoords = &Coords{
 					X: i,
 					Y: j,

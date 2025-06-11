@@ -1,14 +1,5 @@
 package model
 
-// import (
-// 	"database/sql"
-// 	"fmt"
-// 	"log"
-// 	"os"
-// 	"testing"
-// 	"time"
-// )
-
 // // test the init room
 // func TestInitRoomPath(t *testing.T) {
 // 	room := InitRoom(true)

@@ -29,7 +29,7 @@ func (g *Game) Move(newCoords *Coords) {
 		return
 	}
 
-	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == wall {
+	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == "Wall" {
 		return
 	}
 
@@ -52,7 +52,7 @@ func (g *Game) Move(newCoords *Coords) {
 		currRoom.PillarType = noPillar
 	}
 
-	if g.TheHero.Name != "MATT" && currRoom.RoomType == pit {
+	if g.TheHero.Name != "MATT" && currRoom.RoomType == "Poop" {
 		g.TheHero.CurrHealth -= 20 // can change the pit damage
 	}
 
@@ -66,7 +66,7 @@ func (g *Game) Move(newCoords *Coords) {
 		return
 	}
 
-	if currRoom.RoomType == end && len(g.TheHero.AquiredPillars) == 4 {
+	if currRoom.RoomType == "Exit" && len(g.TheHero.AquiredPillars) == 4 {
 		g.Status = "Won"
 		return
 	}
