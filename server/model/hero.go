@@ -44,7 +44,7 @@ func initHero(heroName string, db *sql.DB) *Hero {
 		Attack:         attack,
 		CoolDown:       cooldown,
 		CurrCoolDown:   cooldown,
-		AquiredPillars: make([]Pillar, 4),
+		AquiredPillars: make([]Pillar, 0),
 		AquiredPotions: make(map[Potion]int, 2),
 	}
 
