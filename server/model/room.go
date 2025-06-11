@@ -6,17 +6,6 @@ import (
 	"math/rand"
 )
 
-// room enums
-type RoomTypes int
-
-const (
-	wall RoomTypes = iota
-	start
-	end
-	path
-	pit
-)
-
 // for pillar type enums
 type Pillar int
 
@@ -39,20 +28,20 @@ const (
 
 // Rooms make up the maze
 type Room struct {
-	RoomType    RoomTypes `json:"RoomType"`
-	RoomMonster *Monster  `json:"RoomMonster"`
-	PillarType  Pillar    `json:"PillarType"`
-	PotionType  Potion    `json:"PotionType"`
+	RoomType    string   `json:"RoomType"`
+	RoomMonster *Monster `json:"RoomMonster"`
+	PillarType  Pillar   `json:"PillarType"`
+	PotionType  Potion   `json:"PotionType"`
 }
 
 // Inits and returns a room based on
 // whether we canPass through or not.
 func InitRoom(isPath bool) *Room {
-	var roomType RoomTypes
+	var roomType string
 	if isPath {
-		roomType = path
+		roomType = "Path"
 	} else {
-		roomType = wall
+		roomType = "Wall"
 	}
 	return &Room{
 		RoomType:    roomType,
@@ -91,7 +80,7 @@ func (r *Room) SetUpRoom(db *sql.DB) {
 
 	switch id {
 	case 1:
-		r.RoomType = pit
+		r.RoomType = "Poop"
 	case 2:
 		r.RoomMonster = initMonster(db)
 	case 3:
