@@ -30,11 +30,11 @@ import background from '../../assets/background.jpg';
 
 // Constants
 const ROOM_TYPES = {
-  0: 'Wall',
-  1: 'Entrance',
-  2: 'Exit',
-  3: 'Path',
-  4: 'Poop'
+  "Wall": 'Wall',
+  "Entrance": 'Entrance',
+  "Exit": 'Exit',
+  "Path": 'Path',
+  "Poop": 'Poop'
 };
 
 const PILLAR_TYPES = {
@@ -220,7 +220,7 @@ const Play = () => {
         const currentY = data.Maze.CurrCoords.Y;
         const currentRoom = data?.Maze?.Grid?.[currentX]?.[currentY];
         
-        if (currentRoom?.RoomType === 2) {
+        if (currentRoom?.RoomType === "Entrance") {
           setVisitedExits(prev => new Set(prev).add(`${currentX}-${currentY}`));
         }
         
@@ -331,7 +331,7 @@ const Play = () => {
     if (
       newX < 0 || newX >= Grid.length ||
       newY < 0 || newY >= Grid[0].length ||
-      Grid[newX][newY].RoomType === 0
+      Grid[newX][newY].RoomType === "Wall"
     ) {
       setGMessage("Invalid move: Wall or out of bounds.");
       return;
@@ -344,12 +344,12 @@ const Play = () => {
       
       // Check if new room is a pit and mark it as visited
       const newRoom = updatedData.Maze.Grid[newX][newY];
-      if (newRoom.RoomType === 4) { // Pit
+      if (newRoom.RoomType === "Poop") { // Pit
         setVisitedPits(prev => new Set(prev).add(`${newX}-${newY}`));
       }
       
       // Check if new room is an exit and mark it as visited
-      if (newRoom.RoomType === 2) { // Exit
+      if (newRoom.RoomType === "Exit") { // Exit
         setVisitedExits(prev => new Set(prev).add(`${newX}-${newY}`));
       }
       
@@ -452,8 +452,8 @@ const Play = () => {
   // Cell class helper
   const getCellClasses = (cell, rowIndex, colIndex) => {
     const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
-    const isPit = cell.RoomType === 4;
-    const isExit = cell.RoomType === 2;
+    const isPit = cell.RoomType === "Poop";
+    const isExit = cell.RoomType === "Exit";
     const isVisitedPit = isPit && visitedPits.has(`${rowIndex}-${colIndex}`);
     const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
     
@@ -464,9 +464,9 @@ const Play = () => {
       roomTypeClass = isVisitedExit ? styles.exit : styles.path; // Hide exit until visited
     } else {
       roomTypeClass = {
-        0: styles.wall,
-        1: styles.entrance,
-        3: styles.path
+        "Wall": styles.wall,
+        "Entrance": styles.entrance,
+        "Exit": styles.path
       }[cell.RoomType] || '';
     }
 
@@ -540,8 +540,8 @@ const Play = () => {
                 <div key={rowIndex} className={styles.mazeRow}>
                   {row.map((cell, colIndex) => {
                     const isCurrent = rowIndex === CurrCoords.X && colIndex === CurrCoords.Y;
-                    const isWall = cell.RoomType === 0;
-                    const isExit = cell.RoomType === 2;
+                    const isWall = cell.RoomType === "Wall";
+                    const isExit = cell.RoomType === "Exit";
                     const isVisitedExit = isExit && visitedExits.has(`${rowIndex}-${colIndex}`);
 
                     let cellStyle = {};
@@ -589,7 +589,7 @@ const Play = () => {
                             )}
 
                             {/* Pit code stays the same */}
-                            {(cell.RoomType == 4) && visitedPits.has(`${rowIndex}-${colIndex}`) && (
+                            {(cell.RoomType == "Poop") && visitedPits.has(`${rowIndex}-${colIndex}`) && (
                               <div className={styles.pitIndicator}>
                                 {EnvironmentImages['POOP'] ? (
                                   <img 
