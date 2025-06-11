@@ -30,7 +30,7 @@ const (
 type Room struct {
 	RoomType    string   `json:"RoomType"`
 	RoomMonster *Monster `json:"RoomMonster"`
-	PillarType  Pillar   `json:"PillarType"`
+	PillarType  string   `json:"PillarType"`
 	PotionType  Potion   `json:"PotionType"`
 }
 
@@ -45,7 +45,7 @@ func InitRoom(isPath bool) *Room {
 	}
 	return &Room{
 		RoomType:    roomType,
-		PillarType:  noPillar,
+		PillarType:  "",
 		PotionType:  NoPotion,
 		RoomMonster: nil,
 	}

@@ -50,7 +50,7 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 		validRooms = removeElement(validRooms, randInt)
 	}
 
-	pillar_list := []Pillar{pillar1, pillar2, pillar3, pillar4}
+	pillar_list := []string{"Apple", "Saddle", "Horn", "Wings"}
 	for _, pillar := range pillar_list {
 		randInt := rand.Intn(len(validRooms) - 1)
 		validRooms[randInt].PillarType = pillar
