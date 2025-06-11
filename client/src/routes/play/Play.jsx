@@ -4,7 +4,7 @@ import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../con
 import styles from './play.module.css';
 import Sidebar from './components/sidebar/sidebar.jsx';
 import BattleOverlay from './components/battle/battle.jsx';
-import GameEndScreen from './components/gameendscreen/GameEndScreen.jsx';
+import GameEndScreen from './components/gameendscreen/gameendscreen.jsx';
 import nickImg from '../../assets/nick.png';
 import matthewImg from '../../assets/matthew.png';
 import celestinImg from '../../assets/celestin.png';
