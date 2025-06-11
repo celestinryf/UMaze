@@ -383,14 +383,14 @@
   height: 80px;
 }
 
-.potion1 { 
+/* .potion1 { 
   background: linear-gradient(135deg, #e74c3c, #c0392b);
   box-shadow: 0 0 8px rgba(231, 76, 60, 0.6);
 }
 .potion2 { 
   background: linear-gradient(135deg, #3498db, #2980b9);
   box-shadow: 0 0 8px rgba(52, 152, 219, 0.6);
-}
+} */
 
 .controlsInfo {
   text-align: center;

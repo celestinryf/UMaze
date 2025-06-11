@@ -39,10 +39,10 @@ const ROOM_TYPES = {
 };
 
 const PILLAR_TYPES = {
-  1: 'Apple',
-  2: 'Saddle',
-  3: 'Horn',
-  4: 'Wings'
+  "Apple": 'Apple',
+  "Saddle": 'Saddle',
+  "Horn": 'Horn',
+  "Wings": 'Wings'
 };
 
 const POTION_TYPES = {
@@ -537,7 +537,7 @@ const Play = () => {
                             )}
                             
                             {/* Pillar and potion code stays the same */}
-                            {cell.PillarType > 0 && (
+                            {cell.PillarType > '' && (
                               <div className={styles.pillarIndicator}>
                                 {ToolsOfEscapeImages[PILLAR_TYPES[cell.PillarType].toUpperCase()] ? (
                                   <img 
