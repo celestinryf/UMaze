@@ -47,9 +47,9 @@ func (g *Game) Move(newCoords *Coords) {
 		currRoom.PotionType = NoPotion
 	}
 
-	if currRoom.PillarType != noPillar {
+	if currRoom.PillarType != "" {
 		g.TheHero.AquiredPillars = append(g.TheHero.AquiredPillars, currRoom.PillarType)
-		currRoom.PillarType = noPillar
+		currRoom.PillarType = ""
 	}
 
 	if g.TheHero.Name != "MATT" && currRoom.RoomType == "Poop" {
