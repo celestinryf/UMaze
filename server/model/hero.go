@@ -14,7 +14,7 @@ type Hero struct {
 	CoolDown       int            `json:"CoolDown"`
 	CurrCoolDown   int            `json:"CurrCoolDown"`
 	AquiredPillars []Pillar       `json:"AquiredPillars"`
-	AquiredPotions map[Potion]int `json:"AquiredPotions"`
+	AquiredPotions map[string]int `json:"AquiredPotions"`
 }
 
 // Inits hero based on a heroName (must match one in db)
@@ -45,15 +45,15 @@ func initHero(heroName string, db *sql.DB) *Hero {
 		CoolDown:       cooldown,
 		CurrCoolDown:   cooldown,
 		AquiredPillars: make([]Pillar, 0),
-		AquiredPotions: make(map[Potion]int, 2),
+		AquiredPotions: make(map[string]int, 2),
 	}
 
 	if heroName == "NICK" {
-		temp.AquiredPotions[AttackPotion] = 1
-		temp.AquiredPotions[HealingPotion] = 1
+		temp.AquiredPotions["Attack"] = 1
+		temp.AquiredPotions["Health"] = 1
 	} else {
-		temp.AquiredPotions[AttackPotion] = 0
-		temp.AquiredPotions[HealingPotion] = 0
+		temp.AquiredPotions["Attack"] = 0
+		temp.AquiredPotions["Health"] = 0
 	}
 
 	return temp
