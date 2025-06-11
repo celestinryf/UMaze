@@ -13,7 +13,7 @@ type Hero struct {
 	Attack         int            `json:"Attack"`
 	CoolDown       int            `json:"CoolDown"`
 	CurrCoolDown   int            `json:"CurrCoolDown"`
-	AquiredPillars []Pillar       `json:"AquiredPillars"`
+	AquiredPillars []string       `json:"AquiredPillars"`
 	AquiredPotions map[string]int `json:"AquiredPotions"`
 }
 
@@ -44,7 +44,7 @@ func initHero(heroName string, db *sql.DB) *Hero {
 		Attack:         attack,
 		CoolDown:       cooldown,
 		CurrCoolDown:   cooldown,
-		AquiredPillars: make([]Pillar, 0),
+		AquiredPillars: make([]string, 0),
 		AquiredPotions: make(map[string]int, 2),
 	}
 
