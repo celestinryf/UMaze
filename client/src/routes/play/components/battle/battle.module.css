@@ -1,0 +1,414 @@
+/* Health Bar for battle overlay */
+.statItem {
+    margin-bottom: 1rem;
+  }
+  
+  .healthBar {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 10px;
+    height: 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .healthFill {
+    background: linear-gradient(90deg, #2ed573, #00d4ff);
+    height: 100%;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  }
+  
+  .healthText {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 0.875rem;
+    font-weight: bold;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  
+  /* Battle Overlay - Enhanced with modern styling */
+  .battleOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    animation: fadeIn 0.3s ease-in;
+    overflow: hidden;
+    z-index: 9999;
+  }
+  
+  .battleOverlay::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(0,0,0,0.4) 100%);
+    animation: pulse 3s ease-in-out infinite;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.8; }
+  }
+  
+  .battleContainer {
+    background: rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(20px);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 40px;
+    width: 90%;
+    box-shadow: 0 0 50px rgba(0, 212, 255, 0.3);
+    animation: slideUp 0.4s ease-out;
+    position: relative;
+    z-index: 1;
+  }
+  
+  @keyframes slideUp {
+    from { 
+      transform: translateY(50px);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .battleTitle {
+    text-align: center;
+    font-size: 3em;
+    font-weight: 900;
+    margin-bottom: 2rem;
+    background: linear-gradient(45deg, #fff, #00d4ff, #ff0080);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    animation: titlePulse 2s infinite;
+  }
+  
+  @keyframes titlePulse {
+    0%, 100% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+  }
+  
+  .battleArena {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 3rem;
+    margin-bottom: 2rem;
+    min-height: 300px;
+  }
+  
+  .battleMonsterSection,
+  .battleHeroSection {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+  .battleCharacterInfo {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    width: 100%;
+    text-align: center;
+  }
+  
+  .battleCharacterInfo h3 {
+    color: #00d4ff;
+    margin: 0 0 1rem 0;
+    font-size: 1.5em;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  
+  .battleHealthBar {
+    margin: 1rem 0;
+  }
+  
+  .battleHealthBar .healthBar {
+    height: 28px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 14px;
+  }
+  
+  .battleHealthBar .healthFill {
+    background: linear-gradient(90deg, #ff4444, #ff0080);
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: inset 0 2px 4px rgba(255, 255, 255, 0.3);
+  }
+  
+  .battleHealthBar .healthText {
+    font-size: 0.875rem;
+    font-weight: bold;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+  }
+  
+  .battleStats {
+    color: #a0aec0;
+    font-weight: 600;
+    margin-top: 0.75rem;
+    font-size: 0.875rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .battleMonsterSprite,
+  .battleHeroSprite {
+    font-size: 80px;
+    margin: 1.5rem 0;
+    animation: float 3s ease-in-out infinite;
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.3));
+  }
+  
+  .battleHeroSprite {
+    animation-delay: 1.5s;
+  }
+  
+  .battleHeroSprite img {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    border-radius: 50%;
+    box-shadow: 0 0 30px rgba(255, 255, 255, 0.6);
+  }
+  
+  @keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-20px); }
+  }
+  
+  .monsterEmoji {
+    display: inline-block;
+    animation: shake 2s ease-in-out infinite;
+  }
+  
+  .heroEmoji {
+    display: inline-block;
+  }
+  
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    75% { transform: translateX(5px); }
+  }
+  
+  .battleMonsterImage {
+    height: 50px;
+  }
+  
+  .battleMessage {
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    text-align: center;
+    min-height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .battleMessage p {
+    color: #fff;
+    font-size: 1.1rem;
+    margin: 0;
+    animation: typewriter 0.5s ease-out;
+    line-height: 1.6;
+  }
+  
+  @keyframes typewriter {
+    from { opacity: 0; transform: translateX(-10px); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  
+  .battleActions {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .battleButton {
+    background: linear-gradient(45deg, #48e5f0, #ff00bf);
+    color: white;
+    border: none;
+    padding: 1rem 2.5rem;
+    font-size: 1.1rem;
+    font-weight: bold;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .battleButton::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(45deg, #ff0080, #00d4ff);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+  
+  .battleButton:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+  }
+  
+  .battleButton:hover:not(:disabled)::before {
+    opacity: 0.2;
+  }
+  
+  .battleButton:active:not(:disabled) {
+    transform: translateY(0);
+  }
+  
+  .battleButton:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: linear-gradient(45deg, #4a5568, #2d3748);
+  }
+  
+  .battlePotionButton {
+    background: linear-gradient(135deg, #f093fb, #f5576c);
+  }
+  
+  .battleVictory {
+    text-align: center;
+    margin-top: 1.5rem;
+    animation: celebration 0.5s ease-out;
+  }
+  
+  @keyframes celebration {
+    0% { transform: scale(0.8); opacity: 0; }
+    50% { transform: scale(1.1); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  
+  .battleVictory p {
+    color: #2ed573;
+    font-size: 1.5rem;
+    font-weight: bold;
+    text-shadow: 0 0 20px rgba(46, 213, 115, 0.5);
+    margin-bottom: 1.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  
+  /* Responsive Design for Battle */
+  /* Mobile devices (320px - 480px) */
+  @media (max-width: 480px) {
+    .battleContainer {
+      width: 95%;
+      padding: 20px;
+    }
+    
+    .battleTitle {
+      font-size: 2rem;
+    }
+    
+    .battleArena {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      min-height: auto;
+    }
+    
+    .battleMonsterSprite,
+    .battleHeroSprite {
+      font-size: 50px;
+      margin: 1rem 0;
+    }
+    
+    .battleHeroSprite img {
+      width: 50px;
+      height: 50px;
+    }
+    
+    .battleActions {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .battleButton {
+      width: 100%;
+      padding: 0.75rem 1.5rem;
+      font-size: 0.9rem;
+    }
+  }
+  
+  /* Small tablets (481px - 768px) */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .battleContainer {
+      padding: 24px;
+    }
+    
+    .battleArena {
+      grid-template-columns: 1fr;
+      gap: 1.5rem;
+    }
+    
+    .battleMonsterSprite,
+    .battleHeroSprite {
+      font-size: 60px;
+    }
+  
+    .battleHeroSprite img {
+      width: 60px;
+      height: 60px;
+    }
+    
+    .battleActions {
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+    
+    .battleButton {
+      min-width: 45%;
+      padding: 0.875rem 2rem;
+    }
+  }
+  
+  /* Large tablets and small laptops (769px - 1024px) */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .battleArena {
+      gap: 2rem;
+    }
+  }
+  
+  /* Accessibility - Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }

@@ -274,13 +274,13 @@
     box-shadow: 0 0 12px currentColor;
 }
 
-.potion1 .potionIcon,
-.potion1 { 
+.potionHealth .potionIcon,
+.potionHealth { 
     background: linear-gradient(135deg, #e74c3c, #c0392b);
 }
 
-.potion2 .potionIcon,
-.potion2 { 
+.potionAttack .potionIcon,
+.potionAttack { 
     background: linear-gradient(135deg, #3498db, #2980b9);
 }
 

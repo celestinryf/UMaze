@@ -10,8 +10,8 @@ const PILLAR_TYPES = {
 };
 
 const POTION_TYPES = {
-  1: 'Health Straberry Rita',
-  2: 'Stength Berry Cherry Limeade'
+  "Health": 'Health Straberry Rita',
+  "Attack": 'Stength Berry Cherry Limeade'
 };
 
 // Utility function
@@ -88,7 +88,7 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
           <div className={styles.inventorySection}>
             <h3>Buzz Ballz</h3>
             <div className={styles.potionsList}>
-              {[1, 2].map(potion => {
+              {["Health", "Attack"].map(potion => {
                 const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
                 const canUse = count > 0 && !inBattle;
 

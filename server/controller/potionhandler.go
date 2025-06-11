@@ -21,7 +21,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPut:
 		// get username
 		var CurrPotion struct {
-			PotionType int `json:"potion_type"`
+			PotionType string `json:"potion_type"`
 			// Username   string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&CurrPotion); err != nil {
@@ -31,7 +31,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 		// get redis game
 		game := s.redisGetGame(username)
 		// update potion
-		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Health") {
+		if CurrPotion.PotionType == "Health" && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Health") {
 			if game.TheHero.Name == "PRIMO" {
 				game.TheHero.CurrHealth += 150
 			} else {
@@ -40,7 +40,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			game.TheHero.CurrHealth = min(game.TheHero.CurrHealth, game.TheHero.TotalHealth)
 		}
 
-		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Attack") {
+		if CurrPotion.PotionType == "Attack" && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Attack") {
 			if game.TheHero.Name == "PRIMO" {
 				game.TheHero.Attack += 15
 			} else {
