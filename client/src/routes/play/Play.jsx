@@ -44,8 +44,8 @@ const PILLAR_TYPES = {
 };
 
 const POTION_TYPES = {
-  1: 'Health Buzz Ball',
-  2: 'Attack Buzz Ball'
+  "Health": 'Health Buzz Ball',
+  "Attack": 'Attack Buzz Ball'
 };
 
 // Extended directions to include both arrow keys and WASD
@@ -265,7 +265,7 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
             </button>
             
             {/* Buzz Ball Actions */}
-            {[1, 2].map(potion => {
+            {["Health", "Attack"].map(potion => {
               const count = collectedPotions.has ? (collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0) : collectedPotions.filter(p => p === potion).length;
               const canUse = count > 0;
               const potionName = getName(potion, POTION_TYPES);
