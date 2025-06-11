@@ -5,9 +5,6 @@ import (
 	"math/rand"
 )
 
-// maze has dimensions of mazeSize * mazeSize
-//const mazeSize = 7
-
 // Coordinates of the player
 type Coords struct {
 	X int `json:"X"`
@@ -23,7 +20,6 @@ type Maze struct {
 // Gives the status of the game
 type GameStatus int
 
-// Game Status enums
 const (
 	Won GameStatus = iota
 	Lost

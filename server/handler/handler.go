@@ -89,11 +89,11 @@ func initServer() {
 
 		log.Println("Successfully connected to Turso database")
 
-		// Initialize server with DB and Redis connections
 		srv = controller.InitServer(db, redisClient)
 	})
 }
 
+// Handles incoming requests
 func Handler(w http.ResponseWriter, r *http.Request) {
 	initServer() // Ensure server is initialized
 
@@ -133,10 +133,3 @@ func Handler(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "Not found: %s", r.URL.Path)
 	}
 }
-
-// Optional: Cleanup function that Vercel might call
-// func Cleanup() {
-// 	if redisClient != nil {
-// 		redisClient.Close()
-// 	}
-// }

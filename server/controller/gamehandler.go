@@ -23,15 +23,15 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodPost:
 		//decode body
 		var HeroIdJson struct {
-			HeroId   int `json:"hero_id"`
-			MazeSize int `json:"maze_size"`
+			HeroId   string `json:"hero_id"`
+			MazeSize int    `json:"maze_size"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&HeroIdJson); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
 		// make game
-		newGame := model.InitGame(model.HeroType(HeroIdJson.HeroId), s.DB, HeroIdJson.MazeSize)
+		newGame := model.InitGame(HeroIdJson.HeroId, s.DB, HeroIdJson.MazeSize)
 		// set up redis
 		s.redisSetGame(username, *newGame)
 		// send to front

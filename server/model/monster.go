@@ -3,11 +3,9 @@ package model
 import (
 	"database/sql"
 	"log"
-	"math/rand"
 )
 
-// Monster type with name, totalHealth,
-// currHealth, and attack
+// Hold values associated with a monster
 type Monster struct {
 	Name        string `json:"Name"`
 	TotalHealth int    `json:"TotalHealth"`
@@ -19,12 +17,12 @@ type Monster struct {
 func initMonster(db *sql.DB) *Monster {
 
 	var (
-		name               string
-		health, attack_dmg int
+		name           string
+		health, attack int
 	)
 
-	err := db.QueryRow("SELECT name, health, attack_dmg FROM entities WHERE id = ?", rand.Intn(3)+1).
-		Scan(&name, &health, &attack_dmg)
+	// Query random monster from the db
+	err := db.QueryRow("SELECT name, health, attack FROM monsters ORDER BY RANDOM() LIMIT 1").Scan(&name, &health, &attack)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -33,6 +31,7 @@ func initMonster(db *sql.DB) *Monster {
 		Name:        name,
 		TotalHealth: health,
 		CurrHealth:  health,
-		Attack:      attack_dmg,
+		Attack:      attack,
 	}
+
 }

@@ -14,7 +14,7 @@ type Game struct {
 }
 
 // Gives an initialzed game.
-func InitGame(theHeroType HeroType, db *sql.DB, mazeSize int) *Game {
+func InitGame(theHeroType string, db *sql.DB, mazeSize int) *Game {
 	return &Game{
 		TheMaze: initMaze(db, mazeSize),
 		TheHero: initHero(theHeroType, db),
@@ -37,7 +37,13 @@ func (g *Game) Move(newCoords *Coords) {
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
 
 	if currRoom.PotionType != NoPotion {
-		g.TheHero.AquiredPotions[currRoom.PotionType]++
+
+		if currRoom.PotionType == HealingPotion {
+			g.TheHero.AquiredPotions["Health"]++
+		} else if currRoom.PotionType == AttackPotion {
+			g.TheHero.AquiredPotions["Attack"]++
+		}
+
 		currRoom.PotionType = NoPotion
 	}
 
@@ -69,11 +75,13 @@ func (g *Game) Move(newCoords *Coords) {
 // attack
 func (g *Game) Attack(specialAttack bool) {
 
+	// fix curr vs normal cooldown
+
 	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y]
 	roomMonster := room.RoomMonster
 	hero := g.TheHero
 
-	if roomMonster == nil || (specialAttack && hero.CoolDown != 0) {
+	if roomMonster == nil || (specialAttack && hero.CurrCoolDown != 0) {
 		return
 	}
 
@@ -93,11 +101,11 @@ func (g *Game) Attack(specialAttack bool) {
 			roomMonster.CurrHealth = max(0, roomMonster.CurrHealth)
 			hero.CurrHealth += (initHealth - roomMonster.CurrHealth) / 2
 		}
-		hero.CoolDown = CooldownTime
+		hero.CurrCoolDown = hero.CoolDown
 	} else {
 		// (normal attack)
 		roomMonster.CurrHealth -= hero.Attack
-		hero.CoolDown = max(0, hero.CoolDown-1)
+		hero.CurrCoolDown = max(0, hero.CurrCoolDown-1)
 	}
 
 	// get attacked by the monster

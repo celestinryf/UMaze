@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
-
-	"github.com/celestinryf/go-backend/model"
 )
 
 // Handles battles
@@ -33,7 +31,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 		// get redis game
 		game := s.redisGetGame(username)
 		// update potion
-		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.HealingPotion) {
+		if CurrPotion.PotionType == 1 && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Health") {
 			if game.TheHero.Name == "PRIMO" {
 				game.TheHero.CurrHealth += 150
 			} else {
@@ -42,7 +40,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			game.TheHero.CurrHealth = min(game.TheHero.CurrHealth, game.TheHero.TotalHealth)
 		}
 
-		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&game.TheHero.AquiredPotions, model.AttackPotion) {
+		if CurrPotion.PotionType == 2 && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Attack") {
 			if game.TheHero.Name == "PRIMO" {
 				game.TheHero.Attack += 15
 			} else {
@@ -65,7 +63,8 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-func hasPotionAndRemove(bag *map[model.Potion]int, potion model.Potion) bool {
+// Checks if a bag has a potion and removes it
+func hasPotionAndRemove(bag *map[string]int, potion string) bool {
 	val := (*bag)[potion]
 	if val > 0 {
 		(*bag)[potion]--

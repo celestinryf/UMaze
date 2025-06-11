@@ -5,57 +5,55 @@ import (
 	"log"
 )
 
-const CooldownTime = 4
-
-type HeroType int
-
-const (
-	Matt HeroType = iota + 4
-	Primo
-	Nick
-	Celestin
-)
-
-// Hero Type with name, totalHealth, currHealth, and attack.vssdvs
+// All stats associated with a hero
 type Hero struct {
 	Name           string         `json:"Name"`
 	TotalHealth    int            `json:"TotalHealth"`
 	CurrHealth     int            `json:"CurrHealth"`
 	Attack         int            `json:"Attack"`
 	CoolDown       int            `json:"CoolDown"`
+	CurrCoolDown   int            `json:"CurrCoolDown"`
 	AquiredPillars []Pillar       `json:"AquiredPillars"`
-	AquiredPotions map[Potion]int `json:"AquiredPotions"`
+	AquiredPotions map[string]int `json:"AquiredPotions"`
 }
 
-// Inits hero with totalHealth,
-// currHealth, attack, and name.
-func initHero(heroType HeroType, db *sql.DB) *Hero {
+// Inits hero based on a heroName (must match one in db)
+// Returns a pointer to a new hero
+func initHero(heroName string, db *sql.DB) *Hero {
+
 	var (
-		name               string
-		health, attack_dmg int
+		health   int
+		attack   int
+		cooldown int
 	)
 
-	err := db.QueryRow("SELECT name, health, attack_dmg FROM entities WHERE id = ?", heroType).Scan(&name, &health, &attack_dmg)
+	err := db.QueryRow("SELECT health, attack, cooldown FROM heroes WHERE name = ?", heroName).Scan(&health, &attack, &cooldown)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	temp := &Hero{
-		Name:           name,
-		TotalHealth:    health,
-		CurrHealth:     health,
-		Attack:         attack_dmg,
-		CoolDown:       CooldownTime,
-		AquiredPillars: make([]Pillar, 0),
-		AquiredPotions: make(map[Potion]int, 0),
+	// make sure the hero was in db
+	if health == 0 || attack == 0 {
+		log.Fatal("Invalid hero name passed into initHero")
 	}
 
-	temp.AquiredPotions[AttackPotion] = 0
-	temp.AquiredPotions[HealingPotion] = 0
+	temp := &Hero{
+		Name:           heroName,
+		TotalHealth:    health,
+		CurrHealth:     health,
+		Attack:         attack,
+		CoolDown:       cooldown,
+		CurrCoolDown:   cooldown,
+		AquiredPillars: make([]Pillar, 0),
+		AquiredPotions: make(map[string]int, 2),
+	}
 
-	if temp.Name == "NICK" {
-		temp.AquiredPotions[AttackPotion]++
-		temp.AquiredPotions[HealingPotion]++
+	if heroName == "NICK" {
+		temp.AquiredPotions["Attack"] = 1
+		temp.AquiredPotions["Health"] = 1
+	} else {
+		temp.AquiredPotions["Attack"] = 0
+		temp.AquiredPotions["Health"] = 0
 	}
 
 	return temp
