@@ -4,6 +4,7 @@ import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../con
 import styles from './play.module.css';
 import Sidebar from './components/sidebar/sidebar.jsx';
 import BattleOverlay from './components/battle/battle.jsx';
+import GameEndScreen from './components/gameendscreen/GameEndScreen.jsx';
 import nickImg from '../../assets/nick.png';
 import matthewImg from '../../assets/matthew.png';
 import celestinImg from '../../assets/celestin.png';
@@ -113,74 +114,6 @@ const HealthBar = ({ current, total, label, showLabel = true, className = '' }) 
     </div>
   </div>
 );
-
-const GameEndScreen = ({ status, message, navigate }) => {
-  if (status === 'Won') {
-    return (
-      <div 
-        className={styles.endgameContainer}
-        style={{ '--background-image': `url(${background})` }}
-      >
-
-        {/* Main content area with horse and message */}
-        <div className={styles.wonContentArea}>
-          
-          <div className={styles.horseContainer}>
-            <img 
-              src={horse} 
-              alt="Victory Horse" 
-              className={styles.victoryHorse}
-            />
-          </div>
-          
-          <div className={styles.victoryMessage}>
-            <p>Thank you, brave adventurer.</p>
-            <p>You have successfully collected everything I need to escape the treacherous forest!</p>
-          </div>
-        </div>
-
-        {/* Buttons at very bottom */}
-        <div className={styles.endgameButtons}>
-          <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
-            Start New Game
-          </button>
-          <button onClick={() => navigate('/')} className={styles.retryButton}>
-            Back to Home
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // Original layout for Lost status
-  return (
-    <div 
-      className={styles.endgameContainer}
-      style={{ '--background-image': `url(${background})` }}
-    >
-      <h1 
-        className={styles.gameTitle}
-        onClick={() => navigate('/')}
-        style={{ cursor: 'pointer' }}
-        title="Return to Home"
-      >
-        Maze Adventure
-      </h1>
-      <h2 className={styles.lostMessage}>
-        💀 Game Over 💀
-      </h2>
-      <p>{message}</p>
-      <div className={styles.endgameButtons}>
-        <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
-          Start New Game
-        </button>
-        <button onClick={() => navigate('/')} className={styles.retryButton}>
-          Back to Home
-        </button>
-      </div>
-    </div>
-  );
-};
 
 const Play = () => {
   const location = useLocation();

@@ -1,0 +1,193 @@
+/* Game End Screen Styles */
+.endgameContainer {
+    width: 100%;
+    min-height: 100vh;
+    background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    background-blend-mode: overlay;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+  }
+  
+  .gameTitle {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    animation: titlePulse 3s ease-in-out infinite alternate;
+  }
+  
+  @keyframes titlePulse {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+  }
+  
+  .lostMessage {
+    font-size: 3.5rem;
+    font-weight: 900;
+    margin-bottom: 1.5rem;
+    background: linear-gradient(45deg, #ff4757, #ff0080);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 71, 87, 0.5);
+    animation: titlePulse 2s infinite;
+  }
+  
+  .wonContentArea {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex-grow: 1;
+  }
+  
+  .horseContainer {
+    margin: -200px 0;
+  }
+  
+  .victoryHorse {
+    width: 1000px;
+    height: 1000px;
+    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    animation: victoryGlow 2s ease-in-out infinite alternate;
+  }
+  
+  @keyframes victoryGlow {
+    from {
+      filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
+    }
+    to {
+      filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1));
+    }
+  }
+  
+  .victoryMessage {
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.6;
+    max-width: 600px;
+    margin: 20px 0;
+    color: #fff;
+  }
+  
+  .victoryMessage p {
+    margin: 10px 0;
+  }
+  
+  .endgameButtons {
+    display: flex;
+    gap: 1rem;
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 2rem;
+  }
+  
+  .retryButton {
+    padding: 12px 30px;
+    background: linear-gradient(45deg, #3742fa, #00d4ff);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(55, 66, 250, 0.3);
+    margin: 0.5rem;
+  }
+  
+  .retryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+  }
+  
+  /* Responsive Design */
+  /* Mobile devices (320px - 480px) */
+  @media (max-width: 480px) {
+    .gameTitle {
+      font-size: 1.5rem;
+    }
+    
+    .lostMessage {
+      font-size: 2rem;
+    }
+    
+    .endgameContainer {
+      padding: 1rem;
+    }
+    
+    .victoryHorse {
+      width: 300px;
+      height: 300px;
+    }
+    
+    .horseContainer {
+      margin: -50px 0;
+    }
+    
+    .victoryMessage {
+      font-size: 1rem;
+      max-width: 300px;
+    }
+    
+    .endgameButtons {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .retryButton {
+      width: 100%;
+      margin: 0.25rem;
+    }
+  }
+  
+  /* Small tablets (481px - 768px) */
+  @media (min-width: 481px) and (max-width: 768px) {
+    .gameTitle {
+      font-size: 1.75rem;
+    }
+    
+    .lostMessage {
+      font-size: 2.5rem;
+    }
+    
+    .victoryHorse {
+      width: 500px;
+      height: 500px;
+    }
+    
+    .horseContainer {
+      margin: -100px 0;
+    }
+    
+    .victoryMessage {
+      max-width: 400px;
+    }
+  }
+  
+  /* Large tablets and small laptops (769px - 1024px) */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    .victoryHorse {
+      width: 700px;
+      height: 700px;
+    }
+    
+    .horseContainer {
+      margin: -150px 0;
+    }
+  }

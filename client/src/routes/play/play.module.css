@@ -1,4 +1,4 @@
-/* Main Play.module.css - Sidebar styles moved to Sidebar.module.css */
+/* Main Play.module.css - GameEndScreen styles moved to GameEndScreen.module.css */
 .gameContainer {
   width: 100%;
   min-height: 100vh;
@@ -871,8 +871,7 @@
 
 /* Loading and Error States */
 .errorContainer,
-.loadingContainer,
-.endgameContainer {
+.loadingContainer {
   width: 100%;
   min-height: 100vh;
   background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
@@ -929,30 +928,6 @@
 
 @keyframes spin {
   to { transform: rotate(360deg); }
-}
-
-.wonMessage {
-  font-size: 3.5rem;
-  font-weight: 900;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(45deg, #2ed573, #00d4ff);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(46, 213, 115, 0.5);
-  animation: titlePulse 2s infinite;
-}
-
-.lostMessage {
-  font-size: 3.5rem;
-  font-weight: 900;
-  margin-bottom: 1.5rem;
-  background: linear-gradient(45deg, #ff4757, #ff0080);
-  background-clip: text;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  text-shadow: 0 0 30px rgba(255, 71, 87, 0.5);
-  animation: titlePulse 2s infinite;
 }
 
 /* Responsive Design - Mobile First Approach */
@@ -1242,48 +1217,5 @@
   .movementControls,
   .saveGameSection {
     display: none;
-  }
-}
-
-/* Victory screen specific styles */
-.wonContentArea {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex-grow: 1;
-}
-
-.horseContainer {
-  margin: -200px 0;
-}
-
-.victoryHorse {
-  width: 1000px;
-  height: 1000px;
-  /* object-fit: contain; */
-  filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
-  animation: victoryGlow 2s ease-in-out infinite alternate;
-}
-
-.victoryMessage {
-  text-align: center;
-  font-size: 1.2rem;
-  line-height: 1.6;
-  max-width: 600px;
-  margin: 20px 0;
-  color: #fff;
-}
-
-.victoryMessage p {
-  margin: 10px 0;
-}
-
-@keyframes victoryGlow {
-  from {
-    filter: drop-shadow(0 0 20px rgba(255, 215, 0, 0.8));
-  }
-  to {
-    filter: drop-shadow(0 0 30px rgba(255, 215, 0, 1));
   }
 }
