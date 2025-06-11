@@ -6,10 +6,9 @@ import (
 	"math/rand"
 )
 
-// for room Type enums
+// room enums
 type RoomTypes int
 
-// room enums
 const (
 	wall RoomTypes = iota
 	start
@@ -21,7 +20,6 @@ const (
 // for pillar type enums
 type Pillar int
 
-// pillar enums
 const (
 	noPillar Pillar = iota
 	pillar1
@@ -33,7 +31,6 @@ const (
 // potion types
 type Potion int
 
-// potion enums
 const (
 	NoPotion Potion = iota
 	HealingPotion

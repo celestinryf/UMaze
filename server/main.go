@@ -9,7 +9,9 @@ import (
 	"github.com/joho/godotenv"
 )
 
+// Starting Point of the program (not for vercel)
 func main() {
+
 	// Load .env file for local development
 	err := godotenv.Load()
 	if err != nil {
@@ -18,9 +20,7 @@ func main() {
 
 	fmt.Println("Starting server on :8080")
 
-	// Use the Handler function from the handler package for all requests
 	http.HandleFunc("/", handler.Handler)
-
 	err = http.ListenAndServe(":8080", nil)
 	if err != nil {
 		panic(err)

@@ -65,6 +65,7 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
+// Checks if a bag has a potion and removes it
 func hasPotionAndRemove(bag *map[model.Potion]int, potion model.Potion) bool {
 	val := (*bag)[potion]
 	if val > 0 {

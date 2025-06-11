@@ -14,7 +14,7 @@ import bgImage from '../../assets/background.jpg';
 const myHeroes = [
   {
     id: 6,
-    name: "Nick",
+    name: "NICK",
     img: nickImg,
     desc: "A powerful warrior with high power.",
     spec: "DUI: Powerful, but reckless attack",
@@ -27,7 +27,7 @@ const myHeroes = [
   },
   {
     id: 4,
-    name: "Matthew",
+    name: "MATT",
     img: matthewImg,
     desc: "Bulky, who can take this guy down?.",
     pass: "Stinky: Immune to Poos",
@@ -40,7 +40,7 @@ const myHeroes = [
   },
   {
     id: 7,
-    name: "Celestin",
+    name: "CELESTIN",
     img: celestinImg,
     desc: "No matter the damage, he always gets back up.",
     spec: "Great at Math: Halves Opponenents HP",
@@ -53,7 +53,7 @@ const myHeroes = [
   },
   {
     id: 5,
-    name: "Primo",
+    name: "PRIMO",
     img: primoImg,
     desc: "Crafty Mage that can make the best of what he has.",
     pass: "Crafty: Better Utilizes Buzz Ballz",
@@ -96,7 +96,7 @@ const HeroSelect = () => {
     console.log(`Starting game with hero: ${mySelectedHero.name}, difficulty: ${selectedDifficulty.label} (maze size: ${selectedDifficulty.value})`);
     
     try {
-      const result = await gameAPI.startGame(mySelectedHero.id, selectedDifficulty.value);
+      const result = await gameAPI.startGame(mySelectedHero.name, selectedDifficulty.value);
       console.log(result);
       myNavigate('/play', { state: { hero: mySelectedHero, difficulty: selectedDifficulty } });
     } catch (error) {
