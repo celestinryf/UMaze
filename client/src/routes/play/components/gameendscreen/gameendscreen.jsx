@@ -22,7 +22,7 @@ const GameEndScreen = ({ status, message, navigate }) => {
           </div>
           
           <div className={styles.victoryMessage}>
-            <p>Thank you, brave adventurer.</p>
+            <p>Thank you, brave traveler.</p>
             <p>You have successfully collected everything I need to escape the treacherous forest!</p>
           </div>
         </div>
