@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql"
-	"log"
+	"errors"
 )
 
 // Hold values associated with a monster
@@ -14,7 +14,11 @@ type Monster struct {
 }
 
 // inits a random monster
-func initMonster(db *sql.DB) *Monster {
+func initMonster(db *sql.DB) (*Monster, error) {
+
+	if db == nil {
+		return nil, errors.New("Database is nil")
+	}
 
 	var (
 		name           string
@@ -24,7 +28,7 @@ func initMonster(db *sql.DB) *Monster {
 	// Query random monster from the db
 	err := db.QueryRow("SELECT name, health, attack FROM monsters ORDER BY RANDOM() LIMIT 1").Scan(&name, &health, &attack)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	return &Monster{
@@ -32,6 +36,6 @@ func initMonster(db *sql.DB) *Monster {
 		TotalHealth: health,
 		CurrHealth:  health,
 		Attack:      attack,
-	}
+	}, nil
 
 }

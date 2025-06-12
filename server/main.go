@@ -12,7 +12,7 @@ import (
 // Starting Point of the program (not for vercel)
 func main() {
 
-	// Load .env file for local development
+	//Load .env file for local development
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("No .env file found, using system environment variables")

@@ -10,11 +10,7 @@ func TestSetupNewGridThirteen(t *testing.T) {
 
 	mazeSize := 13
 
-	modelGrid := make([][]bool, mazeSize)
-	for i := range modelGrid {
-		modelGrid[i] = make([]bool, mazeSize)
-	}
-	setupNewGrid(1, 1, mazeSize, modelGrid)
+	modelGrid, _ := setupNewGrid(mazeSize)
 
 	for i := range mazeSize {
 		if modelGrid[i][0] || modelGrid[i][mazeSize-1] ||
@@ -64,11 +60,7 @@ func TestSetupNewGridEleven(t *testing.T) {
 
 	mazeSize := 11
 
-	modelGrid := make([][]bool, mazeSize)
-	for i := range modelGrid {
-		modelGrid[i] = make([]bool, mazeSize)
-	}
-	setupNewGrid(1, 1, mazeSize, modelGrid)
+	modelGrid, _ := setupNewGrid(mazeSize)
 
 	for i := range mazeSize {
 		if modelGrid[i][0] || modelGrid[i][mazeSize-1] ||
@@ -115,7 +107,7 @@ func TestNewGridThirteen(t *testing.T) {
 
 	mazeSize := 13
 
-	grid := newGrid(mazeSize)
+	grid, _ := newGrid(mazeSize)
 
 	for i := range mazeSize {
 		if grid[i][0].RoomType == "Path" ||
@@ -167,7 +159,7 @@ func TestNewGridEleven(t *testing.T) {
 
 	mazeSize := 11
 
-	grid := newGrid(mazeSize)
+	grid, _ := newGrid(mazeSize)
 
 	for i := range mazeSize {
 		if grid[i][0].RoomType == "Path" ||

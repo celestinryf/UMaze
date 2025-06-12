@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql"
-	"log"
+	"errors"
 )
 
 // All stats associated with a hero
@@ -19,22 +19,18 @@ type Hero struct {
 
 // Inits hero based on a heroName (must match one in db)
 // Returns a pointer to a new hero
-func initHero(heroName string, db *sql.DB) *Hero {
+func initHero(heroName string, db *sql.DB) (*Hero, error) {
 
-	var (
-		health   int
-		attack   int
-		cooldown int
-	)
+	var health, attack, cooldown int
 
 	err := db.QueryRow("SELECT health, attack, cooldown FROM heroes WHERE name = ?", heroName).Scan(&health, &attack, &cooldown)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 
 	// make sure the hero was in db
 	if health == 0 || attack == 0 {
-		log.Fatal("Invalid hero name passed into initHero")
+		return nil, errors.New("invalid hero name passed in")
 	}
 
 	temp := &Hero{
@@ -48,6 +44,7 @@ func initHero(heroName string, db *sql.DB) *Hero {
 		AquiredPotions: make(map[string]int, 2),
 	}
 
+	// Account for NICK's passive
 	if heroName == "NICK" {
 		temp.AquiredPotions["Attack"] = 1
 		temp.AquiredPotions["Health"] = 1
@@ -56,5 +53,5 @@ func initHero(heroName string, db *sql.DB) *Hero {
 		temp.AquiredPotions["Health"] = 0
 	}
 
-	return temp
+	return temp, nil
 }

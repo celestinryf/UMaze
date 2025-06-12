@@ -3,6 +3,7 @@ package model
 import (
 	"database/sql"
 	"math/rand"
+	"slices"
 )
 
 // Coordinates of the player
@@ -29,8 +30,10 @@ const (
 // inits the maze struct and returns a pointer to a maze
 func initMaze(db *sql.DB, mazeSize int) *Maze {
 
+	grid, _ := newGrid(mazeSize)
+
 	newMaze := Maze{
-		Grid:       newGrid(mazeSize),
+		Grid:       grid,
 		CurrCoords: nil,
 	}
 
@@ -47,14 +50,14 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 	for _, roomType := range room_list {
 		randInt := rand.Intn(len(validRooms) - 1)
 		validRooms[randInt].RoomType = roomType
-		validRooms = removeElement(validRooms, randInt)
+		validRooms = slices.Delete(validRooms, randInt, randInt+1)
 	}
 
 	pillar_list := []string{"Apple", "Saddle", "Horn", "Wings"}
 	for _, pillar := range pillar_list {
 		randInt := rand.Intn(len(validRooms) - 1)
 		validRooms[randInt].PillarType = pillar
-		validRooms = removeElement(validRooms, randInt)
+		validRooms = slices.Delete(validRooms, randInt, randInt+1)
 	}
 
 	for _, room := range validRooms {
@@ -73,9 +76,4 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 	}
 
 	return &newMaze
-}
-
-// Helper method to remove element from a slice
-func removeElement(slice []*Room, index int) []*Room {
-	return append(slice[:index], slice[index+1:]...)
 }

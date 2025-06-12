@@ -6,32 +6,12 @@ import (
 	"math/rand"
 )
 
-// for pillar type enums
-type Pillar int
-
-const (
-	noPillar Pillar = iota
-	pillar1
-	pillar2
-	pillar3
-	pillar4
-)
-
-// potion types
-type Potion int
-
-const (
-	NoPotion Potion = iota
-	HealingPotion
-	AttackPotion
-)
-
 // Rooms make up the maze
 type Room struct {
-	RoomType    string   `json:"RoomType"`
 	RoomMonster *Monster `json:"RoomMonster"`
+	RoomType    string   `json:"RoomType"`
 	PillarType  string   `json:"PillarType"`
-	PotionType  Potion   `json:"PotionType"`
+	PotionType  string   `json:"PotionType"`
 }
 
 // Inits and returns a room based on
@@ -46,17 +26,17 @@ func InitRoom(isPath bool) *Room {
 	return &Room{
 		RoomType:    roomType,
 		PillarType:  "",
-		PotionType:  NoPotion,
+		PotionType:  "",
 		RoomMonster: nil,
 	}
 }
 
 // sets up rooms with pits, potions, and monsters
-func (r *Room) SetUpRoom(db *sql.DB) {
+func (r *Room) SetUpRoom(db *sql.DB) error {
 
 	probs, err := db.Query("SELECT * FROM spawn_rates")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 	defer probs.Close()
 
@@ -82,14 +62,16 @@ func (r *Room) SetUpRoom(db *sql.DB) {
 	case 1:
 		r.RoomType = "Poop"
 	case 2:
-		r.RoomMonster = initMonster(db)
+		r.RoomMonster, _ = initMonster(db)
 	case 3:
 		potion := rand.Intn(2) + 1
 		switch potion {
 		case 1:
-			r.PotionType = HealingPotion
+			r.PotionType = "Health"
 		case 2:
-			r.PotionType = AttackPotion
+			r.PotionType = "Attack"
 		}
 	}
+
+	return nil
 }
