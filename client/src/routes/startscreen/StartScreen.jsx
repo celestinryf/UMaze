@@ -45,11 +45,13 @@ function StartScreen() {
   const [usernameInput, setUsernameInput] = useState('');
   const [currentUsername, setCurrentUsername] = useState('');
   const [showButtons, setShowButtons] = useState(false);
+  const [usernameTaken, setUsernameTaken] = useState(false); // NEW: Track if username is taken
+  const [acknowledgedTaken, setAcknowledgedTaken] = useState(false); // NEW: Track if user acknowledged
   const [validationStatus, setValidationStatus] = useState({
     isChecking: false,
     message: '',
     isValid: false,
-    type: 'idle' // 'idle', 'error', 'success', 'checking'
+    type: 'idle' // 'idle', 'error', 'success', 'checking', 'warning'
   });
 
   useEffect(() => {
@@ -60,7 +62,7 @@ function StartScreen() {
     }
   }, []);
 
-  // Clear validation status when user types (optional - keeps UI clean)
+  // Clear validation status when user types
   useEffect(() => {
     if (validationStatus.type !== 'idle') {
       setValidationStatus({
@@ -70,6 +72,9 @@ function StartScreen() {
         type: 'idle'
       });
     }
+    // Reset taken states when user changes input
+    setUsernameTaken(false);
+    setAcknowledgedTaken(false);
   }, [usernameInput]);
 
   const validateUsername = async (username) => {
@@ -80,7 +85,7 @@ function StartScreen() {
         isValid: false, 
         type: 'error' 
       });
-      return false;
+      return { isValid: false, isTaken: false };
     }
 
     // Format validation first
@@ -92,7 +97,7 @@ function StartScreen() {
         isValid: false, 
         type: 'error' 
       });
-      return false;
+      return { isValid: false, isTaken: false };
     }
 
     // Availability check
@@ -104,42 +109,86 @@ function StartScreen() {
     });
     
     const availabilityError = await UsernameValidator.checkAvailability(username);
+    
     if (availabilityError) {
       setValidationStatus({ 
         isChecking: false, 
         message: availabilityError, 
         isValid: false, 
-        type: 'error' 
+        type: 'warning'
       });
-      return false;
+      return { isValid: false, isTaken: true };
     } else {
       setValidationStatus({ 
         isChecking: false, 
-        message: '✓ Username is available!', 
+        message: 'Username is available!', 
         isValid: true, 
         type: 'success' 
       });
-      return true;
+      return { isValid: true, isTaken: false };
     }
   };
 
   const handleUsernameSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate username
-    const isValid = await validateUsername(usernameInput.trim());
+    // If username is taken and user clicks button, they want to proceed
+    if (usernameTaken) {
+      // User is clicking "PROCEED ANYWAY" - skip all validation and proceed
+      try {
+        playSFX(clickSFX);
+        const finalUsername = usernameInput.trim();
+        
+        setUsername(finalUsername);
+        setCurrentUsername(finalUsername);
+        setShowButtons(true);
+        setValidationStatus({
+          isChecking: false,
+          message: '',
+          isValid: false,
+          type: 'idle'
+        });
+        return;
+      } catch (error) {
+        setValidationStatus({ 
+          isChecking: false, 
+          message: error.message || 'Error setting username', 
+          isValid: false, 
+          type: 'error' 
+        });
+        return;
+      }
+    }
     
-    if (!isValid) {
-      // Error message is already set by validateUsername
+    // Normal flow - validate username
+    const validation = await validateUsername(usernameInput.trim());
+    
+    // Handle validation results
+    if (!validation.isValid && !validation.isTaken) {
+      // Format error - stay on form
+      return;
+    }
+    
+    if (validation.isTaken) {
+      // Username taken - show warning and change button to "PROCEED ANYWAY"
+      setUsernameTaken(true);
+      setValidationStatus({
+        isChecking: false,
+        message: 'Username is already taken. Click "PROCEED ANYWAY" to continue with this name.',
+        isValid: false,
+        type: 'warning'
+      });
       return;
     }
 
+    // Username is available - proceed
     try {
       playSFX(clickSFX);
-      setUsername(usernameInput.trim());
-      setCurrentUsername(usernameInput.trim());
+      const finalUsername = usernameInput.trim();
+      
+      setUsername(finalUsername);
+      setCurrentUsername(finalUsername);
       setShowButtons(true);
-      // Clear the validation status when successful
       setValidationStatus({
         isChecking: false,
         message: '',
@@ -166,6 +215,8 @@ function StartScreen() {
     setShowButtons(false);
     setUsernameInput('');
     setCurrentUsername('');
+    setUsernameTaken(false);
+    setAcknowledgedTaken(false);
     setValidationStatus({
       isChecking: false,
       message: '',
@@ -178,6 +229,7 @@ function StartScreen() {
     let className = styles.usernameInput;
     if (validationStatus.type === 'error') className += ` ${styles.inputError}`;
     if (validationStatus.type === 'success') className += ` ${styles.inputSuccess}`;
+    if (validationStatus.type === 'warning') className += ` ${styles.inputWarning}`;
     return className;
   };
 
@@ -192,17 +244,11 @@ function StartScreen() {
     );
   };
 
-  const getUsernameGuidelines = () => (
-    <div className={styles.usernameGuidelines}>
-      <strong>Username Requirements:</strong>
-      <ul>
-        <li>{UsernameValidator.MIN_LENGTH}-{UsernameValidator.MAX_LENGTH} characters long</li>
-        <li>Letters, numbers, hyphens (-), and underscores (_) only</li>
-        <li>Cannot start or end with hyphen or underscore</li>
-        <li>Must be unique</li>
-      </ul>
-    </div>
-  );
+  const getButtonText = () => {
+    if (validationStatus.isChecking) return 'CHECKING...';
+    if (usernameTaken && !acknowledgedTaken) return 'PROCEED ANYWAY';
+    return 'BEGIN QUEST';
+  };
 
   return (
     <div
@@ -234,15 +280,10 @@ function StartScreen() {
                 className={styles.usernameButton}
                 disabled={validationStatus.isChecking}
               >
-                {validationStatus.isChecking ? 'CHECKING...' : 'BEGIN QUEST'}
+                {getButtonText()}
               </button>
             </form>
             
-            {getUsernameGuidelines()}
-            
-            <p className={styles.usernameHint}>
-              Choose a name that will strike fear into the hearts of monsters!
-            </p>
           </div>
         ) : (
           <>

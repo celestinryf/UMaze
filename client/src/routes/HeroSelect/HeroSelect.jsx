@@ -20,7 +20,7 @@ const myHeroes = [
     spec: "DUI: Powerful, but reckless attack",
     pass: "Pregame: Starts with 2 Buzz Ballz",
     stats: {
-      attack: 30,
+      attack: 20,
       health: 200,
     },
     class: "Drunk Warrior"
@@ -46,10 +46,10 @@ const myHeroes = [
     spec: "Great at Math: Halves Opponenents HP",
     pass: "Clutch: Gets a second life",
     stats: {
-      attack: 20,
+      attack: 30,
       health: 150,
     },
-    class: "Pheonix"
+    class: "Phoenix"
   },
   {
     id: 5,

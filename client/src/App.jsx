@@ -3,6 +3,7 @@ import { BrowserRouter as Router, Routes, Route, useLocation } from 'react-route
 import { AudioProvider } from './context/AudioContext';
 import VolumeMenu from './components/VolumeOptions/VolumeMenu';
 import './App.css';
+import { Analytics } from "@vercel/analytics/react"
 
 import StartScreen from './routes/startscreen/StartScreen.jsx';
 import Play from './routes/play/Play.jsx';
@@ -27,10 +28,10 @@ function AppContent() {
         <Route path="/menu" element={<LoadGames />} />
         <Route path="/options" element={<Options />} />
       </Routes>
+      <Analytics />
     </>
   );
 }
-
 
 function App() {
   return (

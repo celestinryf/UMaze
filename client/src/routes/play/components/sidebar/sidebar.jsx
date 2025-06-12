@@ -3,10 +3,10 @@ import styles from './sidebar.module.css';
 
 // Constants
 const PILLAR_TYPES = {
-  1: 'Apple',
-  2: 'Saddle', 
-  3: 'Horn',
-  4: 'Wings'
+  "Apple": 'Apple',
+  "Saddle": 'Saddle', 
+  "Horn": 'Horn',
+  "Wings": 'Wings'
 };
 
 const POTION_TYPES = {
@@ -67,11 +67,11 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
             <h3>Tools of Escape</h3>
             <div className={styles.pillarsList}>
               {Object.entries(PILLAR_TYPES).map(([id, name]) => {
-                const pillarId = parseInt(id);
-                const isCollected = collectedPillars.includes(pillarId);
+                // Fixed: Use string id directly instead of parsing as int
+                const isCollected = collectedPillars.includes(id);
                 return (
                   <div
-                    key={pillarId}
+                    key={id}
                     className={`${styles.pillarItem} ${isCollected ? styles.collected : ''}`}
                   >
                     <span className={styles.pillarIcon}>

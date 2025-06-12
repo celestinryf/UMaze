@@ -44,7 +44,7 @@ const HealthBar = ({ current, total, label, showLabel = true, className = '' }) 
 );
 
 const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, onUsePotion, battleMessage, collectedPotions }) => {
-  const canUseSpecial = hero.CoolDown === 0;
+  const canUseSpecial = hero.CurrCoolDown === 0;
   
   return (
     <div className={styles.battleOverlay}>
@@ -121,9 +121,9 @@ const BattleOverlay = ({ hero, monster, onAttack, onSpecialAttack, onContinue, o
               onClick={onSpecialAttack} 
               className={styles.battleButton}
               disabled={!canUseSpecial}
-              title={!canUseSpecial ? `Special Attack on cooldown: ${hero.CoolDown} attacks remaining` : 'Use Special Attack'}
+              title={!canUseSpecial ? `Special Attack on cooldown: ${hero.CurrCoolDown} attacks remaining` : 'Use Special Attack'}
             >
-              Special Attack {!canUseSpecial && `(${hero.CoolDown})`}
+              Special Attack {!canUseSpecial && `(${hero.CurrCoolDown})`}
             </button>
             
             {/* Buzz Ball Actions */}
