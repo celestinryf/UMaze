@@ -15,9 +15,12 @@ type Game struct {
 
 // Gives an initialzed game.
 func InitGame(theHeroType string, db *sql.DB, mazeSize int) *Game {
+
+	hero, _ := initHero(theHeroType, db)
+
 	return &Game{
 		TheMaze: initMaze(db, mazeSize),
-		TheHero: initHero(theHeroType, db),
+		TheHero: hero,
 		Status:  "InProgress",
 	}
 }
@@ -36,15 +39,15 @@ func (g *Game) Move(newCoords *Coords) {
 	g.TheMaze.CurrCoords = newCoords
 	currRoom := g.TheMaze.Grid[newCoords.X][newCoords.Y]
 
-	if currRoom.PotionType != NoPotion {
+	if currRoom.PotionType != "" {
 
-		if currRoom.PotionType == HealingPotion {
+		if currRoom.PotionType == "Health" {
 			g.TheHero.AquiredPotions["Health"]++
-		} else if currRoom.PotionType == AttackPotion {
+		} else if currRoom.PotionType == "Attack" {
 			g.TheHero.AquiredPotions["Attack"]++
 		}
 
-		currRoom.PotionType = NoPotion
+		currRoom.PotionType = ""
 	}
 
 	if currRoom.PillarType != "" {

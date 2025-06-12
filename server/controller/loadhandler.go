@@ -3,7 +3,6 @@ package controller
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"log"
 	"net/http"
 )
@@ -105,29 +104,24 @@ func (s *Server) handleUsernameAvailabilityCheck(w http.ResponseWriter, username
 
 // usernameExists checks if a username already exists in the system
 func (s *Server) usernameExists(username string) bool {
-	// Check Redis for any keys containing this username
-	// Pattern matches: game:username:*, saved_games:username:*, etc.
-	patterns := []string{
-		fmt.Sprintf("game:%s", username),
-		fmt.Sprintf("game:%s:*", username),
-		fmt.Sprintf("saved_games:%s:*", username),
-		fmt.Sprintf("*:%s:*", username),
-	}
-
 	ctx := context.Background()
 
-	for _, pattern := range patterns {
-		keys, err := s.Redi.Keys(ctx, pattern).Result()
-		if err != nil {
-			log.Printf("Error checking pattern %s: %v", pattern, err)
-			continue
-		}
-
-		if len(keys) > 0 {
-			log.Printf("Found existing keys for username '%s' with pattern '%s': %v", username, pattern, keys)
-			return true
-		}
+	// Check if the username exists as a Redis key (how games are stored)
+	_, err := s.Redi.Get(ctx, username).Result()
+	if err == nil {
+		log.Printf("Found existing game for username '%s'", username)
+		return true
 	}
 
-	return false
+	// Also check database for saved games
+	var count int
+	err = s.DB.QueryRow("SELECT COUNT(*) FROM saved_games WHERE username = ?", username).Scan(&count)
+	if err != nil {
+		log.Printf("Error checking database for username '%s': %v", username, err)
+		return false
+	}
+
+	exists := count > 0
+	log.Printf("Username '%s' exists in database: %t", username, exists)
+	return exists
 }
