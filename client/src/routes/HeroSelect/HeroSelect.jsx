@@ -49,7 +49,7 @@ const myHeroes = [
       attack: 20,
       health: 150,
     },
-    class: "Pheonix"
+    class: "Phoenix"
   },
   {
     id: 5,
