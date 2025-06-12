@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"log"
 	"math/rand"
 	"slices"
 )
@@ -60,8 +61,14 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 		validRooms = slices.Delete(validRooms, randInt, randInt+1)
 	}
 
+	roomGenerator, err := getSetUpRoom(db)
+	if err != nil {
+		// fix later
+		log.Fatal(err)
+	}
+
 	for _, room := range validRooms {
-		room.SetUpRoom(db)
+		roomGenerator(room)
 	}
 
 	for i := range newMaze.Grid {
