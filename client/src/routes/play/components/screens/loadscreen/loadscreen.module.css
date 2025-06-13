@@ -1,0 +1,103 @@
+/* LoadingScreen.module.css */
+
+.loadingContainer {
+    width: 100%;
+    min-height: 100vh;
+    background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    background-blend-mode: overlay;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+  }
+  
+  .gameTitle {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    animation: titlePulse 3s ease-in-out infinite alternate;
+    margin-bottom: 2rem;
+  }
+  
+  @keyframes titlePulse {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+  }
+  
+  .loadingContainer h2 {
+    font-size: 1.5rem;
+    margin: 1rem 0;
+    color: #00d4ff;
+  }
+  
+  .loadingContainer p {
+    font-size: 1.1rem;
+    margin: 0.5rem 0;
+    color: #a0aec0;
+  }
+  
+  .loadingSpinner {
+    border: 4px solid rgba(255, 255, 255, 0.1);
+    border-top: 4px solid #00d4ff;
+    border-radius: 50%;
+    width: 60px;
+    height: 60px;
+    animation: spin 1s linear infinite;
+    margin: 2rem 0;
+    box-shadow: 0 0 20px rgba(0, 212, 255, 0.3);
+  }
+  
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
+    .gameTitle {
+      font-size: 1.5rem;
+    }
+    
+    .loadingContainer h2 {
+      font-size: 1.2rem;
+    }
+    
+    .loadingContainer p {
+      font-size: 1rem;
+    }
+    
+    .loadingSpinner {
+      width: 40px;
+      height: 40px;
+    }
+  }
+  
+  /* High resolution displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .loadingSpinner {
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+  }
+  
+  /* Accessibility - Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }

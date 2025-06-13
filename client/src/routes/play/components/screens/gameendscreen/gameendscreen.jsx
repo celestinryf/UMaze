@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './gameendscreen.module.css';
-import horse from '../../../../assets/sprites/horse.png';
-import background from '../../../../assets/background.jpg';
+import horse from '../../../../../assets/sprites/horse.png';
+import background from '../../../../../assets/background.jpg';
 
 const GameEndScreen = ({ status, message, navigate }) => {
   if (status === 'Won') {

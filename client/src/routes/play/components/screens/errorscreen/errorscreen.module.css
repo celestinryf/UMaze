@@ -1,0 +1,151 @@
+/* ErrorScreen.module.css */
+
+.errorContainer {
+    width: 100%;
+    min-height: 100vh;
+    background-image: var(--background-image), linear-gradient(135deg, rgba(26, 26, 46, 0.8) 0%, rgba(22, 33, 62, 0.8) 100%);
+    background-size: cover, cover;
+    background-position: center, center;
+    background-repeat: no-repeat, no-repeat;
+    background-blend-mode: overlay;
+    color: #fff;
+    font-family: 'Arial', sans-serif;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+    position: relative;
+  }
+  
+  .gameTitle {
+    margin: 0;
+    font-size: 2.5em;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+    background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    text-shadow: 0 0 30px rgba(255, 255, 255, 0.3);
+    animation: titlePulse 3s ease-in-out infinite alternate;
+    margin-bottom: 2rem;
+  }
+  
+  @keyframes titlePulse {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+  }
+  
+  .errorContainer h2 {
+    font-size: 1.8rem;
+    margin: 1rem 0;
+    color: #ff4757;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+  
+  .errorMessage {
+    color: #ff4757;
+    margin: 1.5rem 0;
+    font-size: 1.1rem;
+    background: rgba(255, 71, 87, 0.1);
+    padding: 1rem;
+    border-radius: 8px;
+    border: 1px solid rgba(255, 71, 87, 0.3);
+    backdrop-filter: blur(10px);
+    max-width: 500px;
+  }
+  
+  .buttonGroup {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .retryButton {
+    padding: 12px 30px;
+    background: linear-gradient(45deg, #3742fa, #00d4ff);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(55, 66, 250, 0.3);
+    margin: 0.5rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .retryButton:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 212, 255, 0.4);
+    background: linear-gradient(45deg, #48e5f0, #ff00bf);
+  }
+  
+  .retryButton:active {
+    transform: translateY(0);
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 480px) {
+    .gameTitle {
+      font-size: 1.5rem;
+    }
+    
+    .errorContainer h2 {
+      font-size: 1.4rem;
+    }
+    
+    .errorMessage {
+      font-size: 1rem;
+      margin: 1rem 0;
+    }
+    
+    .buttonGroup {
+      flex-direction: column;
+      width: 100%;
+    }
+    
+    .retryButton {
+      width: 100%;
+      margin: 0.25rem 0;
+    }
+  }
+  
+  @media (min-width: 481px) and (max-width: 768px) {
+    .gameTitle {
+      font-size: 1.75rem;
+    }
+    
+    .buttonGroup {
+      flex-direction: column;
+      align-items: center;
+    }
+    
+    .retryButton {
+      min-width: 200px;
+    }
+  }
+  
+  /* High resolution displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .retryButton {
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+  }
+  
+  /* Accessibility - Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }

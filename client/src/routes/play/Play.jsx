@@ -1,64 +1,16 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { gameAPI, saveLoadAPI, hasUsername, getDisplayUsername } from '../../context/api.js';
 import styles from './play.module.css';
 import Sidebar from './components/sidebar/sidebar.jsx';
 import BattleOverlay from './components/battle/battle.jsx';
-import GameEndScreen from './components/gameendscreen/gameendscreen.jsx';
-import MazeGrid from './components/mazegrid/mazegrid.jsx';
+import GameEndScreen from './components/screens/gameendscreen/gameendscreen.jsx';
+import MazeGrid from './components/maze/mazegrid.jsx';
 import MovementControls from './components/controls/movement.jsx';
+import LoadingScreen from './components/screens/loadscreen/loadscreen.jsx';
+import ErrorScreen from './components/screens//errorscreen/errorscreen.jsx';
 
-import horse from '../../assets/sprites/horse.png';
-import path from '../../assets/sprites/path.png';
 import background from '../../assets/background.jpg';
-
-// Constants
-const ROOM_TYPES = {
-  "Wall": 'Wall',
-  "Entrance": 'Entrance',
-  "Exit": 'Exit',
-  "Path": 'Path',
-  "Poop": 'Poop'
-};
-
-const POTION_TYPES = {
-  "Health": 'Health Buzz Ball',
-  "Attack": 'Attack Buzz Ball'
-};
-
-// Extended directions to include both arrow keys and WASD
-const DIRECTIONS = {
-  ArrowUp: [-1, 0],
-  ArrowDown: [1, 0],
-  ArrowLeft: [0, -1],
-  ArrowRight: [0, 1],
-  w: [-1, 0],
-  W: [-1, 0],
-  s: [1, 0],
-  S: [1, 0],
-  a: [0, -1],
-  A: [0, -1],
-  d: [0, 1],
-  D: [0, 1]
-};
-
-// Utility functions
-const getName = (type, mapping) => mapping[type] || 'Unknown';
-
-// Reusable Components
-const HealthBar = ({ current, total, label, showLabel = true, className = '' }) => (
-  <div className={`${styles.statItem} ${className}`}>
-    <div className={styles.healthBar}>
-      <div
-        className={styles.healthFill}
-        style={{ width: `${(current / total) * 100}%` }}
-      />
-      <span className={styles.healthText}>
-        {showLabel && `${label}: `}{current} / {total}
-      </span>
-    </div>
-  </div>
-);
 
 const Play = () => {
   const location = useLocation();
@@ -70,7 +22,6 @@ const Play = () => {
   const [gName, setgName] = useState("");
   const [gMessage, setGMessage] = useState("");
   const [inBattle, setInBattle] = useState(false);
-  const [battleMessage, setBattleMessage] = useState("");
   const [visitedPits, setVisitedPits] = useState(new Set());
   const [visitedExits, setVisitedExits] = useState(new Set());
   const [isTyping, setIsTyping] = useState(false);
@@ -105,7 +56,6 @@ const Play = () => {
         // Check if we should be in battle on load
         if (currentRoom?.RoomMonster) {
           setInBattle(true);
-          setBattleMessage(`A wild ${currentRoom.RoomMonster.Name} appears!`);
         }
       })
       .catch(err => {
@@ -142,172 +92,61 @@ const Play = () => {
     }
   };
 
-  const attackMonster = async (isSpecial) => {
-    try {
-      const result = await gameAPI.attack(isSpecial);
-      setGameData(result);
-      
-      const monster = result?.Maze?.Grid?.[result.Maze.CurrCoords.X]?.[result.Maze.CurrCoords.Y]?.RoomMonster;
-      const attackType = isSpecial ? 'special attack' : 'attack';
-      
-      if (monster) {
-        setBattleMessage(`You used ${attackType}! Monster HP: ${monster.CurrHealth}`);
-      } else {
-        setBattleMessage(`Your ${attackType} defeated the monster!`);
-        // Automatically exit battle after a short delay when monster is defeated
-        setTimeout(() => {
-          setInBattle(false);
-          setBattleMessage("");
-          setGMessage("Monster defeated! You can now move freely.");
-        }, 1500);
-      }
-    } catch (err) {
-      setBattleMessage(`Attack failed: ${err.message}`);
-    }
+  // Event handlers for child components
+  const handleBattleEnd = (updatedGameData, message) => {
+    setGameData(updatedGameData);
+    setInBattle(false);
+    setGMessage(message);
   };
 
-  const continueBattle = async () => {
-    try {
-      // Fetch updated game state from backend after monster defeat
-      const updatedData = await gameAPI.getGame();
-      setGameData(updatedData);
-      setInBattle(false);
-      setBattleMessage("");
-      setGMessage("Monster defeated! You can now move freely.");
-    } catch (err) {
-      setGMessage(`Error syncing game state: ${err.message}`);
-      // Still exit battle even if sync fails
-      setInBattle(false);
-      setBattleMessage("");
-    }
+  const handleSidebarGameUpdate = (updatedGameData) => {
+    setGameData(updatedGameData);
   };
 
-  const usePotion = async (potionType) => {
-    try {
-      const result = await gameAPI.usePotion(potionType);
-      console.log(potionType);
-      setGameData(result);
-      setGameData(result);
-      setGMessage(`Used ${getName(potionType, POTION_TYPES)}!`);
-    } catch (err) {
-      setGMessage(`Buzz Ball use failed: ${err.message}`);
-    }
+  const handleSidebarMessage = (message) => {
+    setGMessage(message);
   };
 
-  const movePlayer = useCallback(async (newX, newY) => {
-    if (!gameData || inBattle) return;
-    
-    const { Maze } = gameData;
-    const { Grid, CurrCoords } = Maze;
+  const handleMovementGameUpdate = (updatedGameData) => {
+    setGameData(updatedGameData);
+  };
 
-    if (Grid[CurrCoords.X][CurrCoords.Y].RoomMonster) {
-      setInBattle(true);
-      setBattleMessage(`A wild ${Grid[CurrCoords.X][CurrCoords.Y].RoomMonster.Name} blocks your path!`);
-      return;
-    }
+  const handleMovementMessage = (message) => {
+    setGMessage(message);
+  };
 
-    if (
-      newX < 0 || newX >= Grid.length ||
-      newY < 0 || newY >= Grid[0].length ||
-      Grid[newX][newY].RoomType === "Wall"
-    ) {
-      setGMessage("Invalid move: Wall or out of bounds.");
-      return;
-    }
+  const handleBattleStart = () => {
+    setInBattle(true);
+  };
 
-    try {
-      const updatedData = await gameAPI.move({ x: newX, y: newY });
-      setGameData(updatedData);
-      setGMessage(`Moved to row ${newX + 1}, col ${newY + 1}`);
-      
-      // Check if new room is a pit and mark it as visited
-      const newRoom = updatedData.Maze.Grid[newX][newY];
-      if (newRoom.RoomType === "Poop") { // Pit
-        setVisitedPits(prev => new Set(prev).add(`${newX}-${newY}`));
-      }
-      
-      // Check if new room is an exit and mark it as visited
-      if (newRoom.RoomType === "Exit") { // Exit
-        setVisitedExits(prev => new Set(prev).add(`${newX}-${newY}`));
-      }
-      
-      // Check if new room has a monster
-      if (newRoom.RoomMonster) {
-        setInBattle(true);
-        setBattleMessage(`A wild ${newRoom.RoomMonster.Name} appears!`);
-      }
-    } catch (err) {
-      setGMessage(`Move failed: ${err.message}`);
-    }
-  }, [gameData, inBattle]);
+  const handlePitVisited = (coords) => {
+    setVisitedPits(prev => new Set(prev).add(coords));
+  };
 
-  // Handle movement from buttons (relative movement)
-  const handleButtonMove = useCallback((deltaX, deltaY) => {
-    if (!gameData || inBattle) return;
-    
-    const { CurrCoords } = gameData.Maze;
-    movePlayer(CurrCoords.X + deltaX, CurrCoords.Y + deltaY);
-  }, [gameData, inBattle, movePlayer]);
+  const handleExitVisited = (coords) => {
+    setVisitedExits(prev => new Set(prev).add(coords));
+  };
 
-  // Keyboard controls (now supports both arrow keys and WASD)
-  useEffect(() => {
-    const handleKeyDown = (e) => {
-      if (!gameData || !DIRECTIONS[e.key] || inBattle || isTyping) return;
-      
-      const { CurrCoords } = gameData.Maze;
-      const [dX, dY] = DIRECTIONS[e.key];
-      movePlayer(CurrCoords.X + dX, CurrCoords.Y + dY);
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [gameData, movePlayer, inBattle, isTyping]);
-
-  // Loading and error states
+  // Loading and error states using components
   if (error) {
     return (
-      <div 
-        className={styles.errorContainer}
-        style={{ '--background-image': `url(${background})` }}
-      >
-        <h1 
-          className={styles.gameTitle}
-          onClick={() => navigate('/')}
-          style={{ cursor: 'pointer' }}
-          title="Return to Home"
-        >
-          Maze Adventure
-        </h1>
-        <h2>Error</h2>
-        <p className={styles.errorMessage}>{error}</p>
-        <button onClick={() => navigate('/heroselect')} className={styles.retryButton}>
-          Start New Game
-        </button>
-        <button onClick={() => navigate('/')} className={styles.retryButton}>
-          Back to Home
-        </button>
-      </div>
+      <ErrorScreen
+        error={error}
+        onTitleClick={() => navigate('/')}
+        onStartNewGame={() => navigate('/heroselect')}
+        onBackToHome={() => navigate('/')}
+        backgroundImage={background}
+      />
     );
   }
 
   if (!gameData) {
     return (
-      <div 
-        className={styles.loadingContainer}
-        style={{ '--background-image': `url(${background})` }}
-      >
-        <h1 
-          className={styles.gameTitle}
-          onClick={() => navigate('/')}
-          style={{ cursor: 'pointer' }}
-          title="Return to Home"
-        >
-          Maze Adventure
-        </h1>
-        <h2>Loading Maze...</h2>
-        <p>Player: {username}</p>
-        <div className={styles.loadingSpinner}></div>
-      </div>
+      <LoadingScreen
+        username={username}
+        onTitleClick={() => navigate('/')}
+        backgroundImage={background}
+      />
     );
   }
 
@@ -337,12 +176,9 @@ const Play = () => {
         <BattleOverlay
           hero={Hero}
           monster={currentRoom.RoomMonster}
-          onAttack={() => attackMonster(false)}
-          onSpecialAttack={() => attackMonster(true)}
-          onContinue={continueBattle}
-          onUsePotion={usePotion}
-          battleMessage={battleMessage}
           collectedPotions={collectedPotions}
+          onBattleEnd={handleBattleEnd}
+          gameAPI={gameAPI}
         />
       )}
 
@@ -356,7 +192,7 @@ const Play = () => {
             style={{ cursor: 'pointer' }}
             title="Return to Home"
           >
-            Maze Adventure
+            Charlie The Unicorn
             {gameData.Status === "Lost" && bypassGameOver && (
               <span className={styles.debugStatus}> [DEBUG: Playing as Ghost]</span>
             )}
@@ -380,13 +216,6 @@ const Play = () => {
           </div>
         </div>
 
-        {/* Game Message */}
-        {gMessage && (
-          <div className={styles.gameMessage}>
-            <p>{gMessage}</p>
-          </div>
-        )}
-
         {/* Main Game Layout */}
         <div className={styles.mainGameLayout}>
           {/* Maze Display */}
@@ -400,18 +229,27 @@ const Play = () => {
             />
 
             <MovementControls 
+              gameData={gameData}
               inBattle={inBattle}
-              onMove={handleButtonMove}
+              isTyping={isTyping}
+              gameAPI={gameAPI}
+              onGameUpdate={handleMovementGameUpdate}
+              onMessage={handleMovementMessage}
+              onBattleStart={handleBattleStart}
+              onPitVisited={handlePitVisited}
+              onExitVisited={handleExitVisited}
             />
           </div>
 
-          {/* Sidebar - REPLACED WITH COMPONENT */}
+          {/* Sidebar */}
           <Sidebar 
             Hero={Hero}
             collectedPillars={collectedPillars}
             collectedPotions={collectedPotions}
             inBattle={inBattle}
-            usePotion={usePotion}
+            gameAPI={gameAPI}
+            onGameUpdate={handleSidebarGameUpdate}
+            onMessage={handleSidebarMessage}
           />
         </div>
 

@@ -17,8 +17,35 @@ const POTION_TYPES = {
 // Utility function
 const getName = (type, mapping) => mapping[type] || 'Unknown';
 
-const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion }) => {
+const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, gameAPI, onGameUpdate, onMessage }) => {
   const [showLegend, setShowLegend] = useState(false);
+  const [isProcessing, setIsProcessing] = useState(false);
+
+  const usePotion = async (potionType) => {
+    if (isProcessing || inBattle) return;
+    
+    setIsProcessing(true);
+    try {
+      const result = await gameAPI.usePotion(potionType);
+      
+      // Notify parent component of game state update
+      if (onGameUpdate) {
+        onGameUpdate(result);
+      }
+      
+      // Send success message
+      if (onMessage) {
+        onMessage(`Used ${getName(potionType, POTION_TYPES)}!`);
+      }
+    } catch (err) {
+      // Send error message
+      if (onMessage) {
+        onMessage(`Buzz Ball use failed: ${err.message}`);
+      }
+    } finally {
+      setIsProcessing(false);
+    }
+  };
 
   return (
     <div className={styles.sidebar}>
@@ -90,12 +117,12 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
             <div className={styles.potionsList}>
               {["Health", "Attack"].map(potion => {
                 const count = collectedPotions.has(String(potion)) ? collectedPotions.get(String(potion)) : 0;
-                const canUse = count > 0 && !inBattle;
+                const canUse = count > 0 && !inBattle && !isProcessing;
 
                 return (
                   <div 
                     key={potion} 
-                    className={`${styles.potionItem} ${canUse ? styles.canUse : ''}`}
+                    className={`${styles.potionItem} ${canUse ? styles.canUse : ''} ${isProcessing ? styles.processing : ''}`}
                     onClick={() => canUse && usePotion(potion)}
                   >
                     <span className={`${styles.potionIcon} ${styles[`potion${potion}`]}`}>
@@ -104,7 +131,9 @@ const Sidebar = ({ Hero, collectedPillars, collectedPotions, inBattle, usePotion
                     <span className={styles.potionName}>
                       {getName(potion, POTION_TYPES)}
                     </span>
-                    <span className={styles.potionCount}>{count}</span>
+                    <span className={styles.potionCount}>
+                      {isProcessing ? '...' : count}
+                    </span>
                   </div>
                 );
               })}

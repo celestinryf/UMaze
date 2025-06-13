@@ -82,6 +82,18 @@
     transform: none;
     box-shadow: none;
   }
+
+  .moveButton.moving {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.5);
+    cursor: wait;
+    animation: movingPulse 1s ease-in-out infinite;
+  }
+
+  @keyframes movingPulse {
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
+  }
   
   /* Touch device optimization */
   @media (hover: none) {
