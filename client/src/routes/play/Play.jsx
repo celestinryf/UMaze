@@ -6,6 +6,7 @@ import Sidebar from './components/sidebar/sidebar.jsx';
 import BattleOverlay from './components/battle/battle.jsx';
 import GameEndScreen from './components/gameendscreen/gameendscreen.jsx';
 import MazeGrid from './components/mazegrid/mazegrid.jsx';
+import MovementControls from './components/controls/movement.jsx';
 
 import horse from '../../assets/sprites/horse.png';
 import path from '../../assets/sprites/path.png';
@@ -379,6 +380,13 @@ const Play = () => {
           </div>
         </div>
 
+        {/* Game Message */}
+        {gMessage && (
+          <div className={styles.gameMessage}>
+            <p>{gMessage}</p>
+          </div>
+        )}
+
         {/* Main Game Layout */}
         <div className={styles.mainGameLayout}>
           {/* Maze Display */}
@@ -391,55 +399,10 @@ const Play = () => {
               visitedExits={visitedExits}
             />
 
-            {/* Controls Info */}
-            <div className={styles.controlsInfo}>
-              <p>Use WASD or Arrow Keys for keyboard control</p>
-            </div>
-
-            {/* Movement Controls */}
-            <div className={styles.movementControls}>
-              <div className={styles.controlsTitle}>Movement</div>
-              <div className={styles.controlsGrid}>
-                <div className={styles.controlRow}>
-                  <div className={styles.controlSpacer}></div>
-                  <button
-                    className={styles.moveButton}
-                    onClick={() => handleButtonMove(-1, 0)}
-                    disabled={inBattle}
-                    title="Move Up"
-                  >
-                    ↑
-                  </button>
-                  <div className={styles.controlSpacer}></div>
-                </div>
-                <div className={styles.controlRow}>
-                  <button
-                    className={styles.moveButton}
-                    onClick={() => handleButtonMove(0, -1)}
-                    disabled={inBattle}
-                    title="Move Left"
-                  >
-                    ←
-                  </button>
-                  <button
-                    className={styles.moveButton}
-                    onClick={() => handleButtonMove(1, 0)}
-                    disabled={inBattle}
-                    title="Move Down"
-                  >
-                    ↓
-                  </button>
-                  <button
-                    className={styles.moveButton}
-                    onClick={() => handleButtonMove(0, 1)}
-                    disabled={inBattle}
-                    title="Move Right"
-                  >
-                    →
-                  </button>
-                </div>
-              </div>
-            </div>
+            <MovementControls 
+              inBattle={inBattle}
+              onMove={handleButtonMove}
+            />
           </div>
 
           {/* Sidebar - REPLACED WITH COMPONENT */}

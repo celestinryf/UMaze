@@ -1,0 +1,138 @@
+/* MovementControls.module.css */
+
+.controlsInfo {
+    text-align: center;
+    margin-top: 1.5rem;
+    color: #a0aec0;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  /* Movement Controls */
+  .movementControls {
+    background: rgba(255, 255, 255, 0.05);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 12px;
+    margin-top: 1rem;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .controlsTitle {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #00d4ff;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  
+  .controlsGrid {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .controlRow {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  
+  .controlSpacer {
+    width: 35px;
+  }
+  
+  .moveButton {
+    width: 35px;
+    height: 35px;
+    border: none;
+    border-radius: 6px;
+    background: linear-gradient(135deg, #00d4ff, #48e5f0);
+    color: #fff;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .moveButton:hover:not(:disabled) {
+    background: linear-gradient(135deg, #48e5f0, #ff00bf);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 212, 255, 0.4);
+  }
+  
+  .moveButton:active:not(:disabled) {
+    transform: translateY(0);
+    box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+  }
+  
+  .moveButton:disabled {
+    background: rgba(255, 255, 255, 0.1);
+    color: rgba(255, 255, 255, 0.3);
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+  
+  /* Touch device optimization */
+  @media (hover: none) {
+    .moveButton {
+      width: 45px;
+      height: 45px;
+      font-size: 16px;
+    }
+    
+    .moveButton:active:not(:disabled) {
+      background: linear-gradient(135deg, #48e5f0, #ff00bf);
+      box-shadow: 0 4px 16px rgba(0, 212, 255, 0.4);
+    }
+  }
+  
+  /* Responsive Design - Mobile First Approach */
+  /* Mobile devices (320px - 480px) */
+  @media (max-width: 480px) {
+    .controlsInfo {
+      font-size: 12px;
+    }
+  }
+  
+  /* Landscape orientation for mobile */
+  @media (max-height: 500px) and (orientation: landscape) {
+    .controlsInfo {
+      display: none;
+    }
+    
+    .movementControls {
+      position: fixed;
+      right: 1rem;
+      bottom: 1rem;
+      background: rgba(0, 0, 0, 0.8);
+      z-index: 100;
+    }
+  }
+  
+  /* High resolution displays */
+  @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+    .moveButton {
+      image-rendering: -webkit-optimize-contrast;
+      image-rendering: crisp-edges;
+    }
+  }
+  
+  /* Accessibility - Reduced Motion */
+  @media (prefers-reduced-motion: reduce) {
+    * {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
