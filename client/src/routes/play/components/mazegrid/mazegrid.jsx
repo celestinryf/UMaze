@@ -62,8 +62,8 @@ const EnvironmentImages = {
 };
 
 const PotionImages = {
-  1: heal_potion,
-  2: attack_potion
+  "Health": heal_potion,
+  "Attack": attack_potion
 };
 
 // Utility function
@@ -190,7 +190,7 @@ const MazeGrid = ({
                       )}
                       
                       {/* Potion */}
-                      {cell.PotionType > 0 && (
+                      {cell.PotionType > '' && (
                         <div className={`${styles.potionIndicator} ${styles[`potion${cell.PotionType}`]}`}>
                           {PotionImages[cell.PotionType] ? (
                             <img 
