@@ -26,7 +26,7 @@ var (
 // Initialize the server and Redis once
 func initServer() {
 	once.Do(func() {
-		// Initialize Redis client
+
 		redisURL := os.Getenv("REDIS_URL")
 		if redisURL == "" {
 			log.Fatal("REDIS_URL environment variable is required")
@@ -34,7 +34,6 @@ func initServer() {
 
 		log.Printf("Connecting to Redis...")
 
-		// Parse Redis URL
 		opt, err := redis.ParseURL(redisURL)
 		if err != nil {
 			log.Fatalf("Failed to parse REDIS_URL: %v", err)
@@ -42,7 +41,6 @@ func initServer() {
 
 		redisClient = redis.NewClient(opt)
 
-		// Test Redis connection
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
 
@@ -52,11 +50,9 @@ func initServer() {
 		}
 		log.Println("Successfully connected to Redis!")
 
-		// Load environment variables for Turso
 		dbURL := os.Getenv("TURSO_DATABASE_URL")
 		authToken := os.Getenv("TURSO_AUTH_TOKEN")
 
-		// Debug: Print what we're getting from environment
 		log.Printf("TURSO_DATABASE_URL: '%s'", dbURL)
 		log.Printf("TURSO_AUTH_TOKEN length: %d", len(authToken))
 
@@ -64,7 +60,6 @@ func initServer() {
 			log.Fatal("TURSO_DATABASE_URL environment variable is not set or is empty")
 		}
 
-		// Build connection string with auth token
 		connStr := dbURL
 		if authToken != "" {
 			connStr = fmt.Sprintf("%s?authToken=%s", dbURL, authToken)
@@ -72,18 +67,15 @@ func initServer() {
 
 		log.Printf("Connecting to Turso database: %s", dbURL)
 
-		// Initialize database connection
 		db, err := sql.Open("libsql", connStr)
 		if err != nil {
 			log.Fatalf("Failed to connect to database: %v", err)
 		}
 
-		// Configure database for serverless
 		db.SetMaxOpenConns(10)
 		db.SetMaxIdleConns(5)
 		db.SetConnMaxLifetime(5 * time.Minute)
 
-		// Test the connection
 		if err := db.Ping(); err != nil {
 			log.Fatalf("Failed to ping database: %v", err)
 		}

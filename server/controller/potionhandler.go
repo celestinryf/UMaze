@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -22,15 +23,17 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 		// get username
 		var CurrPotion struct {
 			PotionType string `json:"potion_type"`
-			// Username   string `json:"username"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&CurrPotion); err != nil {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		// get redis game
-		game := s.redisGetGame(username)
-		// update potion
+		game, err := s.redisGetGame(username)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
 		if CurrPotion.PotionType == "Health" && hasPotionAndRemove(&game.TheHero.AquiredPotions, "Health") {
 			if game.TheHero.Name == "PRIMO" {
 				game.TheHero.CurrHealth += 150
@@ -48,7 +51,11 @@ func (s *Server) PotionHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 		// save to redis
-		s.redisSetGame(username, game)
+		err = s.redisSetGame(username, game)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// send to front end
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)

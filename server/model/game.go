@@ -2,6 +2,7 @@ package model
 
 import (
 	"database/sql"
+	"errors"
 
 	_ "github.com/tursodatabase/libsql-client-go/libsql"
 )
@@ -14,26 +15,35 @@ type Game struct {
 }
 
 // Gives an initialzed game.
-func InitGame(theHeroType string, db *sql.DB, mazeSize int) *Game {
+func InitGame(theHeroType string, db *sql.DB, mazeSize int) (*Game, error) {
 
-	hero, _ := initHero(theHeroType, db)
+	hero, err := initHero(theHeroType, db)
+	if err != nil {
+		return nil, err
+	}
+
+	maze, err := initMaze(db, mazeSize)
+	if err != nil {
+		return nil, err
+	}
 
 	return &Game{
-		TheMaze: initMaze(db, mazeSize),
+		TheMaze: maze,
 		TheHero: hero,
 		Status:  "InProgress",
-	}
+	}, nil
 }
 
 // Sets curr location to x and y
-func (g *Game) Move(newCoords *Coords) {
+func (g *Game) Move(newCoords *Coords) error {
 
-	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomMonster != nil {
-		return
+	if newCoords == nil {
+		return errors.New("coords are nil")
 	}
 
-	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == "Wall" {
-		return
+	if g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomMonster != nil ||
+		g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y].RoomType == "Wall" {
+		return nil
 	}
 
 	g.TheMaze.CurrCoords = newCoords
@@ -66,19 +76,20 @@ func (g *Game) Move(newCoords *Coords) {
 
 	if g.TheHero.CurrHealth <= 0 {
 		g.Status = "Lost"
-		return
+		return nil
 	}
 
 	if currRoom.RoomType == "Exit" && len(g.TheHero.AquiredPillars) == 4 {
 		g.Status = "Won"
-		return
+		return nil
 	}
+
+	return nil
 }
 
-// attack
+// attack given a bool of whether or not the user is
+// doing a special attack.
 func (g *Game) Attack(specialAttack bool) {
-
-	// fix curr vs normal cooldown
 
 	room := g.TheMaze.Grid[g.TheMaze.CurrCoords.X][g.TheMaze.CurrCoords.Y]
 	roomMonster := room.RoomMonster
@@ -88,7 +99,6 @@ func (g *Game) Attack(specialAttack bool) {
 		return
 	}
 
-	// attack the monster
 	if specialAttack {
 		if hero.Name == "CELESTIN" {
 			roomMonster.CurrHealth /= 2

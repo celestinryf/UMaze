@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -17,7 +18,6 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodPut:
-
 		var AttackJson struct {
 			SpecialAttack bool `json:"SpecialAttack"`
 		}
@@ -26,11 +26,19 @@ func (s *Server) BattleHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// get game from redis
-		game := s.redisGetGame(username)
+		game, err := s.redisGetGame(username)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// update game
 		game.Attack(AttackJson.SpecialAttack)
 		//  save to redis
-		s.redisSetGame(username, game)
+		err = s.redisSetGame(username, game)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// send to frontend
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode hero and monster", http.StatusInternalServerError)

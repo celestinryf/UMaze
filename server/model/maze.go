@@ -2,7 +2,7 @@ package model
 
 import (
 	"database/sql"
-	"log"
+	"errors"
 	"math/rand"
 	"slices"
 )
@@ -19,24 +19,19 @@ type Maze struct {
 	CurrCoords *Coords   `json:"CurrCoords"`
 }
 
-// Gives the status of the game
-type GameStatus int
-
-const (
-	Won GameStatus = iota
-	Lost
-	InProgress
-)
-
 // inits the maze struct and returns a pointer to a maze
-func initMaze(db *sql.DB, mazeSize int) *Maze {
+func initMaze(db *sql.DB, mazeSize int) (*Maze, error) {
 
-	grid, _ := newGrid(mazeSize)
-
-	newMaze := Maze{
-		Grid:       grid,
-		CurrCoords: nil,
+	if db == nil {
+		return nil, errors.New("db is nil")
 	}
+
+	grid, err := newGrid(mazeSize)
+	if err != nil {
+		return nil, err
+	}
+
+	newMaze := Maze{Grid: grid}
 
 	validRooms := make([]*Room, 0)
 	for i := range newMaze.Grid {
@@ -63,8 +58,7 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 
 	roomGenerator, err := getSetUpRoom(db)
 	if err != nil {
-		// fix later
-		log.Fatal(err)
+		return nil, err
 	}
 
 	for _, room := range validRooms {
@@ -82,5 +76,5 @@ func initMaze(db *sql.DB, mazeSize int) *Maze {
 		}
 	}
 
-	return &newMaze
+	return &newMaze, nil
 }

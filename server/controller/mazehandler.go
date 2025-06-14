@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -21,9 +22,7 @@ func (s *Server) MoveHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPut: // gives an x and a y and change to that location
-		// decode body
 		var MoveJson struct {
-			// Username     string       `json:"username"`
 			UpdatedCoord model.Coords `json:"new_coords"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&MoveJson); err != nil {
@@ -31,11 +30,24 @@ func (s *Server) MoveHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// get game from redis
-		game := s.redisGetGame(username)
+		game, err := s.redisGetGame(username)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+
 		// update game
-		game.Move(&MoveJson.UpdatedCoord)
+		err = game.Move(&MoveJson.UpdatedCoord)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// save to redi
-		s.redisSetGame(username, game)
+		err = s.redisSetGame(username, game)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// send to front
 		json.NewEncoder(w).Encode(game)
 	default:
