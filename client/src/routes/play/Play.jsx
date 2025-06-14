@@ -99,6 +99,10 @@ const Play = () => {
     setGMessage(message);
   };
 
+  const handleBattleGameUpdate = (updatedGameData) => {
+    setGameData(updatedGameData);
+  };
+
   const handleSidebarGameUpdate = (updatedGameData) => {
     setGameData(updatedGameData);
   };
@@ -179,6 +183,7 @@ const Play = () => {
           collectedPotions={collectedPotions}
           onBattleEnd={handleBattleEnd}
           gameAPI={gameAPI}
+          onGameUpdate={handleBattleGameUpdate}
         />
       )}
 

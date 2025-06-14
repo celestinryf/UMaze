@@ -43,7 +43,7 @@ const HealthBar = ({ current, total, label, showLabel = true, className = '' }) 
   </div>
 );
 
-const BattleOverlay = ({ hero, monster, collectedPotions, onBattleEnd, gameAPI }) => {
+const BattleOverlay = ({ hero, monster, collectedPotions, onBattleEnd, gameAPI, onGameUpdate }) => {
   const [currentHero, setCurrentHero] = useState(hero);
   const [currentMonster, setCurrentMonster] = useState(monster);
   const [battleMessage, setBattleMessage] = useState(`A wild ${monster.Name} appears!`);
@@ -64,6 +64,11 @@ const BattleOverlay = ({ hero, monster, collectedPotions, onBattleEnd, gameAPI }
       
       // Update local state with the result
       setCurrentHero(result.Hero);
+      
+      // Update main game state if callback is provided
+      if (onGameUpdate) {
+        onGameUpdate(result);
+      }
       
       const updatedMonster = result?.Maze?.Grid?.[result.Maze.CurrCoords.X]?.[result.Maze.CurrCoords.Y]?.RoomMonster;
       const attackType = isSpecial ? 'special attack' : 'attack';
@@ -112,6 +117,12 @@ const BattleOverlay = ({ hero, monster, collectedPotions, onBattleEnd, gameAPI }
       
       // Update local hero state
       setCurrentHero(result.Hero);
+      
+      // Update main game state if callback is provided (THIS WAS MISSING!)
+      if (onGameUpdate) {
+        onGameUpdate(result);
+      }
+      
       setBattleMessage(`Used ${getName(potionType, POTION_TYPES)}! ${potionType === 'Health' ? 'Health restored!' : 'Attack boosted!'}`);
     } catch (err) {
       setBattleMessage(`Buzz Ball use failed: ${err.message}`);
@@ -192,7 +203,6 @@ const BattleOverlay = ({ hero, monster, collectedPotions, onBattleEnd, gameAPI }
         )}
 
         {/* Battle Actions */}
-        {!isMonsterDefeated ? (
           <div className={styles.battleActions}>
             <button 
               onClick={() => attackMonster(false)} 
@@ -229,18 +239,6 @@ const BattleOverlay = ({ hero, monster, collectedPotions, onBattleEnd, gameAPI }
               );
             })}
           </div>
-        ) : (
-          <div className={styles.battleVictory}>
-            <p>Victory! The {currentMonster.Name} has been defeated!</p>
-            <button 
-              onClick={continueBattle} 
-              className={styles.battleButton}
-              disabled={isProcessing}
-            >
-              {isProcessing ? 'Loading...' : 'Continue'}
-            </button>
-          </div>
-        )}
       </div>
     </div>
   );
