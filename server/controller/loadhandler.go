@@ -3,6 +3,7 @@ package controller
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 )
@@ -33,7 +34,14 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		// Normal behavior: list saved games
-		if err := json.NewEncoder(w).Encode(s.getSavedGames(username)); err != nil {
+		savedGames, err := s.getSavedGames(username)
+		if err != nil {
+			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
+			fmt.Println(err)
+			return
+		}
+
+		if err := json.NewEncoder(w).Encode(savedGames); err != nil {
 			http.Error(w, "Failed to encode stored games", http.StatusInternalServerError)
 			return
 		}
@@ -45,7 +53,11 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.saveGame(username, dataName.Name)
+		err := s.saveGame(username, dataName.Name)
+		if err != nil {
+			fmt.Print(err)
+			return
+		}
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game saved successfully",
@@ -58,7 +70,11 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.loadGame(username, dataId.Id)
+		err := s.loadGame(username, dataId.Id)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game loaded successfully",
@@ -71,7 +87,11 @@ func (s *Server) LoadHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		s.deleteGame(dataId.Id)
+		err := s.deleteGame(dataId.Id)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		json.NewEncoder(w).Encode(map[string]string{
 			"status":  "success",
 			"message": "Game deleted successfully",
