@@ -17,7 +17,7 @@ type Monster struct {
 func initMonster(db *sql.DB) (*Monster, error) {
 
 	if db == nil {
-		return nil, errors.New("Database is nil")
+		return nil, errors.New("database is nil")
 	}
 
 	var (

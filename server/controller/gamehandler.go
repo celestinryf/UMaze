@@ -2,6 +2,7 @@ package controller
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
 
@@ -21,7 +22,6 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case http.MethodPost:
-		//decode body
 		var HeroIdJson struct {
 			HeroId   string `json:"hero_id"`
 			MazeSize int    `json:"maze_size"`
@@ -30,17 +30,28 @@ func (s *Server) GameHandler(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request body", http.StatusBadRequest)
 			return
 		}
-		// make game
-		newGame := model.InitGame(HeroIdJson.HeroId, s.DB, HeroIdJson.MazeSize)
+		newGame, err := model.InitGame(HeroIdJson.HeroId, s.DB, HeroIdJson.MazeSize)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// set up redis
-		s.redisSetGame(username, *newGame)
+		err = s.redisSetGame(username, newGame)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// send to front
 		if err := json.NewEncoder(w).Encode(newGame); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
 		}
 	case http.MethodGet: // gets curr game json
 		// get game
-		game := s.redisGetGame(username)
+		game, err := s.redisGetGame(username)
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
 		// send to front
 		if err := json.NewEncoder(w).Encode(game); err != nil {
 			http.Error(w, "Failed to encode game state", http.StatusInternalServerError)
